@@ -3,291 +3,458 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control Financiero & E-commerce Suite</title>
+  <title>Control Financiero Empresarial & Personal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <!-- Chart.js para métricas y gráficos visuales -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
   <div class="max-w-7xl mx-auto space-y-5">
 
-    <!-- Header Principal -->
+    <!-- HEADER PRINCIPAL CON LOGO Y WORKSPACE SWITCHER -->
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/90 backdrop-blur p-4 rounded-2xl border border-slate-800 gap-4">
-      <div>
-        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-          <span>📊</span> Centro de Comando Financiero
-        </h1>
-        <p class="text-slate-400 text-xs md:text-sm">Control de Unit Economics, Dropi, Meta Ads y Rentabilidad Real</p>
-      </div>
       
-      <div class="flex flex-wrap items-center gap-2.5">
-        <button onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow-lg shadow-sky-600/20">
-          <span>📁</span> Importar CSV Shopify
+      <!-- Logo + Título -->
+      <div class="flex items-center gap-3.5">
+        <div id="contenedor-logo" class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shrink-0">
+          <img id="app-logo" src="" alt="Logo" class="w-full h-full object-contain p-1 hidden">
+          <span id="app-logo-fallback" class="text-xl">💼</span>
+        </div>
+        <div>
+          <h1 id="workspace-titulo" class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            Tienda Dropshipping & E-commerce
+          </h1>
+          <p id="workspace-subtitulo" class="text-slate-400 text-xs">Unit Economics, Dropi, Meta Ads y Utilidad Real</p>
+        </div>
+      </div>
+
+      <!-- Selector de Workspace y Filtro de Mes -->
+      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+        
+        <!-- Switcher de Espacios -->
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <button onclick="cambiarWorkspace('dropshipping')" id="btn-ws-drop" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition">
+            🛍️ Dropshipping
+          </button>
+          <button onclick="cambiarWorkspace('personal')" id="btn-ws-pers" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+            👤 Honorarios & Personal
+          </button>
+        </div>
+
+        <!-- Botón CSV (solo activo en Drop) -->
+        <button id="btn-import-csv" onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <span>📁</span> Importar CSV
         </button>
+
+        <!-- Filtro Mes -->
         <div class="flex items-center bg-slate-800 rounded-xl px-2.5 py-1.5 border border-slate-700">
           <label class="text-xs text-slate-400 mr-2">Mes:</label>
-          <input type="month" id="filtro-mes" class="bg-transparent text-sm text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
+          <input type="month" id="filtro-mes" class="bg-transparent text-xs md:text-sm text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
         </div>
+
       </div>
     </header>
 
-    <!-- Navegación por Pestañas -->
-    <nav class="flex border-b border-slate-800 gap-2 text-xs md:text-sm font-medium">
-      <button onclick="cambiarTab('dashboard')" id="tab-dashboard-btn" class="tab-btn active-tab px-4 py-2.5 border-b-2 border-sky-500 text-sky-400 font-semibold transition">
-        📈 Dashboard & Métricas
-      </button>
-      <button onclick="cambiarTab('pedidos')" id="tab-pedidos-btn" class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-        📦 Pedidos & Dropi
-      </button>
-      <button onclick="cambiarTab('ads')" id="tab-ads-btn" class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-        📢 Meta Ads
-      </button>
-      <button onclick="cambiarTab('costos')" id="tab-costos-btn" class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-        ⚙️ Suscripciones & Fijos
-      </button>
-    </nav>
+    <!-- ========================================== -->
+    <!-- ESPACIO 1: DROPSHIPPING & E-COMMERCE       -->
+    <!-- ========================================== -->
+    <div id="workspace-dropshipping" class="space-y-5">
+      
+      <!-- Navegación Tabs Drop -->
+      <nav class="flex border-b border-slate-800 gap-2 text-xs md:text-sm font-medium">
+        <button onclick="cambiarTabDrop('dashboard')" id="tab-drop-dash-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-sky-500 text-sky-400 font-semibold transition">
+          📈 Dashboard & Métricas
+        </button>
+        <button onclick="cambiarTabDrop('pedidos')" id="tab-drop-ped-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+          📦 Pedidos & Dropi
+        </button>
+        <button onclick="cambiarTabDrop('ads')" id="tab-drop-ads-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+          📢 Meta Ads
+        </button>
+        <button onclick="cambiarTabDrop('costos')" id="tab-drop-cost-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+          ⚙️ Suscripciones & Fijos
+        </button>
+      </nav>
 
-    <!-- KPIs Principales (Siempre Visibles) -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <span class="text-slate-400 text-xs font-semibold uppercase">Ventas Brutas</span>
-        <p id="kpi-ventas" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
-        <span id="kpi-num-ventas" class="text-[11px] text-slate-500">0 pedidos</span>
+      <!-- KPIs Drop -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Ventas Brutas</span>
+          <p id="kpi-ventas" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
+          <span id="kpi-num-ventas" class="text-[11px] text-slate-500">0 pedidos</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Costos Dropi</span>
+          <p id="kpi-dropi" class="text-xl font-bold text-amber-400 mt-1">$0</p>
+          <span id="kpi-margen-bruto" class="text-[11px] text-slate-400">Margen: $0</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Meta Ads</span>
+          <p id="kpi-ads" class="text-xl font-bold text-indigo-400 mt-1">$0</p>
+          <span id="kpi-roas" class="text-[11px] text-indigo-300 font-medium">ROAS: 0.0x</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Costos Fijos</span>
+          <p id="kpi-fijos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
+          <span id="kpi-fijos-sub" class="text-[11px] text-slate-500">Prorrateados</span>
+        </div>
+        <div class="col-span-2 md:col-span-1 bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Utilidad Neta</span>
+          <p id="kpi-utilidad" class="text-xl font-bold text-sky-400 mt-1">$0</p>
+          <span id="kpi-margen-neto" class="text-[11px] font-medium text-slate-300">Margen: 0%</span>
+        </div>
       </div>
 
-      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <span class="text-slate-400 text-xs font-semibold uppercase">Costos Directos (Dropi)</span>
-        <p id="kpi-dropi" class="text-xl font-bold text-amber-400 mt-1">$0</p>
-        <span id="kpi-margen-bruto" class="text-[11px] text-slate-400">Margen Bruto: $0</span>
+      <!-- Tab: Dashboard Drop -->
+      <div id="tab-drop-dashboard" class="tab-drop-content space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Tendencia Diaria: Ventas vs Costos Variables</h3>
+            <div class="h-64 relative"><canvas id="chart-evolucion"></canvas></div>
+          </div>
+          <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Costos</h3>
+            <div class="h-56 relative flex items-center justify-center"><canvas id="chart-distribucion"></canvas></div>
+            <div id="distribucion-leyenda" class="text-xs text-slate-400 grid grid-cols-3 text-center pt-3 border-t border-slate-800/80 gap-1"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">Ticket Promedio (AOV)</span>
+            <p id="kpi-aov" class="text-lg font-bold text-slate-200 mt-1">$0</p>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">CPA Promedio (Costo Ad / Pedido)</span>
+            <p id="kpi-cpa" class="text-lg font-bold text-indigo-300 mt-1">$0</p>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">Ganancia Neta por Pedido</span>
+            <p id="kpi-profit-unit" class="text-lg font-bold text-sky-400 mt-1">$0</p>
+          </div>
+        </div>
       </div>
 
-      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-        <span class="text-slate-400 text-xs font-semibold uppercase">Inversión Meta Ads</span>
-        <p id="kpi-ads" class="text-xl font-bold text-indigo-400 mt-1">$0</p>
-        <span id="kpi-roas" class="text-[11px] text-indigo-300 font-medium">ROAS: 0.0x</span>
+      <!-- Tab: Pedidos Drop -->
+      <div id="tab-drop-pedidos" class="tab-drop-content hidden space-y-4">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">➕ Registrar Nuevo Pedido</h2>
+          <form id="form-venta" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
+            <div>
+              <label class="text-slate-400">Fecha</label>
+              <input type="date" id="v-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <div class="col-span-2 md:col-span-3">
+              <label class="text-slate-400">Detalle / ID Pedido / Cliente</label>
+              <input type="text" id="v-detalle" placeholder="Ej: #1024 - Cecilia Navarrete" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Total Cobrado ($)</label>
+              <input type="number" id="v-ingreso" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Costo Proveedor ($)</label>
+              <input type="number" id="v-costo-prod" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Flete / Envío ($)</label>
+              <input type="number" id="v-costo-envio" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Comisión Dropi ($)</label>
+              <input type="number" id="v-comision-dropi" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <button type="submit" class="col-span-2 md:col-span-4 bg-emerald-600 hover:bg-emerald-500 font-medium py-2.5 rounded-xl text-white transition text-xs mt-1">
+              Guardar Pedido
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="p-3.5 border-b border-slate-800">
+            <h3 class="text-xs font-semibold uppercase text-slate-400">Listado de Pedidos del Mes</h3>
+          </div>
+          <div class="overflow-x-auto max-h-[500px]">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
+                <tr>
+                  <th class="p-3">Fecha</th>
+                  <th class="p-3">Pedido / Detalle</th>
+                  <th class="p-3 text-right">Venta</th>
+                  <th class="p-3 text-right">Costos Dropi</th>
+                  <th class="p-3 text-right">Margen</th>
+                  <th class="p-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-ventas" class="divide-y divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <span class="text-slate-400 text-xs font-semibold uppercase">Costos Fijos Mes</span>
-        <p id="kpi-fijos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
-        <span id="kpi-fijos-sub" class="text-[11px] text-slate-500">0 servicios activos</span>
+      <!-- Tab: Ads Drop -->
+      <div id="tab-drop-ads" class="tab-drop-content hidden space-y-4">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <h2 class="text-sm font-semibold uppercase text-indigo-400 mb-3">📢 Registrar Gasto Diario Meta Ads</h2>
+          <form id="form-ads" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+            <div>
+              <label class="text-slate-400">Fecha</label>
+              <input type="date" id="ads-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Gasto Total Pauta ($)</label>
+              <input type="number" id="ads-monto" min="1" placeholder="Ej: 15000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-indigo-300 font-semibold mt-1">
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 font-medium py-2 rounded-lg text-white transition text-xs">
+                Guardar Gasto
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="p-3.5 border-b border-slate-800">
+            <h3 class="text-xs font-semibold uppercase text-slate-400">Historial de Publicidad</h3>
+          </div>
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
+                <tr>
+                  <th class="p-3">Fecha</th>
+                  <th class="p-3">Plataforma</th>
+                  <th class="p-3 text-right">Inversión</th>
+                  <th class="p-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-ads" class="divide-y divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div class="col-span-2 md:col-span-1 bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <span class="text-slate-400 text-xs font-semibold uppercase">Utilidad Neta Real</span>
-        <p id="kpi-utilidad" class="text-xl font-bold text-sky-400 mt-1">$0</p>
-        <span id="kpi-margen-neto" class="text-[11px] font-medium text-slate-300">Margen: 0%</span>
+      <!-- Tab: Costos Fijos Drop -->
+      <div id="tab-drop-costos" class="tab-drop-content hidden space-y-4">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">⚙️ Configurar Suscripción de la Tienda</h2>
+          <form id="form-costo" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+            <div>
+              <label class="text-slate-400">Herramienta / Software</label>
+              <input type="text" id="c-nombre" placeholder="Ej: Shopify, Dominio, Apps" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Ciclo</label>
+              <select id="c-frecuencia" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                <option value="30">Mensual (30 días)</option>
+                <option value="90">Trimestral (90 días)</option>
+                <option value="365">Anual (365 días)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-slate-400">Monto Cobrado ($)</label>
+              <input type="number" id="c-monto" min="1" placeholder="Total cobrado" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            </div>
+            <button type="submit" class="col-span-1 md:col-span-3 bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs mt-1">
+              Guardar Costo Fijo
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="p-3.5 border-b border-slate-800">
+            <h3 class="text-xs font-semibold uppercase text-slate-400">Suscripciones Activas de la Tienda</h3>
+          </div>
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
+                <tr>
+                  <th class="p-3">Servicio</th>
+                  <th class="p-3">Frecuencia</th>
+                  <th class="p-3 text-right">Monto Total</th>
+                  <th class="p-3 text-right text-rose-400">Prorrateo Mes</th>
+                  <th class="p-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-costos" class="divide-y divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
+
     </div>
 
-    <!-- PESTAÑA 1: DASHBOARD & GRÁFICOS -->
-    <div id="tab-dashboard" class="tab-content space-y-5">
+    <!-- ========================================== -->
+    <!-- ESPACIO 2: HONORARIOS & FINANZAS PERSONALES-->
+    <!-- ========================================== -->
+    <div id="workspace-personal" class="space-y-5 hidden">
+
+      <!-- KPIs Personal -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Honorarios Líquidos</span>
+          <p id="kpi-pers-ingresos" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
+          <span id="kpi-pers-bruto" class="text-[11px] text-slate-500">Bruto: $0</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Retención SII</span>
+          <p id="kpi-pers-retencion" class="text-xl font-bold text-amber-400 mt-1">$0</p>
+          <span class="text-[11px] text-slate-500">Impuesto acumulado</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Gastos Personales Totales</span>
+          <p id="kpi-pers-gastos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
+          <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Fijos vs Variables</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Ahorro / Saldo Neto Mes</span>
+          <p id="kpi-pers-ahorro" class="text-xl font-bold text-sky-400 mt-1">$0</p>
+          <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa de Ahorro: 0%</span>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
-        <!-- Gráfico Evolución Diaria (8 cols) -->
-        <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">📈 Tendencia Diaria: Ventas vs Costos Variables</h3>
-            <span class="text-xs text-slate-500">Filtrado por mes</span>
+        <!-- Columna Izquierda: Boletas de Honorarios (7 Cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Form Boleta -->
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <h2 class="text-sm font-semibold uppercase text-emerald-400 mb-3">📄 Registrar Boleta de Honorarios</h2>
+            <form id="form-honorario" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+              <div>
+                <label class="text-slate-400">Fecha Emisión</label>
+                <input type="date" id="h-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div class="col-span-2">
+                <label class="text-slate-400">Cliente / Empresa</label>
+                <input type="text" id="h-cliente" placeholder="Ej: Consultoría ABC SpA" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div class="col-span-3">
+                <label class="text-slate-400">Glosa / Detalle del Servicio</label>
+                <input type="text" id="h-detalle" placeholder="Ej: Servicios profesionales de marketing y gestión comercial" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div>
+                <label class="text-slate-400">Monto Bruto ($)</label>
+                <input type="number" id="h-bruto" min="1" placeholder="Ej: 1000000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1" oninput="calcularLiquidoHonorario()">
+              </div>
+              <div>
+                <label class="text-slate-400">Tasa Retención SII (%)</label>
+                <input type="number" id="h-ret-tasa" step="0.01" value="15.25" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="calcularLiquidoHonorario()">
+              </div>
+              <div>
+                <label class="text-slate-400">Monto Líquido a Recibir</label>
+                <input type="text" id="h-liquido-calc" readonly value="$0" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sky-400 font-bold mt-1">
+              </div>
+              <div class="col-span-3 flex items-center justify-between pt-1">
+                <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                  <input type="checkbox" id="h-pagada" class="rounded bg-slate-800 border-slate-700 text-emerald-600 focus:ring-0">
+                  <span>¿Ya fue pagada / depositada?</span>
+                </label>
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-xl transition text-xs">
+                  Guardar Boleta
+                </button>
+              </div>
+            </form>
           </div>
-          <div class="h-64 relative">
-            <canvas id="chart-evolucion"></canvas>
+
+          <!-- Tabla Boletas -->
+          <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+            <div class="p-3.5 border-b border-slate-800">
+              <h3 class="text-xs font-semibold uppercase text-slate-400">Boletas Emitidas del Mes</h3>
+            </div>
+            <div class="overflow-x-auto max-h-80">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
+                  <tr>
+                    <th class="p-2.5">Fecha</th>
+                    <th class="p-2.5">Cliente / Detalle</th>
+                    <th class="p-2.5 text-right">Bruto</th>
+                    <th class="p-2.5 text-right">Líquido</th>
+                    <th class="p-2.5 text-center">Estado</th>
+                    <th class="p-2.5 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-honorarios" class="divide-y divide-slate-800"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        <!-- Gráfico Distribución de Costos (4 cols) -->
-        <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
-          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3">🍩 Distribución de Costos</h3>
-          <div class="h-56 relative flex items-center justify-center">
-            <canvas id="chart-distribucion"></canvas>
+        <!-- Columna Derecha: Gastos Personales (5 Cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <!-- Form Gasto Personal -->
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <h2 class="text-sm font-semibold uppercase text-rose-400 mb-3">💸 Registrar Gasto Personal</h2>
+            <form id="form-gasto-pers" class="grid grid-cols-2 gap-2.5 text-xs">
+              <div>
+                <label class="text-slate-400">Fecha</label>
+                <input type="date" id="gp-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div>
+                <label class="text-slate-400">Categoría</label>
+                <select id="gp-categoria" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <option value="Vivienda/Arriendo">Vivienda / Arriendo / GGCC</option>
+                  <option value="Servicios Básicos">Servicios (Luz, Agua, Gas, Internet)</option>
+                  <option value="Supermercado/Comida">Supermercado & Alimentación</option>
+                  <option value="Transporte/Auto">Transporte / Bencina / Tag</option>
+                  <option value="Salud/Seguros">Salud / Seguros / Farmacia</option>
+                  <option value="Educación/Cursos">Educación & Formación</option>
+                  <option value="Ocio/Personal">Ocio / Salidas / Personal</option>
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+              <div class="col-span-2">
+                <label class="text-slate-400">Descripción</label>
+                <input type="text" id="gp-desc" placeholder="Ej: Pago arriendo depto" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div>
+                <label class="text-slate-400">Monto ($)</label>
+                <input type="number" id="gp-monto" min="1" placeholder="Ej: 350000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-rose-400 font-semibold mt-1">
+              </div>
+              <div>
+                <label class="text-slate-400">Tipo de Gasto</label>
+                <select id="gp-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <option value="fijo">Gasto Fijo Mensual</option>
+                  <option value="variable">Gasto Variable / Diario</option>
+                </select>
+              </div>
+              <button type="submit" class="col-span-2 bg-rose-600 hover:bg-rose-500 font-medium py-2 rounded-xl text-white transition text-xs mt-1">
+                Guardar Gasto Personal
+              </button>
+            </form>
           </div>
-          <div id="distribucion-leyenda" class="text-xs text-slate-400 grid grid-cols-3 text-center pt-3 border-t border-slate-800/80 gap-1">
-            <!-- Dinámico -->
+
+          <!-- Tabla Gastos Personales -->
+          <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+            <div class="p-3.5 border-b border-slate-800">
+              <h3 class="text-xs font-semibold uppercase text-slate-400">Historial Gastos del Mes</h3>
+            </div>
+            <div class="overflow-x-auto max-h-80">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
+                  <tr>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Detalle / Cat</th>
+                    <th class="p-2 text-right">Monto</th>
+                    <th class="p-2 text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-gastos-pers" class="divide-y divide-slate-800"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-      </div>
-
-      <!-- Resumen de Unit Economics Unitarios -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400 font-semibold">Ticket Promedio (AOV)</span>
-          <p id="kpi-aov" class="text-lg font-bold text-slate-200 mt-1">$0</p>
-        </div>
-        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400 font-semibold">CPA Promedio (Costo Ad / Pedido)</span>
-          <p id="kpi-cpa" class="text-lg font-bold text-indigo-300 mt-1">$0</p>
-        </div>
-        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400 font-semibold">Ganancia Neta Promedio por Pedido</span>
-          <p id="kpi-profit-unit" class="text-lg font-bold text-sky-400 mt-1">$0</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- PESTAÑA 2: PEDIDOS & DROPI -->
-    <div id="tab-pedidos" class="tab-content hidden space-y-4">
-      <!-- Formulario Venta Dropi -->
-      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">➕ Registrar Nuevo Pedido</h2>
-        <form id="form-venta" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
-          <div>
-            <label class="text-slate-400">Fecha</label>
-            <input type="date" id="v-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <div class="col-span-2 md:col-span-3">
-            <label class="text-slate-400">Detalle / ID Pedido / Cliente</label>
-            <input type="text" id="v-detalle" placeholder="Ej: #1024 - Cecilia Navarrete" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <div>
-            <label class="text-slate-400">Total Cobrado ($)</label>
-            <input type="number" id="v-ingreso" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
-          </div>
-          <div>
-            <label class="text-slate-400">Costo Proveedor ($)</label>
-            <input type="number" id="v-costo-prod" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <div>
-            <label class="text-slate-400">Flete / Envío ($)</label>
-            <input type="number" id="v-costo-envio" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <div>
-            <label class="text-slate-400">Comisión Dropi ($)</label>
-            <input type="number" id="v-comision-dropi" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <button type="submit" class="col-span-2 md:col-span-4 bg-emerald-600 hover:bg-emerald-500 font-medium py-2.5 rounded-xl text-white transition text-xs mt-1 shadow-lg shadow-emerald-600/20">
-            Guardar Registro de Venta
-          </button>
-        </form>
-      </div>
-
-      <!-- Tabla de Ventas -->
-      <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-        <div class="p-3.5 border-b border-slate-800 flex justify-between items-center">
-          <h3 class="text-xs font-semibold uppercase text-slate-400">Pedidos Registrados del Mes</h3>
-        </div>
-        <div class="overflow-x-auto max-h-[500px]">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-              <tr>
-                <th class="p-3">Fecha</th>
-                <th class="p-3">Pedido / Detalle</th>
-                <th class="p-3 text-right">Venta</th>
-                <th class="p-3 text-right">Costos Dropi</th>
-                <th class="p-3 text-right">Margen Directo</th>
-                <th class="p-3 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-ventas" class="divide-y divide-slate-800">
-              <tr><td colspan="6" class="p-4 text-center text-slate-500">Cargando pedidos...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- PESTAÑA 3: META ADS -->
-    <div id="tab-ads" class="tab-content hidden space-y-4">
-      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <h2 class="text-sm font-semibold uppercase text-indigo-400 mb-3">📢 Inversión Diaria Meta Ads</h2>
-        <form id="form-ads" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
-          <div>
-            <label class="text-slate-400">Fecha del Gasto</label>
-            <input type="date" id="ads-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <div>
-            <label class="text-slate-400">Gasto Total Pauta ($)</label>
-            <input type="number" id="ads-monto" min="1" placeholder="Ej: 15000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-indigo-300 font-semibold mt-1">
-          </div>
-          <div class="flex items-end">
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 font-medium py-2 rounded-lg text-white transition text-xs shadow-lg shadow-indigo-600/20">
-              Guardar Gasto Diario
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-        <div class="p-3.5 border-b border-slate-800">
-          <h3 class="text-xs font-semibold uppercase text-slate-400">Historial de Pauta Publicitaria</h3>
-        </div>
-        <div class="overflow-x-auto max-h-96">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-              <tr>
-                <th class="p-3">Fecha</th>
-                <th class="p-3">Plataforma</th>
-                <th class="p-3 text-right">Inversión</th>
-                <th class="p-3 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-ads" class="divide-y divide-slate-800">
-              <tr><td colspan="4" class="p-4 text-center text-slate-500">Cargando anuncios...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- PESTAÑA 4: SUSCRIPCIONES & COSTOS FIJOS -->
-    <div id="tab-costos" class="tab-content hidden space-y-4">
-      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">⚙️ Configurar Suscripción / Costo Fijo</h2>
-        <form id="form-costo" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
-          <div>
-            <label class="text-slate-400">Herramienta / Servicio</label>
-            <input type="text" id="c-nombre" placeholder="Ej: Shopify, Dominio, ERP" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <div>
-            <label class="text-slate-400">Ciclo de Cobro</label>
-            <select id="c-frecuencia" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-              <option value="30">Mensual (30 días)</option>
-              <option value="90">Trimestral (90 días)</option>
-              <option value="365">Anual (365 días)</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-slate-400">Monto Facturado ($)</label>
-            <input type="number" id="c-monto" min="1" placeholder="Total cobrado" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          </div>
-          <button type="submit" class="col-span-1 md:col-span-3 bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs mt-1">
-            Guardar Costo Recurrente
-          </button>
-        </form>
-      </div>
-
-      <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-        <div class="p-3.5 border-b border-slate-800">
-          <h3 class="text-xs font-semibold uppercase text-slate-400">Suscripciones y Servicios Activos</h3>
-        </div>
-        <div class="overflow-x-auto max-h-96">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-              <tr>
-                <th class="p-3">Servicio</th>
-                <th class="p-3">Frecuencia</th>
-                <th class="p-3 text-right">Monto Total</th>
-                <th class="p-3 text-right text-rose-400">Prorrateo / Mes</th>
-                <th class="p-3 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-costos" class="divide-y divide-slate-800">
-              <tr><td colspan="5" class="p-4 text-center text-slate-500">Cargando costos...</td></tr>
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- MODAL DE EDICIÓN DE PEDIDO / VENTA -->
+  <!-- MODALES DE EDICIÓN Y CSV -->
+  <!-- 1. Modal Editar Venta Drop -->
   <div id="modal-editar-venta" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h2 class="text-base font-bold text-white">✏️ Editar Registro de Pedido</h2>
+        <h2 class="text-base font-bold text-white">✏️ Editar Pedido Dropi</h2>
         <button onclick="cerrarModalEditarVenta()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
       <form id="form-editar-venta" class="space-y-3 text-xs">
@@ -326,17 +493,17 @@
     </div>
   </div>
 
-  <!-- MODAL DE EDICIÓN DE COSTO FIJO -->
+  <!-- 2. Modal Editar Costo Drop -->
   <div id="modal-editar-costo" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h2 class="text-base font-bold text-white">✏️ Editar Costo Fijo / Suscripción</h2>
+        <h2 class="text-base font-bold text-white">✏️ Editar Costo Fijo Tienda</h2>
         <button onclick="cerrarModalEditarCosto()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
       <form id="form-editar-costo" class="space-y-3 text-xs">
         <input type="hidden" id="edit-c-id">
         <div>
-          <label class="text-slate-400">Servicio / Herramienta</label>
+          <label class="text-slate-400">Servicio</label>
           <input type="text" id="edit-c-nombre" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
         </div>
         <div>
@@ -348,7 +515,7 @@
           </select>
         </div>
         <div>
-          <label class="text-slate-400">Monto Facturado ($)</label>
+          <label class="text-slate-400">Monto Cobrado ($)</label>
           <input type="number" id="edit-c-monto" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
@@ -359,7 +526,53 @@
     </div>
   </div>
 
-  <!-- MODAL CSV SHOPIFY -->
+  <!-- 3. Modal Editar Boleta -->
+  <div id="modal-editar-honorario" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white">✏️ Editar Boleta de Honorarios</h2>
+        <button onclick="cerrarModalEditarHonorario()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+      <form id="form-editar-honorario" class="space-y-3 text-xs">
+        <input type="hidden" id="edit-h-id">
+        <div>
+          <label class="text-slate-400">Fecha</label>
+          <input type="date" id="edit-h-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+        </div>
+        <div>
+          <label class="text-slate-400">Cliente / Empresa</label>
+          <input type="text" id="edit-h-cliente" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+        </div>
+        <div>
+          <label class="text-slate-400">Glosa / Detalle</label>
+          <input type="text" id="edit-h-detalle" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-slate-400">Monto Bruto ($)</label>
+            <input type="number" id="edit-h-bruto" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Tasa Retención (%)</label>
+            <input type="number" step="0.01" id="edit-h-ret-tasa" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+        </div>
+        <div>
+          <label class="text-slate-400">Estado de Pago</label>
+          <select id="edit-h-estado" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <option value="pendiente">Pendiente por cobrar</option>
+            <option value="pagada">Pagada / Depositada</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalEditarHonorario()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl transition">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Modal CSV Shopify -->
   <div id="modal-csv" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -425,190 +638,321 @@
   </div>
 
   <script>
-    // 1. SUPABASE CLIENT
+    // ==========================================
+    // CONFIGURACIÓN & CLIENTE SUPABASE
+    // ==========================================
     const SUPABASE_URL = 'https://eturayylryyhkgkmdris.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0dXJheXlscnl5aGtna21kcmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNjAxODEsImV4cCI6MjEwMjkzNjE4MX0.dShnzpUkrtBOvL2oIPoDg6LVif9D0EjbNTSYUxNTHd0';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let datosGlobales = { ventas: [], ads: [], costos: [] };
+    // PEGA AQUÍ LA URL DE TU LOGO DIRECTAMENTE
+    const URL_LOGO = 'https://drive.google.com/uc?export=view&id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx'; // Ej: 'https://mi-servidor.com/mi-logo.png'
+
+    if (URL_LOGO && URL_LOGO.trim() !== '') {
+      const imgLogo = document.getElementById('app-logo');
+      imgLogo.src = URL_LOGO;
+      imgLogo.classList.remove('hidden');
+      document.getElementById('app-logo-fallback').classList.add('hidden');
+    }
+
+    let workspaceActivo = 'dropshipping';
+    let datosDrop = { ventas: [], ads: [], costos: [] };
+    let datosPersonal = { honorarios: [], gastos: [] };
     let filasParaImportar = [];
     let chartEvolucion = null;
     let chartDistribucion = null;
 
-    // Inicializar fechas
     const hoy = new Date();
     document.getElementById('filtro-mes').value = hoy.toISOString().slice(0, 7);
     document.getElementById('v-fecha').valueAsDate = hoy;
     document.getElementById('ads-fecha').valueAsDate = hoy;
+    document.getElementById('h-fecha').valueAsDate = hoy;
+    document.getElementById('gp-fecha').valueAsDate = hoy;
 
     const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
-    function cambiarTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(el => {
+    // ==========================================
+    // WORKSPACE SWITCHER
+    // ==========================================
+    function cambiarWorkspace(ws) {
+      workspaceActivo = ws;
+      const btnDrop = document.getElementById('btn-ws-drop');
+      const btnPers = document.getElementById('btn-ws-pers');
+      const wsDrop = document.getElementById('workspace-dropshipping');
+      const wsPers = document.getElementById('workspace-personal');
+      const btnCsv = document.getElementById('btn-import-csv');
+      const tit = document.getElementById('workspace-titulo');
+      const sub = document.getElementById('workspace-subtitulo');
+
+      if (ws === 'dropshipping') {
+        btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition';
+        btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+        wsDrop.classList.remove('hidden');
+        wsPers.classList.add('hidden');
+        btnCsv.classList.remove('hidden');
+        tit.textContent = 'Tienda Dropshipping & E-commerce';
+        sub.textContent = 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
+        renderizarGraficos();
+      } else {
+        btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition';
+        btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+        wsDrop.classList.add('hidden');
+        wsPers.classList.remove('hidden');
+        btnCsv.classList.add('hidden');
+        tit.textContent = 'Servicios Profesionales & Finanzas Personales';
+        sub.textContent = 'Control de Boletas de Honorarios, Retenciones SII y Gastos Personales';
+      }
+    }
+
+    function cambiarTabDrop(tab) {
+      document.querySelectorAll('.tab-drop-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-drop-btn').forEach(el => {
         el.classList.remove('border-sky-500', 'text-sky-400', 'font-semibold');
         el.classList.add('border-transparent', 'text-slate-400');
       });
 
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      const btn = document.getElementById(`tab-${tab}-btn`);
+      document.getElementById(`tab-drop-${tab}`).classList.remove('hidden');
+      const btn = document.getElementById(`tab-drop-${tab}-btn`);
       btn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
       btn.classList.remove('border-transparent', 'text-slate-400');
 
-      if (tab === 'dashboard') {
-        renderizarGraficos();
-      }
+      if (tab === 'dashboard') renderizarGraficos();
     }
 
+    // ==========================================
+    // CARGAR DATOS
+    // ==========================================
     async function cargarTodo() {
       const mesSeleccionado = document.getElementById('filtro-mes').value;
       const [anio, mes] = mesSeleccionado.split('-');
       const primerDia = `${anio}-${mes}-01`;
       const ultimoDia = new Date(anio, mes, 0).toISOString().slice(0, 10);
 
-      const [resVentas, resAds, resCostos] = await Promise.all([
+      const [resVentas, resAds, resCostos, resHon, resGastosPers] = await Promise.all([
         db.from('ventas').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
         db.from('gasto_publicidad').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
-        db.from('costos_recurrentes').select('*').eq('activo', true)
+        db.from('costos_recurrentes').select('*').eq('activo', true),
+        db.from('honorarios').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
+        db.from('gastos_personales').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false })
       ]);
 
-      datosGlobales.ventas = resVentas.data || [];
-      datosGlobales.ads = resAds.data || [];
-      datosGlobales.costos = resCostos.data || [];
+      datosDrop.ventas = resVentas.data || [];
+      datosDrop.ads = resAds.data || [];
+      datosDrop.costos = resCostos.data || [];
+      datosPersonal.honorarios = resHon.data || [];
+      datosPersonal.gastos = resGastosPers.data || [];
 
-      // Procesar Ventas
+      procesarModuloDropshipping();
+      procesarModuloPersonal();
+    }
+
+    // --- PROCESAMIENTO DROPSHIPPING ---
+    function procesarModuloDropshipping() {
       let totalVentas = 0;
       let totalCostosDropi = 0;
       const cuerpoVentas = document.getElementById('tabla-ventas');
 
-      if (datosGlobales.ventas.length === 0) {
-        cuerpoVentas.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin pedidos registrados en este mes.</td></tr>';
+      if (datosDrop.ventas.length === 0) {
+        cuerpoVentas.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin pedidos en este mes.</td></tr>';
       } else {
-        cuerpoVentas.innerHTML = datosGlobales.ventas.map(v => {
-          const costoDropiItem = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
-          const ingresoItem = Number(v.ingreso_total || 0);
-          const margenItem = ingresoItem - costoDropiItem;
-
-          totalVentas += ingresoItem;
-          totalCostosDropi += costoDropiItem;
+        cuerpoVentas.innerHTML = datosDrop.ventas.map(v => {
+          const costoDropi = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
+          const ingreso = Number(v.ingreso_total || 0);
+          const margen = ingreso - costoDropi;
+          totalVentas += ingreso;
+          totalCostosDropi += costoDropi;
 
           return `
             <tr class="hover:bg-slate-800/40">
               <td class="p-3 text-slate-400">${v.fecha.slice(5)}</td>
               <td class="p-3 font-medium text-slate-200">${v.cliente_detalle}</td>
-              <td class="p-3 text-right font-medium text-emerald-400">${formatoCLP(ingresoItem)}</td>
-              <td class="p-3 text-right text-rose-300">-${formatoCLP(costoDropiItem)}</td>
-              <td class="p-3 text-right font-semibold ${margenItem >= 0 ? 'text-sky-400' : 'text-rose-500'}">${formatoCLP(margenItem)}</td>
+              <td class="p-3 text-right font-medium text-emerald-400">${formatoCLP(ingreso)}</td>
+              <td class="p-3 text-right text-rose-300">-${formatoCLP(costoDropi)}</td>
+              <td class="p-3 text-right font-semibold ${margen >= 0 ? 'text-sky-400' : 'text-rose-500'}">${formatoCLP(margen)}</td>
               <td class="p-3 text-center space-x-1.5">
-                <button onclick="abrirModalEditarVenta(${v.id})" title="Editar" class="text-sky-400 hover:text-sky-200 text-xs px-1.5 py-0.5 bg-sky-950/40 rounded border border-sky-800/50">✏️</button>
-                <button onclick="eliminarVenta(${v.id})" title="Eliminar" class="text-rose-400 hover:text-rose-200 text-xs px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
+                <button onclick="abrirModalEditarVenta(${v.id})" class="text-sky-400 px-1.5 py-0.5 bg-sky-950/40 rounded border border-sky-800/50">✏️</button>
+                <button onclick="eliminarVenta(${v.id})" class="text-rose-400 px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
               </td>
             </tr>
           `;
         }).join('');
       }
 
-      // Procesar Meta Ads
-      let totalAds = 0;
-      const cuerpoAds = document.getElementById('tabla-ads');
-
-      if (datosGlobales.ads.length === 0) {
-        cuerpoAds.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Sin registros de pauta en este mes.</td></tr>';
-      } else {
-        cuerpoAds.innerHTML = datosGlobales.ads.map(a => {
-          totalAds += Number(a.gasto);
-          return `
+      let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto), 0);
+      document.getElementById('tabla-ads').innerHTML = datosDrop.ads.length === 0
+        ? '<tr><td colspan="4" class="p-4 text-center text-slate-500">Sin anuncios este mes.</td></tr>'
+        : datosDrop.ads.map(a => `
             <tr class="hover:bg-slate-800/40">
               <td class="p-3 text-slate-400">${a.fecha}</td>
               <td class="p-3 font-medium text-slate-200">${a.plataforma}</td>
               <td class="p-3 font-medium text-indigo-300 text-right">${formatoCLP(a.gasto)}</td>
               <td class="p-3 text-center">
-                <button onclick="eliminarAds(${a.id})" class="text-rose-400 hover:text-rose-200">✕</button>
+                <button onclick="eliminarAds(${a.id})" class="text-rose-400 px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
               </td>
             </tr>
-          `;
-        }).join('');
-      }
+          `).join('');
 
-      // Procesar Costos Fijos
       let totalFijosMes = 0;
-      const cuerpoCostos = document.getElementById('tabla-costos');
+      document.getElementById('tabla-costos').innerHTML = datosDrop.costos.length === 0
+        ? '<tr><td colspan="5" class="p-4 text-center text-slate-500">Sin suscripciones configuradas.</td></tr>'
+        : datosDrop.costos.map(c => {
+            let impacto = Number(c.monto);
+            let et = '30d';
+            if (c.frecuencia_dias === 90) { impacto /= 3; et = '90d'; }
+            if (c.frecuencia_dias === 365) { impacto /= 12; et = '1 año'; }
+            totalFijosMes += impacto;
 
-      if (datosGlobales.costos.length === 0) {
-        cuerpoCostos.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Sin costos fijos configurados.</td></tr>';
-      } else {
-        cuerpoCostos.innerHTML = datosGlobales.costos.map(c => {
-          let impactoMes = Number(c.monto);
-          let etiqueta = '30d';
+            return `
+              <tr class="hover:bg-slate-800/40">
+                <td class="p-3 font-medium text-slate-200">${c.nombre}</td>
+                <td class="p-3 text-slate-400">${et}</td>
+                <td class="p-3 text-right text-slate-400">${formatoCLP(c.monto)}</td>
+                <td class="p-3 text-right font-medium text-rose-400">${formatoCLP(impacto)}</td>
+                <td class="p-3 text-center space-x-1.5">
+                  <button onclick="abrirModalEditarCosto(${c.id})" class="text-sky-400 px-1.5 py-0.5 bg-sky-950/40 rounded border border-sky-800/50">✏️</button>
+                  <button onclick="eliminarCosto(${c.id})" class="text-rose-400 px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
 
-          if (c.frecuencia_dias === 90) {
-            impactoMes = Number(c.monto) / 3;
-            etiqueta = '90d';
-          } else if (c.frecuencia_dias === 365) {
-            impactoMes = Number(c.monto) / 12;
-            etiqueta = '1 año';
-          }
-
-          totalFijosMes += impactoMes;
-
-          return `
-            <tr class="hover:bg-slate-800/40">
-              <td class="p-3 font-medium text-slate-200">${c.nombre}</td>
-              <td class="p-3 text-slate-400">${etiqueta}</td>
-              <td class="p-3 text-right text-slate-400">${formatoCLP(c.monto)}</td>
-              <td class="p-3 text-right font-medium text-rose-400">${formatoCLP(impactoMes)}</td>
-              <td class="p-3 text-center space-x-1.5">
-                <button onclick="abrirModalEditarCosto(${c.id})" title="Editar" class="text-sky-400 hover:text-sky-200 text-xs px-1.5 py-0.5 bg-sky-950/40 rounded border border-sky-800/50">✏️</button>
-                <button onclick="eliminarCosto(${c.id})" title="Eliminar" class="text-rose-400 hover:text-rose-200 text-xs px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // Cálculos Financieros Totales
-      const numPedidos = datosGlobales.ventas.length;
-      const margenContribucion = totalVentas - totalCostosDropi;
-      const utilidadNeta = margenContribucion - totalAds - totalFijosMes;
+      const numVentas = datosDrop.ventas.length;
+      const margenContrib = totalVentas - totalCostosDropi;
+      const utilidadNeta = margenContrib - totalAds - totalFijosMes;
       const roas = totalAds > 0 ? (totalVentas / totalAds).toFixed(2) : '0.0';
-      const margenNetoPorcentaje = totalVentas > 0 ? ((utilidadNeta / totalVentas) * 100).toFixed(1) : 0;
-      const aov = numPedidos > 0 ? Math.round(totalVentas / numPedidos) : 0;
-      const cpa = numPedidos > 0 ? Math.round(totalAds / numPedidos) : 0;
-      const profitUnit = numPedidos > 0 ? Math.round(utilidadNeta / numPedidos) : 0;
+      const margenPct = totalVentas > 0 ? ((utilidadNeta / totalVentas) * 100).toFixed(1) : 0;
 
-      // Actualizar UI KPIs
       document.getElementById('kpi-ventas').textContent = formatoCLP(totalVentas);
-      document.getElementById('kpi-num-ventas').textContent = `${numPedidos} pedidos`;
-
+      document.getElementById('kpi-num-ventas').textContent = `${numVentas} pedidos`;
       document.getElementById('kpi-dropi').textContent = formatoCLP(totalCostosDropi);
-      document.getElementById('kpi-margen-bruto').textContent = `Margen Bruto: ${formatoCLP(margenContribucion)}`;
-
+      document.getElementById('kpi-margen-bruto').textContent = `Margen: ${formatoCLP(margenContrib)}`;
       document.getElementById('kpi-ads').textContent = formatoCLP(totalAds);
       document.getElementById('kpi-roas').textContent = `ROAS: ${roas}x`;
-
       document.getElementById('kpi-fijos').textContent = formatoCLP(totalFijosMes);
-      document.getElementById('kpi-fijos-sub').textContent = `${datosGlobales.costos.length} servicios activos`;
+      document.getElementById('kpi-fijos-sub').textContent = `${datosDrop.costos.length} activas`;
 
-      const elUtilidad = document.getElementById('kpi-utilidad');
-      elUtilidad.textContent = formatoCLP(utilidadNeta);
-      elUtilidad.className = `text-xl font-bold mt-1 ${utilidadNeta >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
+      const elUt = document.getElementById('kpi-utilidad');
+      elUt.textContent = formatoCLP(utilidadNeta);
+      elUt.className = `text-xl font-bold mt-1 ${utilidadNeta >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
 
-      const elMargenNeto = document.getElementById('kpi-margen-neto');
-      elMargenNeto.textContent = `Margen Real: ${margenNetoPorcentaje}%`;
-      elMargenNeto.className = `text-[11px] font-medium ${utilidadNeta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      const elMargen = document.getElementById('kpi-margen-neto');
+      elMargen.textContent = `Margen: ${margenPct}%`;
+      elMargen.className = `text-[11px] font-medium ${utilidadNeta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
-      document.getElementById('kpi-aov').textContent = formatoCLP(aov);
-      document.getElementById('kpi-cpa').textContent = formatoCLP(cpa);
-      document.getElementById('kpi-profit-unit').textContent = formatoCLP(profitUnit);
+      document.getElementById('kpi-aov').textContent = formatoCLP(numVentas > 0 ? Math.round(totalVentas / numVentas) : 0);
+      document.getElementById('kpi-cpa').textContent = formatoCLP(numVentas > 0 ? Math.round(totalAds / numVentas) : 0);
+      document.getElementById('kpi-profit-unit').textContent = formatoCLP(numVentas > 0 ? Math.round(utilidadNeta / numVentas) : 0);
 
       renderizarGraficos();
     }
 
-    // Renderizado de Gráficos (Chart.js)
+    // --- PROCESAMIENTO PERSONAL & HONORARIOS ---
+    function procesarModuloPersonal() {
+      let totalBruto = 0;
+      let totalLiquido = 0;
+      let totalRetencion = 0;
+
+      const cuerpoHon = document.getElementById('tabla-honorarios');
+      if (datosPersonal.honorarios.length === 0) {
+        cuerpoHon.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin boletas emitidas en este mes.</td></tr>';
+      } else {
+        cuerpoHon.innerHTML = datosPersonal.honorarios.map(h => {
+          const bruto = Number(h.monto_bruto);
+          const ret = Number(h.retencion_porcentaje);
+          const montoRet = bruto * (ret / 100);
+          const liquido = Number(h.monto_liquido) || (bruto - montoRet);
+
+          totalBruto += bruto;
+          totalLiquido += liquido;
+          totalRetencion += montoRet;
+
+          const esPagada = h.estado === 'pagada';
+
+          return `
+            <tr class="hover:bg-slate-800/40">
+              <td class="p-2.5 text-slate-400">${h.fecha.slice(5)}</td>
+              <td class="p-2.5">
+                <div class="font-medium text-slate-200">${h.cliente_empresa}</div>
+                <div class="text-[10px] text-slate-500 truncate max-w-xs">${h.detalle_servicio}</div>
+              </td>
+              <td class="p-2.5 text-right font-medium text-slate-300">${formatoCLP(bruto)}</td>
+              <td class="p-2.5 text-right font-semibold text-emerald-400">${formatoCLP(liquido)}</td>
+              <td class="p-2.5 text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${esPagada ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
+                  ${esPagada ? 'PAGADA' : 'PENDIENTE'}
+                </span>
+              </td>
+              <td class="p-2.5 text-center space-x-1">
+                <button onclick="abrirModalEditarHonorario(${h.id})" class="text-sky-400 px-1.5 py-0.5 bg-sky-950/40 rounded border border-sky-800/50">✏️</button>
+                <button onclick="eliminarHonorario(${h.id})" class="text-rose-400 px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      let totalGastosPers = 0;
+      let totalGastosFijosPers = 0;
+      const cuerpoGastos = document.getElementById('tabla-gastos-pers');
+
+      if (datosPersonal.gastos.length === 0) {
+        cuerpoGastos.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Sin gastos personales registrados.</td></tr>';
+      } else {
+        cuerpoGastos.innerHTML = datosPersonal.gastos.map(g => {
+          const monto = Number(g.monto);
+          totalGastosPers += monto;
+          if (g.tipo === 'fijo') totalGastosFijosPers += monto;
+
+          return `
+            <tr class="hover:bg-slate-800/40">
+              <td class="p-2 text-slate-400">${g.fecha.slice(5)}</td>
+              <td class="p-2">
+                <div class="font-medium text-slate-200">${g.descripcion}</div>
+                <div class="text-[10px] text-slate-500">${g.categoria} • <span class="${g.tipo==='fijo'?'text-amber-400':'text-slate-400'}">${g.tipo}</span></div>
+              </td>
+              <td class="p-2 text-right font-semibold text-rose-400">-${formatoCLP(monto)}</td>
+              <td class="p-2 text-center">
+                <button onclick="eliminarGastoPersonal(${g.id})" class="text-rose-400 hover:text-rose-200">✕</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const saldoAhorro = totalLiquido - totalGastosPers;
+      const tasaAhorro = totalLiquido > 0 ? ((saldoAhorro / totalLiquido) * 100).toFixed(1) : 0;
+
+      document.getElementById('kpi-pers-ingresos').textContent = formatoCLP(totalLiquido);
+      document.getElementById('kpi-pers-bruto').textContent = `Bruto: ${formatoCLP(totalBruto)}`;
+      document.getElementById('kpi-pers-retencion').textContent = formatoCLP(totalRetencion);
+      document.getElementById('kpi-pers-gastos').textContent = formatoCLP(totalGastosPers);
+      document.getElementById('kpi-pers-gastos-fijos').textContent = `Fijos: ${formatoCLP(totalGastosFijosPers)}`;
+
+      const elAhorro = document.getElementById('kpi-pers-ahorro');
+      elAhorro.textContent = formatoCLP(saldoAhorro);
+      elAhorro.className = `text-xl font-bold mt-1 ${saldoAhorro >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
+
+      const elCap = document.getElementById('kpi-pers-capacidad');
+      elCap.textContent = `Tasa de Ahorro: ${tasaAhorro}%`;
+      elCap.className = `text-[11px] font-medium ${saldoAhorro >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+    }
+
+    function calcularLiquidoHonorario() {
+      const bruto = Number(document.getElementById('h-bruto').value || 0);
+      const tasa = Number(document.getElementById('h-ret-tasa').value || 15.25);
+      const retencion = bruto * (tasa / 100);
+      const liquido = bruto - retencion;
+      document.getElementById('h-liquido-calc').value = formatoCLP(liquido);
+    }
+
+    // ==========================================
+    // GRÁFICOS DROPSHIPPING
+    // ==========================================
     function renderizarGraficos() {
-      // 1. Agrupar por día para gráfico de evolución
+      if (workspaceActivo !== 'dropshipping') return;
+
       const diasMap = {};
-      datosGlobales.ventas.forEach(v => {
+      datosDrop.ventas.forEach(v => {
         const dia = v.fecha.slice(8, 10);
         if (!diasMap[dia]) diasMap[dia] = { ventas: 0, costos: 0 };
         const costoDirecto = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
@@ -620,7 +964,6 @@
       const datasetVentas = labels.map(d => diasMap[d].ventas);
       const datasetCostos = labels.map(d => diasMap[d].costos);
 
-      // Gráfico de Barras / Líneas
       const ctxEvolucion = document.getElementById('chart-evolucion').getContext('2d');
       if (chartEvolucion) chartEvolucion.destroy();
 
@@ -629,39 +972,21 @@
         data: {
           labels: labels.map(d => `Día ${d}`),
           datasets: [
-            {
-              label: 'Ventas ($)',
-              data: datasetVentas,
-              borderColor: '#34d399',
-              backgroundColor: 'rgba(52, 211, 153, 0.1)',
-              fill: true,
-              tension: 0.3
-            },
-            {
-              label: 'Costos Dropi ($)',
-              data: datasetCostos,
-              borderColor: '#f87171',
-              backgroundColor: 'transparent',
-              borderDash: [5, 5],
-              tension: 0.3
-            }
+            { label: 'Ventas ($)', data: datasetVentas, borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true, tension: 0.3 },
+            { label: 'Costos Dropi ($)', data: datasetCostos, borderColor: '#f87171', borderDash: [5, 5], tension: 0.3 }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
-          scales: {
-            x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
-            y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
-          }
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
         }
       });
 
-      // Gráfico Dona: Distribución de Costos
-      let totalCostosDropi = datosGlobales.ventas.reduce((acc, v) => acc + Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0), 0);
-      let totalAds = datosGlobales.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
-      let totalFijosMes = datosGlobales.costos.reduce((acc, c) => {
+      let totalCostosDropi = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0), 0);
+      let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
+      let totalFijosMes = datosDrop.costos.reduce((acc, c) => {
         let f = Number(c.monto);
         if (c.frecuencia_dias === 90) f /= 3;
         if (c.frecuencia_dias === 365) f /= 12;
@@ -674,19 +999,10 @@
       chartDistribucion = new Chart(ctxDistribucion, {
         type: 'doughnut',
         data: {
-          labels: ['Dropi (Prod/Env)', 'Meta Ads', 'Fijos/Suscripciones'],
-          datasets: [{
-            data: [totalCostosDropi, totalAds, totalFijosMes],
-            backgroundColor: ['#fbbf24', '#818cf8', '#f43f5e'],
-            borderWidth: 0
-          }]
+          labels: ['Dropi', 'Meta Ads', 'Suscripciones'],
+          datasets: [{ data: [totalCostosDropi, totalAds, totalFijosMes], backgroundColor: ['#fbbf24', '#818cf8', '#f43f5e'], borderWidth: 0 }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          cutout: '70%'
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
       });
 
       document.getElementById('distribucion-leyenda').innerHTML = `
@@ -696,11 +1012,63 @@
       `;
     }
 
-    // Control Modal Edición Ventas
-    function abrirModalEditarVenta(id) {
-      const v = datosGlobales.ventas.find(item => item.id === id);
-      if (!v) return;
+    // ==========================================
+    // HANDLERS REGISTRO: HONORARIOS & PERSONAL
+    // ==========================================
+    document.getElementById('form-honorario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const bruto = Number(document.getElementById('h-bruto').value);
+      const tasa = Number(document.getElementById('h-ret-tasa').value);
+      const retencion = bruto * (tasa / 100);
+      const liquido = bruto - retencion;
 
+      const nuevaBoleta = {
+        fecha: document.getElementById('h-fecha').value,
+        cliente_empresa: document.getElementById('h-cliente').value.trim(),
+        detalle_servicio: document.getElementById('h-detalle').value.trim(),
+        monto_bruto: bruto,
+        retencion_porcentaje: tasa,
+        monto_liquido: liquido,
+        estado: document.getElementById('h-pagada').checked ? 'pagada' : 'pendiente'
+      };
+
+      const { error } = await db.from('honorarios').insert([nuevaBoleta]);
+      if (error) alert("Error al registrar boleta: " + error.message);
+      else {
+        document.getElementById('h-cliente').value = '';
+        document.getElementById('h-detalle').value = '';
+        document.getElementById('h-bruto').value = '';
+        document.getElementById('h-liquido-calc').value = '$0';
+        document.getElementById('h-pagada').checked = false;
+        cargarTodo();
+      }
+    });
+
+    document.getElementById('form-gasto-pers').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevoGasto = {
+        fecha: document.getElementById('gp-fecha').value,
+        categoria: document.getElementById('gp-categoria').value,
+        descripcion: document.getElementById('gp-desc').value.trim(),
+        monto: Number(document.getElementById('gp-monto').value),
+        tipo: document.getElementById('gp-tipo').value
+      };
+
+      const { error } = await db.from('gastos_personales').insert([nuevoGasto]);
+      if (error) alert("Error al registrar gasto: " + error.message);
+      else {
+        document.getElementById('gp-desc').value = '';
+        document.getElementById('gp-monto').value = '';
+        cargarTodo();
+      }
+    });
+
+    // ==========================================
+    // MODALES & EDICIONES
+    // ==========================================
+    function abrirModalEditarVenta(id) {
+      const v = datosDrop.ventas.find(item => item.id === id);
+      if (!v) return;
       document.getElementById('edit-v-id').value = v.id;
       document.getElementById('edit-v-fecha').value = v.fecha;
       document.getElementById('edit-v-detalle').value = v.cliente_detalle;
@@ -708,13 +1076,9 @@
       document.getElementById('edit-v-costo-prod').value = v.costo_producto;
       document.getElementById('edit-v-costo-envio').value = v.costo_envio;
       document.getElementById('edit-v-comision-dropi').value = v.comision_dropi || 0;
-
       document.getElementById('modal-editar-venta').classList.remove('hidden');
     }
-
-    function cerrarModalEditarVenta() {
-      document.getElementById('modal-editar-venta').classList.add('hidden');
-    }
+    function cerrarModalEditarVenta() { document.getElementById('modal-editar-venta').classList.add('hidden'); }
 
     document.getElementById('form-editar-venta').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -727,31 +1091,21 @@
         costo_envio: Number(document.getElementById('edit-v-costo-envio').value || 0),
         comision_dropi: Number(document.getElementById('edit-v-comision-dropi').value || 0)
       };
-
-      const { error } = await db.from('ventas').update(actualizacion).eq('id', id);
-      if (error) alert("Error al editar pedido: " + error.message);
-      else {
-        cerrarModalEditarVenta();
-        cargarTodo();
-      }
+      await db.from('ventas').update(actualizacion).eq('id', id);
+      cerrarModalEditarVenta();
+      cargarTodo();
     });
 
-    // Control Modal Edición Costos Fijos
     function abrirModalEditarCosto(id) {
-      const c = datosGlobales.costos.find(item => item.id === id);
+      const c = datosDrop.costos.find(item => item.id === id);
       if (!c) return;
-
       document.getElementById('edit-c-id').value = c.id;
       document.getElementById('edit-c-nombre').value = c.nombre;
       document.getElementById('edit-c-frecuencia').value = c.frecuencia_dias;
       document.getElementById('edit-c-monto').value = c.monto;
-
       document.getElementById('modal-editar-costo').classList.remove('hidden');
     }
-
-    function cerrarModalEditarCosto() {
-      document.getElementById('modal-editar-costo').classList.add('hidden');
-    }
+    function cerrarModalEditarCosto() { document.getElementById('modal-editar-costo').classList.add('hidden'); }
 
     document.getElementById('form-editar-costo').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -761,29 +1115,117 @@
         frecuencia_dias: Number(document.getElementById('edit-c-frecuencia').value),
         monto: Number(document.getElementById('edit-c-monto').value)
       };
-
-      const { error } = await db.from('costos_recurrentes').update(actualizacion).eq('id', id);
-      if (error) alert("Error al editar costo: " + error.message);
-      else {
-        cerrarModalEditarCosto();
-        cargarTodo();
-      }
+      await db.from('costos_recurrentes').update(actualizacion).eq('id', id);
+      cerrarModalEditarCosto();
+      cargarTodo();
     });
 
-    // CSV Modal Controls
+    function abrirModalEditarHonorario(id) {
+      const h = datosPersonal.honorarios.find(item => item.id === id);
+      if (!h) return;
+      document.getElementById('edit-h-id').value = h.id;
+      document.getElementById('edit-h-fecha').value = h.fecha;
+      document.getElementById('edit-h-cliente').value = h.cliente_empresa;
+      document.getElementById('edit-h-detalle').value = h.detalle_servicio;
+      document.getElementById('edit-h-bruto').value = h.monto_bruto;
+      document.getElementById('edit-h-ret-tasa').value = h.retencion_porcentaje;
+      document.getElementById('edit-h-estado').value = h.estado;
+      document.getElementById('modal-editar-honorario').classList.remove('hidden');
+    }
+    function cerrarModalEditarHonorario() { document.getElementById('modal-editar-honorario').classList.add('hidden'); }
+
+    document.getElementById('form-editar-honorario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-h-id').value;
+      const bruto = Number(document.getElementById('edit-h-bruto').value);
+      const tasa = Number(document.getElementById('edit-h-ret-tasa').value);
+      const ret = bruto * (tasa / 100);
+      const liquido = bruto - ret;
+
+      const actualizacion = {
+        fecha: document.getElementById('edit-h-fecha').value,
+        cliente_empresa: document.getElementById('edit-h-cliente').value.trim(),
+        detalle_servicio: document.getElementById('edit-h-detalle').value.trim(),
+        monto_bruto: bruto,
+        retencion_porcentaje: tasa,
+        monto_liquido: liquido,
+        estado: document.getElementById('edit-h-estado').value
+      };
+      await db.from('honorarios').update(actualizacion).eq('id', id);
+      cerrarModalEditarHonorario();
+      cargarTodo();
+    });
+
+    // ==========================================
+    // FORMULARIOS MANUALES DROPSHIPPING
+    // ==========================================
+    document.getElementById('form-venta').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevaVenta = {
+        fecha: document.getElementById('v-fecha').value,
+        cliente_detalle: document.getElementById('v-detalle').value.trim(),
+        ingreso_total: Number(document.getElementById('v-ingreso').value),
+        costo_producto: Number(document.getElementById('v-costo-prod').value),
+        costo_envio: Number(document.getElementById('v-costo-envio').value || 0),
+        comision_dropi: Number(document.getElementById('v-comision-dropi').value || 0)
+      };
+      await db.from('ventas').insert([nuevaVenta]);
+      document.getElementById('v-detalle').value = '';
+      document.getElementById('v-ingreso').value = '';
+      document.getElementById('v-costo-prod').value = '';
+      document.getElementById('v-costo-envio').value = '';
+      document.getElementById('v-comision-dropi').value = '';
+      cargarTodo();
+    });
+
+    document.getElementById('form-ads').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevoGasto = {
+        fecha: document.getElementById('ads-fecha').value,
+        gasto: Number(document.getElementById('ads-monto').value),
+        plataforma: 'Meta Ads'
+      };
+      await db.from('gasto_publicidad').insert([nuevoGasto]);
+      document.getElementById('ads-monto').value = '';
+      cargarTodo();
+    });
+
+    document.getElementById('form-costo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevoCosto = {
+        nombre: document.getElementById('c-nombre').value.trim(),
+        frecuencia_dias: Number(document.getElementById('c-frecuencia').value),
+        monto: Number(document.getElementById('c-monto').value),
+        tipo_costo: 'fijo'
+      };
+      await db.from('costos_recurrentes').insert([nuevoCosto]);
+      document.getElementById('c-nombre').value = '';
+      document.getElementById('c-monto').value = '';
+      cargarTodo();
+    });
+
+    // ==========================================
+    // BORRADOS
+    // ==========================================
+    async function eliminarVenta(id) { if (confirm("¿Eliminar este pedido?")) { await db.from('ventas').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarAds(id) { if (confirm("¿Eliminar este gasto de anuncios?")) { await db.from('gasto_publicidad').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarCosto(id) { if (confirm("¿Eliminar este costo fijo?")) { await db.from('costos_recurrentes').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarHonorario(id) { if (confirm("¿Eliminar esta boleta?")) { await db.from('honorarios').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarGastoPersonal(id) { if (confirm("¿Eliminar este gasto personal?")) { await db.from('gastos_personales').delete().eq('id', id); cargarTodo(); } }
+
+    // ==========================================
+    // MODAL CSV SHOPIFY
+    // ==========================================
     function abrirModalCSV() { document.getElementById('modal-csv').classList.remove('hidden'); }
     function cerrarModalCSV() { document.getElementById('modal-csv').classList.add('hidden'); }
 
     document.getElementById('input-csv').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        complete: function(results) {
-          procesarFilasCSV(results.data);
-        }
+        complete: function(results) { procesarFilasCSV(results.data); }
       });
     });
 
@@ -813,7 +1255,6 @@
           });
         }
       });
-
       renderizarPreviewCSV();
     }
 
@@ -827,7 +1268,6 @@
         item.costo_envio = envioDef;
         item.comision_dropi = dropiDef;
       });
-
       renderizarPreviewCSV();
     }
 
@@ -876,7 +1316,7 @@
         btn.disabled = false;
         btn.textContent = 'Confirmar y Cargar a Supabase';
       } else {
-        alert(`¡Listo! Se importaron ${filasParaImportar.length} pedidos.`);
+        alert(`¡Éxito! Se importaron ${filasParaImportar.length} pedidos.`);
         cerrarModalCSV();
         document.getElementById('input-csv').value = '';
         filasParaImportar = [];
@@ -884,83 +1324,7 @@
       }
     }
 
-    // Formularios Manuales
-    document.getElementById('form-venta').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nuevaVenta = {
-        fecha: document.getElementById('v-fecha').value,
-        cliente_detalle: document.getElementById('v-detalle').value.trim(),
-        ingreso_total: Number(document.getElementById('v-ingreso').value),
-        costo_producto: Number(document.getElementById('v-costo-prod').value),
-        costo_envio: Number(document.getElementById('v-costo-envio').value || 0),
-        comision_dropi: Number(document.getElementById('v-comision-dropi').value || 0)
-      };
-
-      const { error } = await db.from('ventas').insert([nuevaVenta]);
-      if (error) alert("Error al registrar venta: " + error.message);
-      else {
-        document.getElementById('v-detalle').value = '';
-        document.getElementById('v-ingreso').value = '';
-        document.getElementById('v-costo-prod').value = '';
-        document.getElementById('v-costo-envio').value = '';
-        document.getElementById('v-comision-dropi').value = '';
-        cargarTodo();
-      }
-    });
-
-    document.getElementById('form-ads').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nuevoGasto = {
-        fecha: document.getElementById('ads-fecha').value,
-        gasto: Number(document.getElementById('ads-monto').value),
-        plataforma: 'Meta Ads'
-      };
-
-      const { error } = await db.from('gasto_publicidad').insert([nuevoGasto]);
-      if (error) alert("Error al registrar gasto: " + error.message);
-      else {
-        document.getElementById('ads-monto').value = '';
-        cargarTodo();
-      }
-    });
-
-    document.getElementById('form-costo').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nuevoCosto = {
-        nombre: document.getElementById('c-nombre').value.trim(),
-        frecuencia_dias: Number(document.getElementById('c-frecuencia').value),
-        monto: Number(document.getElementById('c-monto').value),
-        tipo_costo: 'fijo'
-      };
-
-      const { error } = await db.from('costos_recurrentes').insert([nuevoCosto]);
-      if (error) alert("Error al registrar costo: " + error.message);
-      else {
-        document.getElementById('c-nombre').value = '';
-        document.getElementById('c-monto').value = '';
-        cargarTodo();
-      }
-    });
-
-    async function eliminarVenta(id) {
-      if (!confirm("¿Eliminar este pedido?")) return;
-      await db.from('ventas').delete().eq('id', id);
-      cargarTodo();
-    }
-
-    async function eliminarAds(id) {
-      if (!confirm("¿Eliminar este gasto publicitario?")) return;
-      await db.from('gasto_publicidad').delete().eq('id', id);
-      cargarTodo();
-    }
-
-    async function eliminarCosto(id) {
-      if (!confirm("¿Eliminar este costo fijo?")) return;
-      await db.from('costos_recurrentes').delete().eq('id', id);
-      cargarTodo();
-    }
-
-    // Iniciar
+    // Inicializar
     cargarTodo();
   </script>
 </body>
