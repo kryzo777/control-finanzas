@@ -3,184 +3,352 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Finanzas</title>
+  <title>Control Financiero & Unit Economics</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
-  <div class="max-w-4xl mx-auto space-y-6">
-    
-    <!-- Encabezado -->
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 border-b border-slate-700 gap-2">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Header y Filtro -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900 p-4 rounded-xl border border-slate-800 gap-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight">Panel de Control</h1>
-        <p class="text-slate-400 text-sm">Registro de ingresos y gastos en tiempo real</p>
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white">Tablero de Rendimiento & Flujo de Caja</h1>
+        <p class="text-slate-400 text-xs md:text-sm">Costos fijos prorrateados, costos variables y utilidad real</p>
       </div>
-      <button onclick="cargarDatos()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded border border-slate-600 transition">
-        Actualizar Datos
-      </button>
+      <div class="flex items-center gap-2">
+        <label class="text-xs text-slate-400">Mes de análisis:</label>
+        <input type="month" id="filtro-mes" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-sky-500" onchange="cargarTodo()">
+      </div>
     </header>
 
-    <!-- Resumen Métricas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
-        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Ingresos Totales</span>
-        <p id="total-ingresos" class="text-2xl font-bold text-emerald-400 mt-1">$0</p>
+    <!-- Métricas Clave de Negocio (KPIs Reales) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <span class="text-slate-400 text-xs font-semibold uppercase">Ventas Brutas</span>
+        <p id="kpi-ventas" class="text-xl md:text-2xl font-bold text-emerald-400 mt-1">$0</p>
+        <span id="kpi-num-ventas" class="text-xs text-slate-500">0 operaciones</span>
       </div>
-      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
-        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Gastos Totales</span>
-        <p id="total-gastos" class="text-2xl font-bold text-rose-400 mt-1">$0</p>
+
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <span class="text-slate-400 text-xs font-semibold uppercase">Costos Variables (Prod+Envío)</span>
+        <p id="kpi-variables" class="text-xl md:text-2xl font-bold text-amber-400 mt-1">$0</p>
+        <span id="kpi-margen-bruto" class="text-xs text-slate-400">Margen Contrib: $0</span>
       </div>
-      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
-        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Balance Neto</span>
-        <p id="balance-total" class="text-2xl font-bold text-sky-400 mt-1">$0</p>
+
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <span class="text-slate-400 text-xs font-semibold uppercase">Costos Fijos (Prorrateo Mensual)</span>
+        <p id="kpi-fijos" class="text-xl md:text-2xl font-bold text-rose-400 mt-1">$0</p>
+        <span id="kpi-suscripciones" class="text-xs text-slate-500">Servicios & Subscripciones</span>
+      </div>
+
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <span class="text-slate-400 text-xs font-semibold uppercase">Utilidad Neta Real</span>
+        <p id="kpi-utilidad" class="text-xl md:text-2xl font-bold text-sky-400 mt-1">$0</p>
+        <span id="kpi-margen-neto" class="text-xs font-medium text-slate-300">Margen: 0%</span>
       </div>
     </div>
 
-    <!-- Formulario de Registro -->
-    <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
-      <h2 class="text-lg font-semibold mb-4 text-slate-200">Registrar Movimiento</h2>
-      <form id="form-movimiento" class="grid grid-cols-1 md:grid-cols-5 gap-3">
-        <select id="tipo" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
-          <option value="ingreso">Ingreso (+)</option>
-          <option value="gasto">Gasto (-)</option>
-        </select>
-        <input type="date" id="fecha" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
-        <input type="text" id="categoria" placeholder="Categoría (ej. Ventas, Insumos)" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
-        <input type="number" id="monto" placeholder="Monto ($)" min="1" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
-        <button type="submit" class="bg-sky-600 hover:bg-sky-500 text-white font-medium p-2.5 rounded-lg text-sm transition">
-          Guardar
-        </button>
-      </form>
-    </div>
+    <!-- Pestañas de Gestión -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- Tabla de Transacciones -->
-    <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-      <div class="p-4 border-b border-slate-700">
-        <h2 class="text-md font-semibold text-slate-200">Últimos Movimientos</h2>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900/60 text-xs uppercase text-slate-400 border-b border-slate-700">
-            <tr>
-              <th class="p-3">Fecha</th>
-              <th class="p-3">Tipo</th>
-              <th class="p-3">Categoría</th>
-              <th class="p-3 text-right">Monto</th>
-              <th class="p-3 text-center">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tabla-cuerpo" class="divide-y divide-slate-700/60">
-            <tr>
-              <td colspan="5" class="p-4 text-center text-slate-500">Cargando transacciones...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <!-- Columna Izquierda: Registro y Listado de Ventas (7 Cols) -->
+      <div class="lg:col-span-7 space-y-4">
+        <!-- Formulario Ventas -->
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+          <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">➕ Registrar Venta con Unit Economics</h2>
+          <form id="form-venta" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+            <div class="col-span-2 md:col-span-1">
+              <label class="text-slate-400">Fecha</label>
+              <input type="date" id="v-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+            </div>
+            <div class="col-span-2">
+              <label class="text-slate-400">Detalle / Producto / Cliente</label>
+              <input type="text" id="v-detalle" placeholder="Ej: Pedido #102 - 3 Unidades" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Precio Cobrado ($)</label>
+              <input type="number" id="v-ingreso" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1 font-semibold text-emerald-400">
+            </div>
+            <div>
+              <label class="text-slate-400">Costo Producto / Insumos ($)</label>
+              <input type="number" id="v-costo-prod" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Costo Envío ($)</label>
+              <input type="number" id="v-costo-envio" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+            </div>
+            <button type="submit" class="col-span-2 md:col-span-3 bg-emerald-600 hover:bg-emerald-500 font-medium py-2 rounded text-white transition text-xs mt-1">
+              Guardar Registro de Venta
+            </button>
+          </form>
+        </div>
 
+        <!-- Tabla Ventas -->
+        <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+          <div class="p-3 border-b border-slate-800">
+            <h3 class="text-xs font-semibold uppercase text-slate-400">Ventas del Mes Seleccionado</h3>
+          </div>
+          <div class="overflow-x-auto max-h-80">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
+                <tr>
+                  <th class="p-2.5">Fecha</th>
+                  <th class="p-2.5">Detalle</th>
+                  <th class="p-2.5 text-right">Venta</th>
+                  <th class="p-2.5 text-right">Costos Var.</th>
+                  <th class="p-2.5 text-right">Margen</th>
+                  <th class="p-2.5 text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-ventas" class="divide-y divide-slate-800">
+                <tr><td colspan="6" class="p-3 text-center text-slate-500">Cargando ventas...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Estructura de Costos Fijos & Suscripciones (5 Cols) -->
+      <div class="lg:col-span-5 space-y-4">
+        <!-- Formulario Costo Fijo/Suscripción -->
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+          <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">⚙️ Suscripción / Costo Fijo</h2>
+          <form id="form-costo" class="grid grid-cols-2 gap-2 text-xs">
+            <div class="col-span-2">
+              <label class="text-slate-400">Servicio / Herramienta</label>
+              <input type="text" id="c-nombre" placeholder="Ej. Hosting, Shopify, Contador" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+            </div>
+            <div>
+              <label class="text-slate-400">Frecuencia Pago</label>
+              <select id="c-frecuencia" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+                <option value="30">Mensual (30 días)</option>
+                <option value="90">Trimestral (90 días)</option>
+                <option value="365">Anual (365 días)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-slate-400">Monto Cobrado ($)</label>
+              <input type="number" id="c-monto" min="1" placeholder="Monto total cobrado" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+            </div>
+            <button type="submit" class="col-span-2 bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded text-white transition text-xs mt-1">
+              Añadir a Costos Recurrentes
+            </button>
+          </form>
+        </div>
+
+        <!-- Tabla Costos Fijos & Prorrateo -->
+        <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+          <div class="p-3 border-b border-slate-800 flex justify-between items-center">
+            <h3 class="text-xs font-semibold uppercase text-slate-400">Estructura de Servicios Fijos</h3>
+            <span class="text-[10px] text-slate-500">Prorrateo / Mes</span>
+          </div>
+          <div class="overflow-x-auto max-h-80">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
+                <tr>
+                  <th class="p-2">Servicio</th>
+                  <th class="p-2">Ciclo</th>
+                  <th class="p-2 text-right">Total</th>
+                  <th class="p-2 text-right text-rose-400">Mes</th>
+                  <th class="p-2 text-center">x</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-costos" class="divide-y divide-slate-800">
+                <tr><td colspan="5" class="p-3 text-center text-slate-500">Cargando costos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <script>
-    // REEMPLAZA ESTOS VALORES CON LOS DE TU PANEL DE SUPABASE
+    // 1. REEMPLAZA CON TUS CREDENCIALES DE SUPABASE
     const SUPABASE_URL = 'https://eturayylryyhkgkmdris.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0dXJheXlscnl5aGtna21kcmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNjAxODEsImV4cCI6MjEwMjkzNjE4MX0.dShnzpUkrtBOvL2oIPoDg6LVif9D0EjbNTSYUxNTHd0';
-    
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Inicializar fecha de hoy en el formulario
-    document.getElementById('fecha').valueAsDate = new Date();
+    // Inicializar mes actual (YYYY-MM) y fecha de hoy
+    const hoy = new Date();
+    document.getElementById('filtro-mes').value = hoy.toISOString().slice(0, 7);
+    document.getElementById('v-fecha').valueAsDate = hoy;
 
-    const formatearMoneda = (valor) => {
-      return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(valor);
-    };
+    const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
-    async function cargarDatos() {
-      const { data: transacciones, error } = await db
-        .from('transacciones')
+    async function cargarTodo() {
+      const mesSeleccionado = document.getElementById('filtro-mes').value; // 'YYYY-MM'
+      const [anio, mes] = mesSeleccionado.split('-');
+      const primerDia = `${anio}-${mes}-01`;
+      const ultimoDia = new Date(anio, mes, 0).toISOString().slice(0, 10);
+
+      // Traer Ventas del mes
+      const { data: ventas, error: errVentas } = await db
+        .from('ventas')
         .select('*')
-        .order('fecha', { ascending: false })
-        .order('id', { ascending: false });
+        .gte('fecha', primerDia)
+        .lte('fecha', ultimoDia)
+        .order('fecha', { ascending: false });
 
-      if (error) {
-        console.error('Error al cargar datos:', error);
+      // Traer Costos Fijos
+      const { data: costos, error: errCostos } = await db
+        .from('costos_recurrentes')
+        .select('*')
+        .eq('activo', true);
+
+      if (errVentas || errCostos) {
+        console.error("Error al cargar datos", errVentas || errCostos);
         return;
       }
 
-      let totalIngresos = 0;
-      let totalGastos = 0;
-      const cuerpoTabla = document.getElementById('tabla-cuerpo');
+      // Calcular Ventas y Variables
+      let totalVentas = 0;
+      let totalVariables = 0;
+      const cuerpoVentas = document.getElementById('tabla-ventas');
 
-      if (!transacciones || transacciones.length === 0) {
-        cuerpoTabla.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No hay movimientos registrados.</td></tr>';
+      if (!ventas || ventas.length === 0) {
+        cuerpoVentas.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-500">Sin ventas en este mes.</td></tr>';
       } else {
-        cuerpoTabla.innerHTML = transacciones.map(item => {
-          const montoNum = Number(item.monto);
-          if (item.tipo === 'ingreso') totalIngresos += montoNum;
-          if (item.tipo === 'gasto') totalGastos += montoNum;
+        cuerpoVentas.innerHTML = ventas.map(v => {
+          const varItem = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.costo_otros_variables || 0);
+          const ingresoItem = Number(v.ingreso_total || 0);
+          const margenItem = ingresoItem - varItem;
 
-          const esIngreso = item.tipo === 'ingreso';
+          totalVentas += ingresoItem;
+          totalVariables += varItem;
+
           return `
-            <tr class="hover:bg-slate-700/30 transition">
-              <td class="p-3">${item.fecha}</td>
-              <td class="p-3">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${esIngreso ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-rose-950 text-rose-300 border border-rose-800'}">
-                  ${item.tipo.toUpperCase()}
-                </span>
-              </td>
-              <td class="p-3 font-medium text-slate-200">${item.categoria}</td>
-              <td class="p-3 text-right font-semibold ${esIngreso ? 'text-emerald-400' : 'text-rose-400'}">
-                ${esIngreso ? '+' : '-'}${formatearMoneda(montoNum)}
-              </td>
-              <td class="p-3 text-center">
-                <button onclick="eliminarMovimiento(${item.id})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 bg-rose-950/40 rounded border border-rose-800/50">
-                  Eliminar
-                </button>
+            <tr class="hover:bg-slate-800/40">
+              <td class="p-2.5 text-slate-400">${v.fecha.slice(5)}</td>
+              <td class="p-2.5 font-medium text-slate-200">${v.cliente_detalle}</td>
+              <td class="p-2.5 text-right font-medium text-emerald-400">${formatoCLP(ingresoItem)}</td>
+              <td class="p-2.5 text-right text-rose-300">-${formatoCLP(varItem)}</td>
+              <td class="p-2.5 text-right font-semibold ${margenItem >= 0 ? 'text-sky-400' : 'text-rose-500'}">${formatoCLP(margenItem)}</td>
+              <td class="p-2.5 text-center">
+                <button onclick="eliminarVenta(${v.id})" class="text-rose-400 hover:text-rose-200">✕</button>
               </td>
             </tr>
           `;
         }).join('');
       }
 
-      document.getElementById('total-ingresos').textContent = formatearMoneda(totalIngresos);
-      document.getElementById('total-gastos').textContent = formatearMoneda(totalGastos);
+      // Calcular Costos Fijos Prorrateados
+      let totalFijosMensuales = 0;
+      const cuerpoCostos = document.getElementById('tabla-costos');
+
+      if (!costos || costos.length === 0) {
+        cuerpoCostos.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-500">Sin costos fijos configurados.</td></tr>';
+      } else {
+        cuerpoCostos.innerHTML = costos.map(c => {
+          let impactoMensual = 0;
+          let etiquetaFrecuencia = 'Mensual';
+
+          if (c.frecuencia_dias === 30) {
+            impactoMensual = Number(c.monto);
+            etiquetaFrecuencia = '30d';
+          } else if (c.frecuencia_dias === 90) {
+            impactoMensual = Number(c.monto) / 3;
+            etiquetaFrecuencia = '90d';
+          } else if (c.frecuencia_dias === 365) {
+            impactoMensual = Number(c.monto) / 12;
+            etiquetaFrecuencia = '1 año';
+          }
+
+          totalFijosMensuales += impactoMensual;
+
+          return `
+            <tr class="hover:bg-slate-800/40">
+              <td class="p-2 font-medium text-slate-200">${c.nombre}</td>
+              <td class="p-2 text-slate-400">${etiquetaFrecuencia}</td>
+              <td class="p-2 text-right text-slate-400">${formatoCLP(c.monto)}</td>
+              <td class="p-2 text-right font-medium text-rose-400">${formatoCLP(impactoMensual)}</td>
+              <td class="p-2 text-center">
+                <button onclick="eliminarCosto(${c.id})" class="text-rose-400 hover:text-rose-200">✕</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // KPIs y Utilidad
+      const margenContribucion = totalVentas - totalVariables;
+      const utilidadNeta = margenContribucion - totalFijosMensuales;
+      const margenPorcentaje = totalVentas > 0 ? ((utilidadNeta / totalVentas) * 100).toFixed(1) : 0;
+
+      document.getElementById('kpi-ventas').textContent = formatoCLP(totalVentas);
+      document.getElementById('kpi-num-ventas').textContent = `${ventas ? ventas.length : 0} transacciones`;
+
+      document.getElementById('kpi-variables').textContent = formatoCLP(totalVariables);
+      document.getElementById('kpi-margen-bruto').textContent = `Margen Contrib: ${formatoCLP(margenContribucion)}`;
+
+      document.getElementById('kpi-fijos').textContent = formatoCLP(totalFijosMensuales);
       
-      const balance = totalIngresos - totalGastos;
-      const balanceElem = document.getElementById('balance-total');
-      balanceElem.textContent = formatearMoneda(balance);
-      balanceElem.className = `text-2xl font-bold mt-1 ${balance >= 0 ? 'text-sky-400' : 'text-rose-400'}`;
+      const elUtilidad = document.getElementById('kpi-utilidad');
+      elUtilidad.textContent = formatoCLP(utilidadNeta);
+      elUtilidad.className = `text-xl md:text-2xl font-bold mt-1 ${utilidadNeta >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
+
+      const elMargenNeto = document.getElementById('kpi-margen-neto');
+      elMargenNeto.textContent = `Margen Real: ${margenPorcentaje}%`;
+      elMargenNeto.className = `text-xs font-medium ${utilidadNeta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
     }
 
-    document.getElementById('form-movimiento').addEventListener('submit', async (e) => {
+    // Manejador Formulario Ventas
+    document.getElementById('form-venta').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const tipo = document.getElementById('tipo').value;
-      const fecha = document.getElementById('fecha').value;
-      const categoria = document.getElementById('categoria').value.trim();
-      const monto = Number(document.getElementById('monto').value);
+      const nuevaVenta = {
+        fecha: document.getElementById('v-fecha').value,
+        cliente_detalle: document.getElementById('v-detalle').value.trim(),
+        ingreso_total: Number(document.getElementById('v-ingreso').value),
+        costo_producto: Number(document.getElementById('v-costo-prod').value),
+        costo_envio: Number(document.getElementById('v-costo-envio').value || 0)
+      };
 
-      const { error } = await db.from('transacciones').insert([{ tipo, fecha, categoria, monto }]);
-
-      if (error) {
-        alert('Error al guardar: ' + error.message);
-      } else {
-        document.getElementById('categoria').value = '';
-        document.getElementById('monto').value = '';
-        cargarDatos();
+      const { error } = await db.from('ventas').insert([nuevaVenta]);
+      if (error) alert("Error al registrar venta: " + error.message);
+      else {
+        document.getElementById('v-detalle').value = '';
+        document.getElementById('v-ingreso').value = '';
+        document.getElementById('v-costo-prod').value = '';
+        document.getElementById('v-costo-envio').value = '';
+        cargarTodo();
       }
     });
 
-    async function eliminarMovimiento(id) {
-      if (!confirm('¿Deseas eliminar este registro?')) return;
-      const { error } = await db.from('transacciones').delete().eq('id', id);
-      if (error) {
-        alert('Error al eliminar: ' + error.message);
-      } else {
-        cargarDatos();
+    // Manejador Formulario Costos Fijos
+    document.getElementById('form-costo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevoCosto = {
+        nombre: document.getElementById('c-nombre').value.trim(),
+        frecuencia_dias: Number(document.getElementById('c-frecuencia').value),
+        monto: Number(document.getElementById('c-monto').value),
+        tipo_costo: 'fijo'
+      };
+
+      const { error } = await db.from('costos_recurrentes').insert([nuevoCosto]);
+      if (error) alert("Error al registrar costo fijo: " + error.message);
+      else {
+        document.getElementById('c-nombre').value = '';
+        document.getElementById('c-monto').value = '';
+        cargarTodo();
       }
+    });
+
+    async function eliminarVenta(id) {
+      if (!confirm("¿Eliminar este registro de venta?")) return;
+      await db.from('ventas').delete().eq('id', id);
+      cargarTodo();
     }
 
-    // Carga inicial
-    cargarDatos();
+    async function eliminarCosto(id) {
+      if (!confirm("¿Eliminar este costo fijo?")) return;
+      await db.from('costos_recurrentes').delete().eq('id', id);
+      cargarTodo();
+    }
+
+    // Cargar al inicio
+    cargarTodo();
   </script>
 </body>
 </html>
