@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suite Financiera Empresarial, Honorarios & Patrimonio</title>
+  <title>Suite Financiera Empresarial & Personal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- PDF.js para leer boletas del SII automáticamente -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 </head>
@@ -17,32 +16,36 @@
 
     <!-- HEADER PRINCIPAL -->
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/90 backdrop-blur p-4 rounded-2xl border border-slate-800 gap-4">
+      
+      <!-- Logo + Títulos Personalizables -->
       <div class="flex items-center gap-3.5">
-        <div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shrink-0">
-          <img src="https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200" alt="Logo" class="w-full h-full object-contain p-1">
+        <div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
+          <img id="app-logo-img" src="https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200" alt="Logo" class="w-full h-full object-contain p-1">
         </div>
         <div>
-          <h1 id="workspace-titulo" class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h1 id="header-titulo-principal" class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
             Tienda Dropshipping & E-commerce
           </h1>
-          <p id="workspace-subtitulo" class="text-slate-400 text-xs">Unit Economics, Dropi, Meta Ads y Utilidad Real</p>
+          <p id="header-subtitulo-principal" class="text-slate-400 text-xs">Unit Economics, Dropi, Meta Ads y Utilidad Real</p>
         </div>
       </div>
 
+      <!-- Controles de Navegación & Configuración -->
       <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+        
         <!-- Switcher Espacios -->
         <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
           <button onclick="cambiarWorkspace('dropshipping')" id="btn-ws-drop" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition">
-            🛍️ Dropshipping
+            🛍️ <span id="label-ws-drop">Dropshipping</span>
           </button>
           <button onclick="cambiarWorkspace('personal')" id="btn-ws-pers" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
-            👤 Honorarios & Personal
+            👤 <span id="label-ws-pers">Honorarios & Personal</span>
           </button>
         </div>
 
-        <!-- Botón Contextual CSV -->
+        <!-- Botón Contextual CSV Shopify -->
         <button id="btn-import-csv" onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
-          <span>📁</span> Importar CSV Shopify
+          <span>📁</span> Importar CSV
         </button>
 
         <!-- Filtro Mes -->
@@ -50,6 +53,12 @@
           <label class="text-xs text-slate-400 mr-2">Mes:</label>
           <input type="month" id="filtro-mes" class="bg-transparent text-xs md:text-sm text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
         </div>
+
+        <!-- Botón Ruedita de Configuración -->
+        <button onclick="abrirModalConfig()" title="Configuración del Sistema" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition">
+          <span class="text-base">⚙️</span>
+        </button>
+
       </div>
     </header>
 
@@ -152,20 +161,11 @@
         </div>
 
         <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-          <div class="p-3.5 border-b border-slate-800">
-            <h3 class="text-xs font-semibold uppercase text-slate-400">Listado de Pedidos del Mes</h3>
-          </div>
+          <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Listado de Pedidos del Mes</h3></div>
           <div class="overflow-x-auto max-h-[500px]">
             <table class="w-full text-left text-xs text-slate-300">
               <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-                <tr>
-                  <th class="p-3">Fecha</th>
-                  <th class="p-3">Pedido / Detalle</th>
-                  <th class="p-3 text-right">Venta</th>
-                  <th class="p-3 text-right">Costos Dropi</th>
-                  <th class="p-3 text-right">Margen</th>
-                  <th class="p-3 text-center">Acciones</th>
-                </tr>
+                <tr><th class="p-3">Fecha</th><th class="p-3">Pedido</th><th class="p-3 text-right">Venta</th><th class="p-3 text-right">Costos Dropi</th><th class="p-3 text-right">Margen</th><th class="p-3 text-center">Acciones</th></tr>
               </thead>
               <tbody id="tabla-ventas" class="divide-y divide-slate-800"></tbody>
             </table>
@@ -178,29 +178,16 @@
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <h2 class="text-sm font-semibold uppercase text-indigo-400 mb-3">📢 Registrar Gasto Diario Meta Ads</h2>
           <form id="form-ads" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
-            <div>
-              <label class="text-slate-400">Fecha</label>
-              <input type="date" id="ads-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-            </div>
-            <div>
-              <label class="text-slate-400">Gasto Total Pauta ($)</label>
-              <input type="number" id="ads-monto" min="1" placeholder="Ej: 15000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-indigo-300 font-semibold mt-1">
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 font-medium py-2 rounded-lg text-white transition text-xs">
-                Guardar Gasto
-              </button>
-            </div>
+            <div><label class="text-slate-400">Fecha</label><input type="date" id="ads-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
+            <div><label class="text-slate-400">Gasto Total Pauta ($)</label><input type="number" id="ads-monto" min="1" placeholder="Ej: 15000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-indigo-300 font-semibold mt-1"></div>
+            <div class="flex items-end"><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 font-medium py-2 rounded-lg text-white transition text-xs">Guardar Gasto</button></div>
           </form>
         </div>
-
         <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-          <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Historial de Publicidad</h3></div>
+          <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Historial Publicidad</h3></div>
           <div class="overflow-x-auto max-h-96">
             <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-                <tr><th class="p-3">Fecha</th><th class="p-3">Plataforma</th><th class="p-3 text-right">Inversión</th><th class="p-3 text-center">Acciones</th></tr>
-              </thead>
+              <thead class="bg-slate-800/80 sticky top-0 text-slate-400"><tr><th class="p-3">Fecha</th><th class="p-3">Plataforma</th><th class="p-3 text-right">Inversión</th><th class="p-3 text-center">Acciones</th></tr></thead>
               <tbody id="tabla-ads" class="divide-y divide-slate-800"></tbody>
             </table>
           </div>
@@ -212,35 +199,22 @@
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">⚙️ Configurar Suscripción de la Tienda</h2>
           <form id="form-costo" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
-            <div>
-              <label class="text-slate-400">Herramienta / Software</label>
-              <input type="text" id="c-nombre" placeholder="Ej: Shopify, Dominio, Apps" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-            </div>
+            <div><label class="text-slate-400">Herramienta</label><input type="text" id="c-nombre" placeholder="Ej: Shopify, Apps" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
             <div>
               <label class="text-slate-400">Ciclo</label>
               <select id="c-frecuencia" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                <option value="30">Mensual (30 días)</option>
-                <option value="90">Trimestral (90 días)</option>
-                <option value="365">Anual (365 días)</option>
+                <option value="30">Mensual (30 días)</option><option value="90">Trimestral (90 días)</option><option value="365">Anual (365 días)</option>
               </select>
             </div>
-            <div>
-              <label class="text-slate-400">Monto Cobrado ($)</label>
-              <input type="number" id="c-monto" min="1" placeholder="Total cobrado" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-            </div>
-            <button type="submit" class="col-span-1 md:col-span-3 bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs mt-1">
-              Guardar Costo Fijo
-            </button>
+            <div><label class="text-slate-400">Monto Facturado ($)</label><input type="number" id="c-monto" min="1" placeholder="Monto total" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
+            <button type="submit" class="col-span-1 md:col-span-3 bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs mt-1">Guardar Costo Fijo</button>
           </form>
         </div>
-
         <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
           <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Suscripciones Activas</h3></div>
           <div class="overflow-x-auto max-h-96">
             <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-                <tr><th class="p-3">Servicio</th><th class="p-3">Frecuencia</th><th class="p-3 text-right">Total</th><th class="p-3 text-right text-rose-400">Mes</th><th class="p-3 text-center">Acciones</th></tr>
-              </thead>
+              <thead class="bg-slate-800/80 sticky top-0 text-slate-400"><tr><th class="p-3">Servicio</th><th class="p-3">Frecuencia</th><th class="p-3 text-right">Total</th><th class="p-3 text-right text-rose-400">Mes</th><th class="p-3 text-center">Acciones</th></tr></thead>
               <tbody id="tabla-costos" class="divide-y divide-slate-800"></tbody>
             </table>
           </div>
@@ -253,47 +227,66 @@
     <!-- ========================================================= -->
     <div id="workspace-personal" class="space-y-5 hidden">
       
-      <!-- Navegación Personal -->
+      <!-- Navegación Personal con Tab de Dashboard de Inicio -->
       <nav class="flex border-b border-slate-800 gap-2 text-xs md:text-sm font-medium">
-        <button onclick="cambiarTabPers('honorarios_gastos')" id="tab-pers-hon-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-emerald-500 text-emerald-400 font-semibold transition">
-          📑 Boletas & Gastos Personales
+        <button onclick="cambiarTabPers('dashboard')" id="tab-pers-dash-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-emerald-500 text-emerald-400 font-semibold transition">
+          📊 Dashboard Patrimonial
+        </button>
+        <button onclick="cambiarTabPers('honorarios_gastos')" id="tab-pers-hon-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+          📑 Boletas & Gastos
         </button>
         <button onclick="cambiarTabPers('inversiones')" id="tab-pers-inv-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          🚀 Inversiones & Proyección de Patrimonio
+          🚀 Inversiones & Proyección
         </button>
       </nav>
 
-      <!-- TAB 1: HONORARIOS & GASTOS -->
-      <div id="tab-pers-honorarios_gastos" class="tab-pers-content space-y-5">
-        <!-- KPIs Personal -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-            <span class="text-slate-400 text-xs font-semibold uppercase">Honorarios Líquidos</span>
-            <p id="kpi-pers-ingresos" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
-            <span id="kpi-pers-bruto" class="text-[11px] text-slate-500">Bruto: $0</span>
+      <!-- KPIs Personal (Siempre Visibles en este workspace) -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Honorarios Líquidos</span>
+          <p id="kpi-pers-ingresos" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
+          <span id="kpi-pers-bruto" class="text-[11px] text-slate-500">Bruto: $0</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Retención SII</span>
+          <p id="kpi-pers-retencion" class="text-xl font-bold text-amber-400 mt-1">$0</p>
+          <span class="text-[11px] text-slate-500">Impuesto acumulado</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Gastos Personales Totales</span>
+          <p id="kpi-pers-gastos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
+          <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Fijos vs Variables</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">Capacidad Ahorro / Mes</span>
+          <p id="kpi-pers-ahorro" class="text-xl font-bold text-sky-400 mt-1">$0</p>
+          <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa: 0%</span>
+        </div>
+      </div>
+
+      <!-- TAB 1: DASHBOARD PATRIMONIAL & FINANZAS PERSONALES -->
+      <div id="tab-pers-dashboard" class="tab-pers-content space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Gráfico de Flujo: Ingresos vs Gastos Personales -->
+          <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Flujo de Caja Personal: Honorarios Líquidos vs Gastos</h3>
+            <div class="h-64 relative"><canvas id="chart-flujo-personal"></canvas></div>
           </div>
-          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-            <span class="text-slate-400 text-xs font-semibold uppercase">Retención SII</span>
-            <p id="kpi-pers-retencion" class="text-xl font-bold text-amber-400 mt-1">$0</p>
-            <span class="text-[11px] text-slate-500">Impuesto acumulado</span>
-          </div>
-          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-            <span class="text-slate-400 text-xs font-semibold uppercase">Gastos Personales Totales</span>
-            <p id="kpi-pers-gastos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
-            <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Fijos vs Variables</span>
-          </div>
-          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-            <span class="text-slate-400 text-xs font-semibold uppercase">Capacidad Ahorro / Mes</span>
-            <p id="kpi-pers-ahorro" class="text-xl font-bold text-sky-400 mt-1">$0</p>
-            <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa: 0%</span>
+          <!-- Gráfico de Dona: Desglose de Gastos por Categoría -->
+          <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Gastos</h3>
+            <div class="h-56 relative flex items-center justify-center"><canvas id="chart-gastos-cat"></canvas></div>
+            <div id="gastos-cat-leyenda" class="text-xs text-slate-400 text-center pt-3 border-t border-slate-800/80"></div>
           </div>
         </div>
+      </div>
 
+      <!-- TAB 2: BOLETAS & GASTOS -->
+      <div id="tab-pers-honorarios_gastos" class="tab-pers-content hidden space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
-          <!-- Columna Izquierda: Boletas SII + Lector PDF (7 Cols) -->
+          <!-- Boletas SII + Lector PDF (7 Cols) -->
           <div class="lg:col-span-7 space-y-4">
-            
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
               <div class="flex justify-between items-center">
                 <h2 class="text-sm font-semibold uppercase text-emerald-400">📄 Registrar Boleta de Honorarios</h2>
@@ -314,7 +307,7 @@
                 </div>
                 <div class="col-span-3">
                   <label class="text-slate-400">Glosa / Detalle del Servicio</label>
-                  <input type="text" id="h-detalle" placeholder="Ej: Servicios profesionales de marketing y gestión" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <input type="text" id="h-detalle" placeholder="Ej: Servicios profesionales de marketing y gestión comercial" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
                 </div>
                 <div>
                   <label class="text-slate-400">Monto Bruto ($)</label>
@@ -333,7 +326,7 @@
                     <input type="checkbox" id="h-pagada" class="rounded bg-slate-800 border-slate-700 text-emerald-600 focus:ring-0">
                     <span>¿Ya fue pagada / depositada?</span>
                   </label>
-                  <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-xl transition text-xs">
+                  <button type="submit" id="btn-guardar-honorario" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-xl transition text-xs">
                     Guardar Boleta
                   </button>
                 </div>
@@ -351,12 +344,10 @@
                 </table>
               </div>
             </div>
-
           </div>
 
-          <!-- Columna Derecha: Gastos Personales + Importador Cartola Banco CSV (5 Cols) -->
+          <!-- Gastos Personales + Importador Banco CSV (5 Cols) -->
           <div class="lg:col-span-5 space-y-4">
-            
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
               <div class="flex justify-between items-center">
                 <h2 class="text-sm font-semibold uppercase text-rose-400">💸 Gastos Personales</h2>
@@ -415,21 +406,17 @@
                 </table>
               </div>
             </div>
-
           </div>
 
         </div>
       </div>
 
-      <!-- TAB 2: INVERSIONES & PROYECCIÓN DE PATRIMONIO -->
+      <!-- TAB 3: INVERSIONES & PROYECCIÓN -->
       <div id="tab-pers-inversiones" class="tab-pers-content hidden space-y-5">
-        
-        <!-- KPIs Inversiones -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
             <span class="text-slate-400 text-xs font-semibold uppercase">Capital Total Invertido</span>
             <p id="kpi-inv-capital" class="text-xl font-bold text-slate-200 mt-1">$0</p>
-            <span class="text-[11px] text-slate-500">Aportes acumulados</span>
           </div>
           <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
             <span class="text-slate-400 text-xs font-semibold uppercase">Valor Actual Cartera</span>
@@ -444,13 +431,11 @@
           <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
             <span class="text-slate-400 text-xs font-semibold uppercase">Proyección a 10 Años</span>
             <p id="kpi-inv-proyeccion-10" class="text-xl font-bold text-purple-400 mt-1">$0</p>
-            <span class="text-[11px] text-purple-300">Interés compuesto estimado</span>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          
-          <!-- Formulario y Tabla de Inversiones (7 Cols) -->
+          <!-- Formulario y Tabla Inversiones (7 Cols) -->
           <div class="lg:col-span-7 space-y-4">
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
               <h2 class="text-sm font-semibold uppercase text-sky-400 mb-3">➕ Registrar Activo / Inversión</h2>
@@ -462,11 +447,7 @@
                 <div>
                   <label class="text-slate-400">Tipo</label>
                   <select id="inv-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                    <option value="ETF">ETF</option>
-                    <option value="Fondo Mutuo">Fondo Mutuo</option>
-                    <option value="Acciones">Acciones</option>
-                    <option value="DAP">Depósito a Plazo</option>
-                    <option value="Cripto">Criptomonedas</option>
+                    <option value="ETF">ETF</option><option value="Fondo Mutuo">Fondo Mutuo</option><option value="Acciones">Acciones</option><option value="DAP">Depósito a Plazo</option><option value="Cripto">Criptomonedas</option>
                   </select>
                 </div>
                 <div>
@@ -486,14 +467,13 @@
                   <input type="text" id="inv-plataforma" placeholder="Ej: Racional, Fintual, Banco, Buda" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
                 </div>
                 <div class="flex items-end">
-                  <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs">
+                  <button type="submit" id="btn-guardar-inversion" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs">
                     Guardar Activo
                   </button>
                 </div>
               </form>
             </div>
 
-            <!-- Tabla Inversiones -->
             <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
               <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Cartera de Inversiones Actual</h3></div>
               <div class="overflow-x-auto max-h-80">
@@ -507,33 +487,76 @@
             </div>
           </div>
 
-          <!-- Gráfico de Proyección Interés Compuesto (5 Cols) -->
+          <!-- Proyección Patrimonio (5 Cols) -->
           <div class="lg:col-span-5 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-sm font-bold uppercase text-purple-400">🚀 Proyección de Crecimiento Patrimonial</h3>
-              <p class="text-xs text-slate-400 mt-1">Simulación a 1, 3, 5 y 10 años con reinversión continua</p>
+              <p class="text-xs text-slate-400 mt-1">Simulación con interés compuesto continuo</p>
             </div>
             <div class="h-64 relative"><canvas id="chart-inversiones"></canvas></div>
-            <div id="simulacion-texto" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1">
-              <!-- Dinámico -->
-            </div>
+            <div id="simulacion-texto" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1"></div>
           </div>
-
         </div>
-
       </div>
 
     </div>
 
   </div>
 
-  <!-- MODAL IMPORTAR CSV BANCO (CARTOLA) -->
+  <!-- ========================================== -->
+  <!-- MODAL DE CONFIGURACIÓN DEL SISTEMA (⚙️)   -->
+  <!-- ========================================== -->
+  <div id="modal-config" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2"><span>⚙️</span> Personalización & Configuración</h2>
+        <button onclick="cerrarModalConfig()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+      
+      <form id="form-config" class="space-y-3.5 text-xs">
+        <div>
+          <label class="text-slate-300 font-semibold">URL del Logo de la Empresa</label>
+          <input type="text" id="cfg-logo-url" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          <p class="text-[10px] text-slate-500 mt-0.5">Puedes usar URLs directas o enlaces compartidos de Google Drive.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-slate-300 font-semibold">Nombre Workspace 1</label>
+            <input type="text" id="cfg-ws-drop" value="Dropshipping" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+          <div>
+            <label class="text-slate-300 font-semibold">Nombre Workspace 2</label>
+            <input type="text" id="cfg-ws-pers" value="Honorarios & Personal" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-slate-300 font-semibold">Retención SII por Defecto (%)</label>
+            <input type="number" step="0.01" id="cfg-ret-sii" value="15.25" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+          <div>
+            <label class="text-slate-300 font-semibold">Rendimiento Inversión Anual (%)</label>
+            <input type="number" step="0.1" id="cfg-tasa-inv" value="8.0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalConfig()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl transition">Guardar Preferencias</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CARTOLA BANCO CSV -->
   <div id="modal-banco-csv" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
           <h2 class="text-lg font-bold text-white">Importar Gastos desde Cartola Bancaria CSV</h2>
-          <p class="text-xs text-slate-400">Carga el archivo CSV exportado desde tu banco</p>
+          <p class="text-xs text-slate-400">Carga tu cartola de Banco Santander, BancoEstado, Banco de Chile, Bci, etc.</p>
         </div>
         <button onclick="cerrarModalBancoCSV()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
@@ -549,7 +572,7 @@
             <tr><th class="p-2">Fecha</th><th class="p-2">Descripción</th><th class="p-2 text-right">Monto ($)</th></tr>
           </thead>
           <tbody id="banco-preview-body" class="divide-y divide-slate-800">
-            <tr><td colspan="3" class="p-6 text-center text-slate-500">Selecciona una cartola para ver los cargos detectados.</td></tr>
+            <tr><td colspan="3" class="p-6 text-center text-slate-500">Selecciona una cartola para ver los cargos.</td></tr>
           </tbody>
         </table>
       </div>
@@ -566,7 +589,7 @@
     </div>
   </div>
 
-  <!-- MODAL CSV SHOPIFY (Mantiene compatibilidad) -->
+  <!-- MODAL CSV SHOPIFY -->
   <div id="modal-csv" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -597,6 +620,9 @@
   </div>
 
   <script>
+    // ==========================================
+    // CLIENTE SUPABASE
+    // ==========================================
     const SUPABASE_URL = 'https://eturayylryyhkgkmdris.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0dXJheXlscnl5aGtna21kcmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNjAxODEsImV4cCI6MjEwMjkzNjE4MX0.dShnzpUkrtBOvL2oIPoDg6LVif9D0EjbNTSYUxNTHd0';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -606,8 +632,11 @@
     let datosPersonal = { honorarios: [], gastos: [], inversiones: [] };
     let filasParaImportar = [];
     let filasBancoImportar = [];
+    
     let chartEvolucion = null;
     let chartDistribucion = null;
+    let chartFlujoPersonal = null;
+    let chartGastosCat = null;
     let chartInversiones = null;
 
     const hoy = new Date();
@@ -619,6 +648,47 @@
 
     const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
+    // ==========================================
+    // CARGAR Y APLICAR CONFIGURACIONES LOCALES
+    // ==========================================
+    function aplicarConfiguraciones() {
+      const cfgLogo = localStorage.getItem('cfg_logo_url') || 'https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200';
+      const cfgWsDrop = localStorage.getItem('cfg_ws_drop') || 'Dropshipping';
+      const cfgWsPers = localStorage.getItem('cfg_ws_pers') || 'Honorarios & Personal';
+      const cfgRetSii = localStorage.getItem('cfg_ret_sii') || '15.25';
+      const cfgTasaInv = localStorage.getItem('cfg_tasa_inv') || '8.0';
+
+      document.getElementById('app-logo-img').src = cfgLogo;
+      document.getElementById('label-ws-drop').textContent = cfgWsDrop;
+      document.getElementById('label-ws-pers').textContent = cfgWsPers;
+      document.getElementById('h-ret-tasa').value = cfgRetSii;
+      document.getElementById('inv-tasa').value = cfgTasaInv;
+
+      document.getElementById('cfg-logo-url').value = cfgLogo;
+      document.getElementById('cfg-ws-drop').value = cfgWsDrop;
+      document.getElementById('cfg-ws-pers').value = cfgWsPers;
+      document.getElementById('cfg-ret-sii').value = cfgRetSii;
+      document.getElementById('cfg-tasa-inv').value = cfgTasaInv;
+    }
+
+    function abrirModalConfig() { document.getElementById('modal-config').classList.remove('hidden'); }
+    function cerrarModalConfig() { document.getElementById('modal-config').classList.add('hidden'); }
+
+    document.getElementById('form-config').addEventListener('submit', (e) => {
+      e.preventDefault();
+      localStorage.setItem('cfg_logo_url', document.getElementById('cfg-logo-url').value.trim());
+      localStorage.setItem('cfg_ws_drop', document.getElementById('cfg-ws-drop').value.trim());
+      localStorage.setItem('cfg_ws_pers', document.getElementById('cfg-ws-pers').value.trim());
+      localStorage.setItem('cfg_ret_sii', document.getElementById('cfg-ret-sii').value);
+      localStorage.setItem('cfg_tasa_inv', document.getElementById('cfg-tasa-inv').value);
+      aplicarConfiguraciones();
+      cerrarModalConfig();
+      alert('¡Configuración guardada exitosamente!');
+    });
+
+    // ==========================================
+    // WORKSPACE & TABS
+    // ==========================================
     function cambiarWorkspace(ws) {
       workspaceActivo = ws;
       const btnDrop = document.getElementById('btn-ws-drop');
@@ -626,8 +696,8 @@
       const wsDrop = document.getElementById('workspace-dropshipping');
       const wsPers = document.getElementById('workspace-personal');
       const btnCsv = document.getElementById('btn-import-csv');
-      const tit = document.getElementById('workspace-titulo');
-      const sub = document.getElementById('workspace-subtitulo');
+      const tit = document.getElementById('header-titulo-principal');
+      const sub = document.getElementById('header-subtitulo-principal');
 
       if (ws === 'dropshipping') {
         btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition';
@@ -635,17 +705,18 @@
         wsDrop.classList.remove('hidden');
         wsPers.classList.add('hidden');
         btnCsv.classList.remove('hidden');
-        tit.textContent = 'Tienda Dropshipping & E-commerce';
+        tit.textContent = localStorage.getItem('cfg_ws_drop') || 'Tienda Dropshipping & E-commerce';
         sub.textContent = 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
-        renderizarGraficos();
+        renderizarGraficosDrop();
       } else {
         btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition';
         btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
         wsDrop.classList.add('hidden');
         wsPers.classList.remove('hidden');
         btnCsv.classList.add('hidden');
-        tit.textContent = 'Servicios Profesionales, Finanzas & Patrimonio';
+        tit.textContent = localStorage.getItem('cfg_ws_pers') || 'Servicios Profesionales, Finanzas & Patrimonio';
         sub.textContent = 'Boletas de Honorarios, Gastos Personales e Inversiones';
+        renderizarGraficosPersonal();
       }
     }
 
@@ -659,7 +730,7 @@
       const btn = document.getElementById(`tab-drop-${tab}-btn`);
       btn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
       btn.classList.remove('border-transparent', 'text-slate-400');
-      if (tab === 'dashboard') renderizarGraficos();
+      if (tab === 'dashboard') renderizarGraficosDrop();
     }
 
     function cambiarTabPers(tab) {
@@ -672,9 +743,14 @@
       const btn = document.getElementById(`tab-pers-${tab}-btn`);
       btn.classList.add('border-emerald-500', 'text-emerald-400', 'font-semibold');
       btn.classList.remove('border-transparent', 'text-slate-400');
+      
+      if (tab === 'dashboard') renderizarGraficosPersonal();
       if (tab === 'inversiones') renderizarGraficoInversiones();
     }
 
+    // ==========================================
+    // CARGAR DATOS GENERALES
+    // ==========================================
     async function cargarTodo() {
       const mesSeleccionado = document.getElementById('filtro-mes').value;
       const [anio, mes] = mesSeleccionado.split('-');
@@ -775,7 +851,7 @@
       elUt.className = `text-xl font-bold mt-1 ${utilidadNeta >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
       document.getElementById('kpi-margen-neto').textContent = `Margen: ${margenPct}%`;
 
-      renderizarGraficos();
+      renderizarGraficosDrop();
     }
 
     function procesarModuloPersonal() {
@@ -822,9 +898,10 @@
       document.getElementById('kpi-pers-gastos-fijos').textContent = `Fijos: ${formatoCLP(totalGastosFijosPers)}`;
       document.getElementById('kpi-pers-ahorro').textContent = formatoCLP(saldoAhorro);
       document.getElementById('kpi-pers-capacidad').textContent = `Tasa: ${totalLiquido > 0 ? ((saldoAhorro / totalLiquido) * 100).toFixed(1) : 0}%`;
+
+      renderizarGraficosPersonal();
     }
 
-    // --- PROCESAMIENTO MÓDULO INVERSIONES ---
     function procesarModuloInversiones() {
       let totalCapital = 0;
       let totalValorActual = 0;
@@ -855,9 +932,7 @@
               <td class="p-2.5 text-right font-semibold ${ret >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                 ${ret >= 0 ? '+' : ''}${formatoCLP(ret)} (${retPct}%)
               </td>
-              <td class="p-2.5 text-center">
-                <button onclick="eliminarInversion(${inv.id})" class="text-rose-400">✕</button>
-              </td>
+              <td class="p-2.5 text-center"><button onclick="eliminarInversion(${inv.id})" class="text-rose-400">✕</button></td>
             </tr>
           `;
         }).join('');
@@ -866,8 +941,6 @@
       const gananciaTotal = totalValorActual - totalCapital;
       const rentabilidadTotalPct = totalCapital > 0 ? ((gananciaTotal / totalCapital) * 100).toFixed(1) : 0;
       const tasaPonderada = totalValorActual > 0 ? (rendimientoPromedioPonderado / totalValorActual) : 8.0;
-
-      // Proyección a 10 años (Interés Compuesto: Vf = V0 * (1 + r)^10)
       const proyeccion10 = totalValorActual * Math.pow(1 + (tasaPonderada / 100), 10);
 
       document.getElementById('kpi-inv-capital').textContent = formatoCLP(totalCapital);
@@ -878,6 +951,75 @@
       document.getElementById('kpi-inv-proyeccion-10').textContent = formatoCLP(Math.round(proyeccion10));
 
       renderizarGraficoInversiones(totalValorActual, tasaPonderada);
+    }
+
+    // ==========================================
+    // GRÁFICOS PERSONAL
+    // ==========================================
+    function renderizarGraficosPersonal() {
+      if (workspaceActivo !== 'personal') return;
+
+      // 1. Gráfico Flujo Ingresos vs Gastos
+      const diasMap = {};
+      datosPersonal.honorarios.forEach(h => {
+        const dia = h.fecha.slice(8, 10);
+        if (!diasMap[dia]) diasMap[dia] = { ingresos: 0, gastos: 0 };
+        diasMap[dia].ingresos += Number(h.monto_liquido || 0);
+      });
+      datosPersonal.gastos.forEach(g => {
+        const dia = g.fecha.slice(8, 10);
+        if (!diasMap[dia]) diasMap[dia] = { ingresos: 0, gastos: 0 };
+        diasMap[dia].gastos += Number(g.monto || 0);
+      });
+
+      const labels = Object.keys(diasMap).sort((a, b) => Number(a) - Number(b));
+      const ctxFlujo = document.getElementById('chart-flujo-personal').getContext('2d');
+      if (chartFlujoPersonal) chartFlujoPersonal.destroy();
+
+      chartFlujoPersonal = new Chart(ctxFlujo, {
+        type: 'bar',
+        data: {
+          labels: labels.map(d => `Día ${d}`),
+          datasets: [
+            { label: 'Honorarios Líquidos ($)', data: labels.map(d => diasMap[d].ingresos), backgroundColor: '#34d399', borderRadius: 4 },
+            { label: 'Gastos ($)', data: labels.map(d => diasMap[d].gastos), backgroundColor: '#f87171', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
+        }
+      });
+
+      // 2. Gráfico Categorías de Gasto
+      const catMap = {};
+      datosPersonal.gastos.forEach(g => {
+        catMap[g.categoria] = (catMap[g.categoria] || 0) + Number(g.monto);
+      });
+
+      const catLabels = Object.keys(catMap);
+      const catData = Object.values(catMap);
+      const ctxCat = document.getElementById('chart-gastos-cat').getContext('2d');
+      if (chartGastosCat) chartGastosCat.destroy();
+
+      chartGastosCat = new Chart(ctxCat, {
+        type: 'doughnut',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            data: catData,
+            backgroundColor: ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#34d399', '#f97316', '#64748b', '#e2e8f0'],
+            borderWidth: 0
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+      });
+
+      document.getElementById('gastos-cat-leyenda').innerHTML = catLabels.map((c, i) => `
+        <span class="inline-block mr-2 mb-1"><span class="inline-block w-2 h-2 rounded-full mr-1" style="background-color: ${['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#34d399', '#f97316', '#64748b', '#e2e8f0'][i % 8]}"></span>${c}: ${formatoCLP(catData[i])}</span>
+      `).join('');
     }
 
     function renderizarGraficoInversiones(valorBase, tasa) {
@@ -910,10 +1052,7 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#94a3b8' } } },
-          scales: {
-            x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
-            y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
-          }
+          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
         }
       });
 
@@ -924,186 +1063,7 @@
       `;
     }
 
-    // ==========================================
-    // LECTOR DE BOLETAS SII EN PDF
-    // ==========================================
-    async function leerPDFBoleta(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        let fullText = '';
-
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          fullText += textContent.items.map(item => item.str).join(' ') + ' ';
-        }
-
-        // Regex para capturar montos y datos del PDF del SII
-        const regexBruto = /Total\s*Honorarios\s*\$?\s*([\d\.]+)/i;
-        const regexRet = /Retenci[oó]n\s*\$?\s*([\d\.]+)/i;
-        const regexLiquido = /Total\s*L[ií]quido\s*\$?\s*([\d\.]+)/i;
-
-        const matchBruto = fullText.match(regexBruto);
-        const matchRet = fullText.match(regexRet);
-        const matchLiq = fullText.match(regexLiquido);
-
-        if (matchBruto) {
-          const bruto = parseInt(matchBruto[1].replace(/\./g, ''), 10);
-          document.getElementById('h-bruto').value = bruto;
-          calcularLiquidoHonorario();
-        }
-
-        alert("¡PDF de boleta analizado! Revisa y completa los campos antes de guardar.");
-      } catch (err) {
-        alert("No se pudo extraer el texto automáticamente del PDF: " + err.message);
-      }
-    }
-
-    // ==========================================
-    // IMPORTADOR CARTOLA BANCO CSV
-    // ==========================================
-    function abrirModalBancoCSV() { document.getElementById('modal-banco-csv').classList.remove('hidden'); }
-    function cerrarModalBancoCSV() { document.getElementById('modal-banco-csv').classList.add('hidden'); }
-
-    document.getElementById('input-banco-csv').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          filasBancoImportar = [];
-          const data = results.data;
-
-          data.forEach(row => {
-            // Detección inteligente de columnas bancarias chilenas
-            const fechaRaw = row['Fecha'] || row['FECHA'] || row['Fecha Transaccion'] || new Date().toISOString().slice(0, 10);
-            const desc = row['Descripcion'] || row['DESCRIPCION'] || row['Detalle'] || row['Glosa'] || 'Gasto Banco';
-            const cargo = row['Cargo'] || row['CARGO'] || row['Monto'] || row['MONTO'] || row['Cargos'];
-
-            if (cargo) {
-              const montoLimpio = Math.abs(parseInt(String(cargo).replace(/[^\d]/g, ''), 10) || 0);
-              if (montoLimpio > 0) {
-                filasBancoImportar.push({
-                  fecha: fechaRaw.length === 10 ? fechaRaw : new Date().toISOString().slice(0, 10),
-                  categoria: 'Otros',
-                  descripcion: desc.trim(),
-                  monto: montoLimpio,
-                  tipo: 'variable'
-                });
-              }
-            }
-          });
-
-          const tbody = document.getElementById('banco-preview-body');
-          const btn = document.getElementById('btn-confirmar-banco-csv');
-          const cont = document.getElementById('banco-contador');
-
-          if (filasBancoImportar.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-500">No se detectaron cargos válidos.</td></tr>';
-            btn.disabled = true;
-          } else {
-            cont.textContent = `${filasBancoImportar.length} cargos detectados`;
-            btn.disabled = false;
-            tbody.innerHTML = filasBancoImportar.slice(0, 50).map(f => `
-              <tr class="hover:bg-slate-900/60">
-                <td class="p-2 text-slate-400">${f.fecha}</td>
-                <td class="p-2 text-slate-200 truncate max-w-xs">${f.descripcion}</td>
-                <td class="p-2 text-right font-semibold text-rose-400">-${formatoCLP(f.monto)}</td>
-              </tr>
-            `).join('');
-          }
-        }
-      });
-    });
-
-    async function guardarBancoCSVEnSupabase() {
-      const btn = document.getElementById('btn-confirmar-banco-csv');
-      btn.disabled = true;
-      btn.textContent = 'Guardando...';
-
-      const { error } = await db.from('gastos_personales').insert(filasBancoImportar);
-      if (error) alert("Error: " + error.message);
-      else {
-        alert(`¡Listo! Se importaron ${filasBancoImportar.length} gastos bancarios.`);
-        cerrarModalBancoCSV();
-        cargarTodo();
-      }
-    }
-
-    // Formularios
-    document.getElementById('form-inversion').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nuevaInv = {
-        nombre: document.getElementById('inv-nombre').value.trim(),
-        tipo: document.getElementById('inv-tipo').value,
-        capital_invertido: Number(document.getElementById('inv-capital').value),
-        valor_actual: Number(document.getElementById('inv-actual').value),
-        rentabilidad_anual_estimada: Number(document.getElementById('inv-tasa').value),
-        plataforma: document.getElementById('inv-plataforma').value.trim()
-      };
-      await db.from('inversiones').insert([nuevaInv]);
-      document.getElementById('inv-nombre').value = '';
-      document.getElementById('inv-capital').value = '';
-      document.getElementById('inv-actual').value = '';
-      cargarTodo();
-    });
-
-    document.getElementById('form-honorario').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const bruto = Number(document.getElementById('h-bruto').value);
-      const tasa = Number(document.getElementById('h-ret-tasa').value);
-      const ret = bruto * (tasa / 100);
-      const liquido = bruto - ret;
-
-      await db.from('honorarios').insert([{
-        fecha: document.getElementById('h-fecha').value,
-        cliente_empresa: document.getElementById('h-cliente').value.trim(),
-        detalle_servicio: document.getElementById('h-detalle').value.trim(),
-        monto_bruto: bruto,
-        retencion_porcentaje: tasa,
-        monto_liquido: liquido,
-        estado: document.getElementById('h-pagada').checked ? 'pagada' : 'pendiente'
-      }]);
-      document.getElementById('h-cliente').value = '';
-      document.getElementById('h-detalle').value = '';
-      document.getElementById('h-bruto').value = '';
-      cargarTodo();
-    });
-
-    document.getElementById('form-gasto-pers').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await db.from('gastos_personales').insert([{
-        fecha: document.getElementById('gp-fecha').value,
-        categoria: document.getElementById('gp-categoria').value,
-        descripcion: document.getElementById('gp-desc').value.trim(),
-        monto: Number(document.getElementById('gp-monto').value),
-        tipo: document.getElementById('gp-tipo').value
-      }]);
-      document.getElementById('gp-desc').value = '';
-      document.getElementById('gp-monto').value = '';
-      cargarTodo();
-    });
-
-    function calcularLiquidoHonorario() {
-      const bruto = Number(document.getElementById('h-bruto').value || 0);
-      const tasa = Number(document.getElementById('h-ret-tasa').value || 15.25);
-      document.getElementById('h-liquido-calc').value = formatoCLP(bruto - (bruto * (tasa / 100)));
-    }
-
-    async function eliminarInversion(id) { if (confirm("¿Eliminar activo?")) { await db.from('inversiones').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarHonorario(id) { if (confirm("¿Eliminar boleta?")) { await db.from('honorarios').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarGastoPersonal(id) { if (confirm("¿Eliminar gasto?")) { await db.from('gastos_personales').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarVenta(id) { if (confirm("¿Eliminar venta?")) { await db.from('ventas').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarAds(id) { if (confirm("¿Eliminar pauta?")) { await db.from('gasto_publicidad').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarCosto(id) { if (confirm("¿Eliminar costo?")) { await db.from('costos_recurrentes').delete().eq('id', id); cargarTodo(); } }
-
-    function renderizarGraficos() {
+    function renderizarGraficosDrop() {
       if (workspaceActivo !== 'dropshipping') return;
       const diasMap = {};
       datosDrop.ventas.forEach(v => {
@@ -1144,6 +1104,369 @@
       document.getElementById('distribucion-leyenda').innerHTML = `<div>Dropi: ${formatoCLP(totalCostosDropi)}</div><div>Ads: ${formatoCLP(totalAds)}</div><div>Fijos: ${formatoCLP(totalFijosMes)}</div>`;
     }
 
+    // ==========================================
+    // LECTOR DE BOLETAS SII EN PDF (ROBUSTO)
+    // ==========================================
+    async function leerPDFBoleta(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          fullText += textContent.items.map(item => item.str).join(' ') + ' ';
+        }
+
+        // Limpieza y matching flexible
+        const textoLimpio = fullText.replace(/\s+/g, ' ');
+
+        // Buscar fecha (DD/MM/YYYY o DD-MM-YYYY)
+        const matchFecha = textoLimpio.match(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/);
+        if (matchFecha) {
+          document.getElementById('h-fecha').value = `${matchFecha[3]}-${matchFecha[2]}-${matchFecha[1]}`;
+        }
+
+        // Extraer montos
+        const matchBruto = textoLimpio.match(/(?:Total\s*Honorarios|Honorarios\s*Bruto)[^\d]*([\d\.]+)/i);
+        const matchRet = textoLimpio.match(/(?:Retenci[oó]n|Retenido)[^\d]*([\d\.]+)/i);
+
+        if (matchBruto) {
+          const montoBruto = parseInt(matchBruto[1].replace(/\./g, ''), 10);
+          if (!isNaN(montoBruto)) document.getElementById('h-bruto').value = montoBruto;
+        }
+
+        // Buscar nombre de cliente/empresa (después de "Señor(es)" o "Rut:")
+        const matchCliente = textoLimpio.match(/(?:Señor\(es\)|Para:)\s*([A-Za-z0-9\s\.\-]{3,40})/i);
+        if (matchCliente && matchCliente[1]) {
+          document.getElementById('h-cliente').value = matchCliente[1].trim();
+        }
+
+        calcularLiquidoHonorario();
+        alert("¡Boleta procesada con éxito! Revisa los campos y pulsa Guardar.");
+      } catch (err) {
+        alert("No se pudo extraer el texto del PDF automáticamente. Puedes rellenar los datos manualmente.");
+      }
+    }
+
+    function calcularLiquidoHonorario() {
+      const bruto = Number(document.getElementById('h-bruto').value || 0);
+      const tasa = Number(document.getElementById('h-ret-tasa').value || 15.25);
+      document.getElementById('h-liquido-calc').value = formatoCLP(bruto - (bruto * (tasa / 100)));
+    }
+
+    // ==========================================
+    // ENVÍO DE FORMULARIOS A SUPABASE CON VALIDACIÓN
+    // ==========================================
+    document.getElementById('form-honorario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-guardar-honorario');
+      btn.disabled = true;
+
+      const bruto = Number(document.getElementById('h-bruto').value);
+      const tasa = Number(document.getElementById('h-ret-tasa').value);
+      const ret = bruto * (tasa / 100);
+      const liquido = bruto - ret;
+
+      const nuevaBoleta = {
+        fecha: document.getElementById('h-fecha').value,
+        cliente_empresa: document.getElementById('h-cliente').value.trim(),
+        detalle_servicio: document.getElementById('h-detalle').value.trim() || 'Servicios Profesionales',
+        monto_bruto: bruto,
+        retencion_porcentaje: tasa,
+        monto_liquido: liquido,
+        estado: document.getElementById('h-pagada').checked ? 'pagada' : 'pendiente'
+      };
+
+      const { data, error } = await db.from('honorarios').insert([nuevaBoleta]).select();
+
+      btn.disabled = false;
+      if (error) {
+        alert("Error al guardar boleta: " + error.message);
+      } else {
+        document.getElementById('h-cliente').value = '';
+        document.getElementById('h-detalle').value = '';
+        document.getElementById('h-bruto').value = '';
+        document.getElementById('h-liquido-calc').value = '$0';
+        document.getElementById('h-pagada').checked = false;
+        cargarTodo();
+      }
+    });
+
+    document.getElementById('form-inversion').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-guardar-inversion');
+      btn.disabled = true;
+
+      const nuevaInv = {
+        nombre: document.getElementById('inv-nombre').value.trim(),
+        tipo: document.getElementById('inv-tipo').value,
+        capital_invertido: Number(document.getElementById('inv-capital').value),
+        valor_actual: Number(document.getElementById('inv-actual').value),
+        rentabilidad_anual_estimada: Number(document.getElementById('inv-tasa').value),
+        plataforma: document.getElementById('inv-plataforma').value.trim()
+      };
+
+      const { data, error } = await db.from('inversiones').insert([nuevaInv]).select();
+
+      btn.disabled = false;
+      if (error) {
+        alert("Error al registrar inversión: " + error.message);
+      } else {
+        document.getElementById('inv-nombre').value = '';
+        document.getElementById('inv-capital').value = '';
+        document.getElementById('inv-actual').value = '';
+        cargarTodo();
+      }
+    });
+
+    document.getElementById('form-gasto-pers').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevoGasto = {
+        fecha: document.getElementById('gp-fecha').value,
+        categoria: document.getElementById('gp-categoria').value,
+        descripcion: document.getElementById('gp-desc').value.trim(),
+        monto: Number(document.getElementById('gp-monto').value),
+        tipo: document.getElementById('gp-tipo').value
+      };
+
+      const { error } = await db.from('gastos_personales').insert([nuevoGasto]);
+      if (error) alert("Error al guardar gasto: " + error.message);
+      else {
+        document.getElementById('gp-desc').value = '';
+        document.getElementById('gp-monto').value = '';
+        cargarTodo();
+      }
+    });
+
+    // Form Drop Handlers
+    document.getElementById('form-venta').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevaVenta = {
+        fecha: document.getElementById('v-fecha').value,
+        cliente_detalle: document.getElementById('v-detalle').value.trim(),
+        ingreso_total: Number(document.getElementById('v-ingreso').value),
+        costo_producto: Number(document.getElementById('v-costo-prod').value),
+        costo_envio: Number(document.getElementById('v-costo-envio').value || 0),
+        comision_dropi: Number(document.getElementById('v-comision-dropi').value || 0)
+      };
+      await db.from('ventas').insert([nuevaVenta]);
+      document.getElementById('v-detalle').value = '';
+      document.getElementById('v-ingreso').value = '';
+      document.getElementById('v-costo-prod').value = '';
+      document.getElementById('v-costo-envio').value = '';
+      document.getElementById('v-comision-dropi').value = '';
+      cargarTodo();
+    });
+
+    document.getElementById('form-ads').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await db.from('gasto_publicidad').insert([{
+        fecha: document.getElementById('ads-fecha').value,
+        gasto: Number(document.getElementById('ads-monto').value),
+        plataforma: 'Meta Ads'
+      }]);
+      document.getElementById('ads-monto').value = '';
+      cargarTodo();
+    });
+
+    document.getElementById('form-costo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await db.from('costos_recurrentes').insert([{
+        nombre: document.getElementById('c-nombre').value.trim(),
+        frecuencia_dias: Number(document.getElementById('c-frecuencia').value),
+        monto: Number(document.getElementById('c-monto').value),
+        tipo_costo: 'fijo'
+      }]);
+      document.getElementById('c-nombre').value = '';
+      document.getElementById('c-monto').value = '';
+      cargarTodo();
+    });
+
+    // Eliminaciones
+    async function eliminarInversion(id) { if (confirm("¿Eliminar activo?")) { await db.from('inversiones').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarHonorario(id) { if (confirm("¿Eliminar boleta?")) { await db.from('honorarios').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarGastoPersonal(id) { if (confirm("¿Eliminar gasto?")) { await db.from('gastos_personales').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarVenta(id) { if (confirm("¿Eliminar venta?")) { await db.from('ventas').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarAds(id) { if (confirm("¿Eliminar pauta?")) { await db.from('gasto_publicidad').delete().eq('id', id); cargarTodo(); } }
+    async function eliminarCosto(id) { if (confirm("¿Eliminar costo?")) { await db.from('costos_recurrentes').delete().eq('id', id); cargarTodo(); } }
+
+    // ==========================================
+    // MODAL BANCO CSV
+    // ==========================================
+    function abrirModalBancoCSV() { document.getElementById('modal-banco-csv').classList.remove('hidden'); }
+    function cerrarModalBancoCSV() { document.getElementById('modal-banco-csv').classList.add('hidden'); }
+
+    document.getElementById('input-banco-csv').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          filasBancoImportar = [];
+          results.data.forEach(row => {
+            const fechaRaw = row['Fecha'] || row['FECHA'] || row['Fecha Transaccion'] || new Date().toISOString().slice(0, 10);
+            const desc = row['Descripcion'] || row['DESCRIPCION'] || row['Detalle'] || row['Glosa'] || 'Gasto Banco';
+            const cargo = row['Cargo'] || row['CARGO'] || row['Monto'] || row['MONTO'] || row['Cargos'];
+
+            if (cargo) {
+              const montoLimpio = Math.abs(parseInt(String(cargo).replace(/[^\d]/g, ''), 10) || 0);
+              if (montoLimpio > 0) {
+                filasBancoImportar.push({
+                  fecha: fechaRaw.length === 10 ? fechaRaw : new Date().toISOString().slice(0, 10),
+                  categoria: 'Otros',
+                  descripcion: desc.trim(),
+                  monto: montoLimpio,
+                  tipo: 'variable'
+                });
+              }
+            }
+          });
+
+          const tbody = document.getElementById('banco-preview-body');
+          const btn = document.getElementById('btn-confirmar-banco-csv');
+          const cont = document.getElementById('banco-contador');
+
+          if (filasBancoImportar.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-500">No se detectaron cargos válidos.</td></tr>';
+            btn.disabled = true;
+          } else {
+            cont.textContent = `${filasBancoImportar.length} cargos listos`;
+            btn.disabled = false;
+            tbody.innerHTML = filasBancoImportar.slice(0, 50).map(f => `
+              <tr class="hover:bg-slate-900/60">
+                <td class="p-2 text-slate-400">${f.fecha}</td>
+                <td class="p-2 text-slate-200 truncate max-w-xs">${f.descripcion}</td>
+                <td class="p-2 text-right font-semibold text-rose-400">-${formatoCLP(f.monto)}</td>
+              </tr>
+            `).join('');
+          }
+        }
+      });
+    });
+
+    async function guardarBancoCSVEnSupabase() {
+      const btn = document.getElementById('btn-confirmar-banco-csv');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      const { error } = await db.from('gastos_personales').insert(filasBancoImportar);
+      if (error) alert("Error: " + error.message);
+      else {
+        alert(`¡Listo! Se importaron ${filasBancoImportar.length} gastos bancarios.`);
+        cerrarModalBancoCSV();
+        cargarTodo();
+      }
+    }
+
+    // Modal CSV Shopify
+    function abrirModalCSV() { document.getElementById('modal-csv').classList.remove('hidden'); }
+    function cerrarModalCSV() { document.getElementById('modal-csv').classList.add('hidden'); }
+
+    document.getElementById('input-csv').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) { procesarFilasCSV(results.data); }
+      });
+    });
+
+    function procesarFilasCSV(data) {
+      filasParaImportar = [];
+      const prodDef = Number(document.getElementById('csv-def-prod').value || 0);
+      const envioDef = Number(document.getElementById('csv-def-envio').value || 0);
+      const dropiDef = Number(document.getElementById('csv-def-dropi').value || 0);
+
+      data.forEach(row => {
+        if (row['Name'] && row['Total'] !== undefined && row['Total'] !== '') {
+          let fecha = new Date().toISOString().slice(0, 10);
+          if (row['Created at']) fecha = row['Created at'].slice(0, 10);
+
+          const cliente = row['Shipping Name'] || row['Billing Name'] || 'Cliente';
+          const producto = row['Lineitem name'] ? `(${row['Lineitem quantity'] || 1}x ${row['Lineitem name'].slice(0, 20)}...)` : '';
+          const detalle = `${row['Name']} - ${cliente} ${producto}`.trim();
+          const totalVenta = Number(row['Total']) || 0;
+
+          filasParaImportar.push({
+            fecha: fecha,
+            cliente_detalle: detalle,
+            ingreso_total: totalVenta,
+            costo_producto: prodDef,
+            costo_envio: envioDef,
+            comision_dropi: dropiDef
+          });
+        }
+      });
+      renderizarPreviewCSV();
+    }
+
+    function aplicarValoresDefecto() {
+      const prodDef = Number(document.getElementById('csv-def-prod').value || 0);
+      const envioDef = Number(document.getElementById('csv-def-envio').value || 0);
+      const dropiDef = Number(document.getElementById('csv-def-dropi').value || 0);
+
+      filasParaImportar.forEach(item => {
+        item.costo_producto = prodDef;
+        item.costo_envio = envioDef;
+        item.comision_dropi = dropiDef;
+      });
+      renderizarPreviewCSV();
+    }
+
+    function renderizarPreviewCSV() {
+      const tbody = document.getElementById('csv-preview-body');
+      const btn = document.getElementById('btn-confirmar-csv');
+      const contador = document.getElementById('csv-contador');
+
+      if (filasParaImportar.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No se detectaron pedidos válidos.</td></tr>';
+        btn.disabled = true;
+        contador.textContent = '0 pedidos listos';
+        return;
+      }
+
+      contador.textContent = `${filasParaImportar.length} pedidos listos`;
+      btn.disabled = false;
+
+      tbody.innerHTML = filasParaImportar.map((f, i) => `
+        <tr class="hover:bg-slate-900/60">
+          <td class="p-2 text-slate-400">${f.fecha}</td>
+          <td class="p-2 font-medium text-slate-200 truncate max-w-xs">${f.cliente_detalle}</td>
+          <td class="p-2 text-right text-emerald-400 font-semibold">${formatoCLP(f.ingreso_total)}</td>
+          <td class="p-2 text-right"><input type="number" value="${f.costo_producto}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].costo_producto = Number(this.value)"></td>
+          <td class="p-2 text-right"><input type="number" value="${f.costo_envio}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].costo_envio = Number(this.value)"></td>
+          <td class="p-2 text-right"><input type="number" value="${f.comision_dropi}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].comision_dropi = Number(this.value)"></td>
+        </tr>
+      `).join('');
+    }
+
+    async function guardarCSVEnSupabase() {
+      const btn = document.getElementById('btn-confirmar-csv');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      const { error } = await db.from('ventas').insert(filasParaImportar);
+      if (error) {
+        alert('Error: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'Confirmar y Cargar a Supabase';
+      } else {
+        alert(`¡Éxito! Se importaron ${filasParaImportar.length} pedidos.`);
+        cerrarModalCSV();
+        cargarTodo();
+      }
+    }
+
+    // Inicialización al cargar la ventana
+    aplicarConfiguraciones();
     cargarTodo();
   </script>
 </body>
