@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Finanzas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
+  <div class="max-w-4xl mx-auto space-y-6">
+    
+    <!-- Encabezado -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 border-b border-slate-700 gap-2">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Panel de Control</h1>
+        <p class="text-slate-400 text-sm">Registro de ingresos y gastos en tiempo real</p>
+      </div>
+      <button onclick="cargarDatos()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded border border-slate-600 transition">
+        Actualizar Datos
+      </button>
+    </header>
+
+    <!-- Resumen Métricas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Ingresos Totales</span>
+        <p id="total-ingresos" class="text-2xl font-bold text-emerald-400 mt-1">$0</p>
+      </div>
+      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Gastos Totales</span>
+        <p id="total-gastos" class="text-2xl font-bold text-rose-400 mt-1">$0</p>
+      </div>
+      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
+        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Balance Neto</span>
+        <p id="balance-total" class="text-2xl font-bold text-sky-400 mt-1">$0</p>
+      </div>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
+      <h2 class="text-lg font-semibold mb-4 text-slate-200">Registrar Movimiento</h2>
+      <form id="form-movimiento" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <select id="tipo" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
+          <option value="ingreso">Ingreso (+)</option>
+          <option value="gasto">Gasto (-)</option>
+        </select>
+        <input type="date" id="fecha" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
+        <input type="text" id="categoria" placeholder="Categoría (ej. Ventas, Insumos)" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
+        <input type="number" id="monto" placeholder="Monto ($)" min="1" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:border-sky-500 focus:outline-none text-slate-100">
+        <button type="submit" class="bg-sky-600 hover:bg-sky-500 text-white font-medium p-2.5 rounded-lg text-sm transition">
+          Guardar
+        </button>
+      </form>
+    </div>
+
+    <!-- Tabla de Transacciones -->
+    <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+      <div class="p-4 border-b border-slate-700">
+        <h2 class="text-md font-semibold text-slate-200">Últimos Movimientos</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900/60 text-xs uppercase text-slate-400 border-b border-slate-700">
+            <tr>
+              <th class="p-3">Fecha</th>
+              <th class="p-3">Tipo</th>
+              <th class="p-3">Categoría</th>
+              <th class="p-3 text-right">Monto</th>
+              <th class="p-3 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-cuerpo" class="divide-y divide-slate-700/60">
+            <tr>
+              <td colspan="5" class="p-4 text-center text-slate-500">Cargando transacciones...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // REEMPLAZA ESTOS VALORES CON LOS DE TU PANEL DE SUPABASE
+    const SUPABASE_URL = 'TU_SUPABASE_PROJECT_URL';
+    const SUPABASE_KEY = 'TU_SUPABASE_ANON_KEY';
+    
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Inicializar fecha de hoy en el formulario
+    document.getElementById('fecha').valueAsDate = new Date();
+
+    const formatearMoneda = (valor) => {
+      return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(valor);
+    };
+
+    async function cargarDatos() {
+      const { data: transacciones, error } = await db
+        .from('transacciones')
+        .select('*')
+        .order('fecha', { ascending: false })
+        .order('id', { ascending: false });
+
+      if (error) {
+        console.error('Error al cargar datos:', error);
+        return;
+      }
+
+      let totalIngresos = 0;
+      let totalGastos = 0;
+      const cuerpoTabla = document.getElementById('tabla-cuerpo');
+
+      if (!transacciones || transacciones.length === 0) {
+        cuerpoTabla.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No hay movimientos registrados.</td></tr>';
+      } else {
+        cuerpoTabla.innerHTML = transacciones.map(item => {
+          const montoNum = Number(item.monto);
+          if (item.tipo === 'ingreso') totalIngresos += montoNum;
+          if (item.tipo === 'gasto') totalGastos += montoNum;
+
+          const esIngreso = item.tipo === 'ingreso';
+          return `
+            <tr class="hover:bg-slate-700/30 transition">
+              <td class="p-3">${item.fecha}</td>
+              <td class="p-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${esIngreso ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-rose-950 text-rose-300 border border-rose-800'}">
+                  ${item.tipo.toUpperCase()}
+                </span>
+              </td>
+              <td class="p-3 font-medium text-slate-200">${item.categoria}</td>
+              <td class="p-3 text-right font-semibold ${esIngreso ? 'text-emerald-400' : 'text-rose-400'}">
+                ${esIngreso ? '+' : '-'}${formatearMoneda(montoNum)}
+              </td>
+              <td class="p-3 text-center">
+                <button onclick="eliminarMovimiento(${item.id})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 bg-rose-950/40 rounded border border-rose-800/50">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('total-ingresos').textContent = formatearMoneda(totalIngresos);
+      document.getElementById('total-gastos').textContent = formatearMoneda(totalGastos);
+      
+      const balance = totalIngresos - totalGastos;
+      const balanceElem = document.getElementById('balance-total');
+      balanceElem.textContent = formatearMoneda(balance);
+      balanceElem.className = `text-2xl font-bold mt-1 ${balance >= 0 ? 'text-sky-400' : 'text-rose-400'}`;
+    }
+
+    document.getElementById('form-movimiento').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tipo = document.getElementById('tipo').value;
+      const fecha = document.getElementById('fecha').value;
+      const categoria = document.getElementById('categoria').value.trim();
+      const monto = Number(document.getElementById('monto').value);
+
+      const { error } = await db.from('transacciones').insert([{ tipo, fecha, categoria, monto }]);
+
+      if (error) {
+        alert('Error al guardar: ' + error.message);
+      } else {
+        document.getElementById('categoria').value = '';
+        document.getElementById('monto').value = '';
+        cargarDatos();
+      }
+    });
+
+    async function eliminarMovimiento(id) {
+      if (!confirm('¿Deseas eliminar este registro?')) return;
+      const { error } = await db.from('transacciones').delete().eq('id', id);
+      if (error) {
+        alert('Error al eliminar: ' + error.message);
+      } else {
+        cargarDatos();
+      }
+    }
+
+    // Carga inicial
+    cargarDatos();
+  </script>
+</body>
+</html>
