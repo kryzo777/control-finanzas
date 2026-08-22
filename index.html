@@ -6,6 +6,8 @@
   <title>Control Financiero - E-commerce & Dropi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Librería para leer CSVs de forma ultra rápida en el navegador -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
   <div class="max-w-7xl mx-auto space-y-5">
@@ -16,9 +18,14 @@
         <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white">Panel Financiero & E-commerce</h1>
         <p class="text-slate-400 text-xs md:text-sm">Costos Dropi, Publicidad Meta Ads, Suscripciones y Utilidad Neta Real</p>
       </div>
-      <div class="flex items-center gap-2">
-        <label class="text-xs text-slate-400">Mes analizado:</label>
-        <input type="month" id="filtro-mes" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-sky-500" onchange="cargarTodo()">
+      <div class="flex items-center gap-3">
+        <button onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+          <span>📁</span> Importar CSV Shopify
+        </button>
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-slate-400">Mes:</label>
+          <input type="month" id="filtro-mes" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-sky-500" onchange="cargarTodo()">
+        </div>
       </div>
     </header>
 
@@ -63,15 +70,15 @@
         
         <!-- Formulario Venta Dropi -->
         <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-          <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">➕ Registrar Pedido / Venta Dropi</h2>
+          <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">➕ Registrar Pedido Manual</h2>
           <form id="form-venta" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
             <div>
               <label class="text-slate-400">Fecha</label>
               <input type="date" id="v-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
             </div>
             <div class="col-span-2 md:col-span-3">
-              <label class="text-slate-400">Detalle / ID Pedido Shopify / Dropi</label>
-              <input type="text" id="v-detalle" placeholder="Ej: Pedido #1240 - Combo Limpieza" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+              <label class="text-slate-400">Detalle / ID Pedido / Cliente</label>
+              <input type="text" id="v-detalle" placeholder="Ej: #1016 - Marta (NailGrow)" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
             </div>
             <div>
               <label class="text-slate-400">Total Venta ($)</label>
@@ -134,7 +141,7 @@
             </div>
             <div>
               <label class="text-slate-400">Gasto del día ($)</label>
-              <input type="number" id="ads-monto" min="1" placeholder="Ej: 15000" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-indigo-300 font-semibold mt-1">
+              <input type="number" id="ads-monto" min="1" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-indigo-300 font-semibold mt-1">
             </div>
             <div class="flex items-end">
               <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 font-medium py-2 rounded text-white transition text-xs">
@@ -143,7 +150,6 @@
             </div>
           </form>
 
-          <!-- Mini Lista Ads -->
           <div class="mt-3 overflow-x-auto max-h-32">
             <table class="w-full text-left text-[11px] text-slate-300">
               <tbody id="tabla-ads" class="divide-y divide-slate-800">
@@ -171,14 +177,13 @@
             </div>
             <div>
               <label class="text-slate-400">Monto Cobrado ($)</label>
-              <input type="number" id="c-monto" min="1" placeholder="Total factura" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
+              <input type="number" id="c-monto" min="1" placeholder="Total cobrado" required class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-100 mt-1">
             </div>
             <button type="submit" class="col-span-2 bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded text-white transition text-xs mt-1">
               Guardar Costo Recurrente
             </button>
           </form>
 
-          <!-- Tabla Costos Fijos -->
           <div class="mt-3 overflow-x-auto max-h-40">
             <table class="w-full text-left text-[11px] text-slate-300">
               <thead class="text-slate-500 border-b border-slate-800">
@@ -201,11 +206,84 @@
     </div>
   </div>
 
+  <!-- MODAL DE CARGA MASIVA CSV SHOPIFY / DROPI -->
+  <div id="modal-csv" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+      
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-lg font-bold text-white">Importar Pedidos Masivos (CSV Shopify)</h2>
+          <p class="text-xs text-slate-400">Sube tu archivo <code class="text-sky-400">orders_export.csv</code> para cargar todos los pedidos de una vez</p>
+        </div>
+        <button onclick="cerrarModalCSV()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <!-- Selección de Archivo y Parámetros por Defecto -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
+        <div class="md:col-span-4">
+          <label class="block text-slate-300 font-semibold mb-1">1. Seleccionar archivo CSV de Shopify:</label>
+          <input type="file" id="input-csv" accept=".csv" class="w-full text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500 cursor-pointer">
+        </div>
+
+        <div>
+          <label class="text-slate-400">Costo Producto / Proveedor ($)</label>
+          <input type="number" id="csv-def-prod" placeholder="Ej: 4500" value="0" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-100 mt-1" oninput="aplicarValoresDefecto()">
+        </div>
+        <div>
+          <label class="text-slate-400">Costo Flete / Envío ($)</label>
+          <input type="number" id="csv-def-envio" placeholder="Ej: 3990" value="0" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-100 mt-1" oninput="aplicarValoresDefecto()">
+        </div>
+        <div>
+          <label class="text-slate-400">Comisión Dropi ($)</label>
+          <input type="number" id="csv-def-dropi" placeholder="Ej: 1000" value="0" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-100 mt-1" oninput="aplicarValoresDefecto()">
+        </div>
+        <div class="flex items-end">
+          <button type="button" onclick="aplicarValoresDefecto()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 py-1.5 rounded text-xs transition">
+            Aplicar a todos
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabla Previa de Importación -->
+      <div class="flex-1 overflow-y-auto border border-slate-800 rounded-xl bg-slate-950/60 min-h-[200px]">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-800/90 sticky top-0 text-slate-400">
+            <tr>
+              <th class="p-2">Fecha</th>
+              <th class="p-2">Pedido / Cliente</th>
+              <th class="p-2 text-right">Venta ($)</th>
+              <th class="p-2 text-right">Costo Prod ($)</th>
+              <th class="p-2 text-right">Envío ($)</th>
+              <th class="p-2 text-right">Comisión ($)</th>
+            </tr>
+          </thead>
+          <tbody id="csv-preview-body" class="divide-y divide-slate-800">
+            <tr><td colspan="6" class="p-6 text-center text-slate-500">Selecciona un archivo CSV para visualizar los datos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer Modal -->
+      <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+        <span id="csv-contador" class="text-xs text-slate-400">0 pedidos listos para importar</span>
+        <div class="space-x-2">
+          <button onclick="cerrarModalCSV()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white">Cancelar</button>
+          <button id="btn-confirmar-csv" onclick="guardarCSVEnSupabase()" disabled class="px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition">
+            Confirmar y Cargar a Supabase
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script>
     // 1. CREDENCIALES DE SUPABASE
     const SUPABASE_URL = 'https://eturayylryyhkgkmdris.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0dXJheXlscnl5aGtna21kcmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNjAxODEsImV4cCI6MjEwMjkzNjE4MX0.dShnzpUkrtBOvL2oIPoDg6LVif9D0EjbNTSYUxNTHd0';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let filasParaImportar = [];
 
     // Fechas iniciales
     const hoy = new Date();
@@ -221,7 +299,6 @@
       const primerDia = `${anio}-${mes}-01`;
       const ultimoDia = new Date(anio, mes, 0).toISOString().slice(0, 10);
 
-      // Traer datos en paralelo
       const [resVentas, resAds, resCostos] = await Promise.all([
         db.from('ventas').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
         db.from('gasto_publicidad').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
@@ -232,7 +309,7 @@
       const ads = resAds.data || [];
       const costos = resCostos.data || [];
 
-      // 1. Procesar Ventas y Costos Directos Dropi
+      // 1. Ventas & Costos Directos Dropi
       let totalVentas = 0;
       let totalCostosDropi = 0;
       const cuerpoVentas = document.getElementById('tabla-ventas');
@@ -263,7 +340,7 @@
         }).join('');
       }
 
-      // 2. Procesar Meta Ads
+      // 2. Meta Ads
       let totalAds = 0;
       const cuerpoAds = document.getElementById('tabla-ads');
 
@@ -284,7 +361,7 @@
         }).join('');
       }
 
-      // 3. Procesar Costos Fijos Prorrateados
+      // 3. Costos Fijos
       let totalFijosMes = 0;
       const cuerpoCostos = document.getElementById('tabla-costos');
 
@@ -318,13 +395,12 @@
         }).join('');
       }
 
-      // 4. Cálculos Financieros Finales
+      // 4. Totales & Márgenes
       const margenContribucion = totalVentas - totalCostosDropi;
       const utilidadNeta = margenContribucion - totalAds - totalFijosMes;
       const roas = totalAds > 0 ? (totalVentas / totalAds).toFixed(2) : '0.0';
       const margenNetoPorcentaje = totalVentas > 0 ? ((utilidadNeta / totalVentas) * 100).toFixed(1) : 0;
 
-      // Actualizar UI
       document.getElementById('kpi-ventas').textContent = formatoCLP(totalVentas);
       document.getElementById('kpi-num-ventas').textContent = `${ventas.length} pedidos`;
 
@@ -345,7 +421,131 @@
       elMargenNeto.className = `text-[11px] font-medium ${utilidadNeta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
     }
 
-    // Handlers de Formularios
+    // Modal CSV Controls
+    function abrirModalCSV() {
+      document.getElementById('modal-csv').classList.remove('hidden');
+    }
+
+    function cerrarModalCSV() {
+      document.getElementById('modal-csv').classList.add('hidden');
+    }
+
+    // Procesar archivo CSV con PapaParse
+    document.getElementById('input-csv').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          procesarFilasCSV(results.data);
+        }
+      });
+    });
+
+    function procesarFilasCSV(data) {
+      filasParaImportar = [];
+      const prodDef = Number(document.getElementById('csv-def-prod').value || 0);
+      const envioDef = Number(document.getElementById('csv-def-envio').value || 0);
+      const dropiDef = Number(document.getElementById('csv-def-dropi').value || 0);
+
+      data.forEach(row => {
+        // Shopify exporta filas que tienen 'Name' (ej: #1016)
+        if (row['Name'] && row['Total'] !== undefined && row['Total'] !== '') {
+          // Extraer fecha en formato YYYY-MM-DD
+          let fecha = new Date().toISOString().slice(0, 10);
+          if (row['Created at']) {
+            fecha = row['Created at'].slice(0, 10);
+          }
+
+          const cliente = row['Shipping Name'] || row['Billing Name'] || 'Cliente';
+          const producto = row['Lineitem name'] ? `(${row['Lineitem quantity'] || 1}x ${row['Lineitem name'].slice(0, 20)}...)` : '';
+          const detalle = `${row['Name']} - ${cliente} ${producto}`.trim();
+          const totalVenta = Number(row['Total']) || 0;
+
+          filasParaImportar.push({
+            fecha: fecha,
+            cliente_detalle: detalle,
+            ingreso_total: totalVenta,
+            costo_producto: prodDef,
+            costo_envio: envioDef,
+            comision_dropi: dropiDef
+          });
+        }
+      });
+
+      renderizarPreviewCSV();
+    }
+
+    function aplicarValoresDefecto() {
+      const prodDef = Number(document.getElementById('csv-def-prod').value || 0);
+      const envioDef = Number(document.getElementById('csv-def-envio').value || 0);
+      const dropiDef = Number(document.getElementById('csv-def-dropi').value || 0);
+
+      filasParaImportar.forEach(item => {
+        item.costo_producto = prodDef;
+        item.costo_envio = envioDef;
+        item.comision_dropi = dropiDef;
+      });
+
+      renderizarPreviewCSV();
+    }
+
+    function renderizarPreviewCSV() {
+      const tbody = document.getElementById('csv-preview-body');
+      const btn = document.getElementById('btn-confirmar-csv');
+      const contador = document.getElementById('csv-contador');
+
+      if (filasParaImportar.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No se detectaron pedidos válidos en el archivo.</td></tr>';
+        btn.disabled = true;
+        contador.textContent = '0 pedidos listos';
+        return;
+      }
+
+      contador.textContent = `${filasParaImportar.length} pedidos listos para importar`;
+      btn.disabled = false;
+
+      tbody.innerHTML = filasParaImportar.map((f, i) => `
+        <tr class="hover:bg-slate-900/60">
+          <td class="p-2 text-slate-400">${f.fecha}</td>
+          <td class="p-2 font-medium text-slate-200 truncate max-w-xs">${f.cliente_detalle}</td>
+          <td class="p-2 text-right text-emerald-400 font-semibold">${formatoCLP(f.ingreso_total)}</td>
+          <td class="p-2 text-right">
+            <input type="number" value="${f.costo_producto}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].costo_producto = Number(this.value)">
+          </td>
+          <td class="p-2 text-right">
+            <input type="number" value="${f.costo_envio}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].costo_envio = Number(this.value)">
+          </td>
+          <td class="p-2 text-right">
+            <input type="number" value="${f.comision_dropi}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].comision_dropi = Number(this.value)">
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function guardarCSVEnSupabase() {
+      const btn = document.getElementById('btn-confirmar-csv');
+      btn.disabled = true;
+      btn.textContent = 'Guardando en Supabase...';
+
+      const { data, error } = await db.from('ventas').insert(filasParaImportar);
+
+      if (error) {
+        alert('Error al importar pedidos: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'Confirmar y Cargar a Supabase';
+      } else {
+        alert(`¡Éxito! Se importaron ${filasParaImportar.length} pedidos correctamente.`);
+        cerrarModalCSV();
+        document.getElementById('input-csv').value = '';
+        filasParaImportar = [];
+        cargarTodo();
+      }
+    }
+
+    // Handlers manuales
     document.getElementById('form-venta').addEventListener('submit', async (e) => {
       e.preventDefault();
       const nuevaVenta = {
