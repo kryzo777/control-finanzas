@@ -16,8 +16,6 @@
 
     <!-- HEADER PRINCIPAL -->
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/90 backdrop-blur p-4 rounded-2xl border border-slate-800 gap-4">
-      
-      <!-- Logo + Títulos Personalizables -->
       <div class="flex items-center gap-3.5">
         <div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
           <img id="app-logo-img" src="https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200" alt="Logo" class="w-full h-full object-contain p-1">
@@ -30,9 +28,7 @@
         </div>
       </div>
 
-      <!-- Controles de Navegación & Configuración -->
       <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
-        
         <!-- Switcher Espacios -->
         <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
           <button onclick="cambiarWorkspace('dropshipping')" id="btn-ws-drop" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition">
@@ -43,22 +39,18 @@
           </button>
         </div>
 
-        <!-- Botón Contextual CSV Shopify -->
         <button id="btn-import-csv" onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
           <span>📁</span> Importar CSV
         </button>
 
-        <!-- Filtro Mes -->
         <div class="flex items-center bg-slate-800 rounded-xl px-2.5 py-1.5 border border-slate-700">
           <label class="text-xs text-slate-400 mr-2">Mes:</label>
           <input type="month" id="filtro-mes" class="bg-transparent text-xs md:text-sm text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
         </div>
 
-        <!-- Botón Ruedita de Configuración -->
-        <button onclick="abrirModalConfig()" title="Configuración del Sistema" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition">
+        <button onclick="abrirModalConfig()" title="Configuración" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition">
           <span class="text-base">⚙️</span>
         </button>
-
       </div>
     </header>
 
@@ -226,8 +218,6 @@
     <!-- ESPACIO 2: HONORARIOS, PERSONAL & PATRIMONIO / INVERSIONES -->
     <!-- ========================================================= -->
     <div id="workspace-personal" class="space-y-5 hidden">
-      
-      <!-- Navegación Personal con Tab de Dashboard de Inicio -->
       <nav class="flex border-b border-slate-800 gap-2 text-xs md:text-sm font-medium">
         <button onclick="cambiarTabPers('dashboard')" id="tab-pers-dash-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-emerald-500 text-emerald-400 font-semibold transition">
           📊 Dashboard Patrimonial
@@ -240,7 +230,7 @@
         </button>
       </nav>
 
-      <!-- KPIs Personal (Siempre Visibles en este workspace) -->
+      <!-- KPIs Personal -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <span class="text-slate-400 text-xs font-semibold uppercase">Honorarios Líquidos</span>
@@ -250,7 +240,7 @@
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <span class="text-slate-400 text-xs font-semibold uppercase">Retención SII</span>
           <p id="kpi-pers-retencion" class="text-xl font-bold text-amber-400 mt-1">$0</p>
-          <span class="text-[11px] text-slate-500">Impuesto acumulado</span>
+          <span class="text-[11px] text-slate-500">Impuesto retenido</span>
         </div>
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <span class="text-slate-400 text-xs font-semibold uppercase">Gastos Personales Totales</span>
@@ -264,15 +254,13 @@
         </div>
       </div>
 
-      <!-- TAB 1: DASHBOARD PATRIMONIAL & FINANZAS PERSONALES -->
+      <!-- TAB 1: DASHBOARD PATRIMONIAL -->
       <div id="tab-pers-dashboard" class="tab-pers-content space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Gráfico de Flujo: Ingresos vs Gastos Personales -->
           <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Flujo de Caja Personal: Honorarios Líquidos vs Gastos</h3>
+            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Flujo de Caja: Honorarios Líquidos vs Gastos</h3>
             <div class="h-64 relative"><canvas id="chart-flujo-personal"></canvas></div>
           </div>
-          <!-- Gráfico de Dona: Desglose de Gastos por Categoría -->
           <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
             <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Gastos</h3>
             <div class="h-56 relative flex items-center justify-center"><canvas id="chart-gastos-cat"></canvas></div>
@@ -303,15 +291,15 @@
                 </div>
                 <div class="col-span-2">
                   <label class="text-slate-400">Cliente / Empresa</label>
-                  <input type="text" id="h-cliente" placeholder="Ej: Consultoría ABC SpA" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <input type="text" id="h-cliente" placeholder="Ej: Rincon Fotografico SpA" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
                 </div>
                 <div class="col-span-3">
                   <label class="text-slate-400">Glosa / Detalle del Servicio</label>
-                  <input type="text" id="h-detalle" placeholder="Ej: Servicios profesionales de marketing y gestión comercial" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <input type="text" id="h-detalle" placeholder="Ej: Gestion, Asesoria y Atencion de Clientes" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
                 </div>
                 <div>
                   <label class="text-slate-400">Monto Bruto ($)</label>
-                  <input type="number" id="h-bruto" min="1" placeholder="Ej: 1000000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1" oninput="calcularLiquidoHonorario()">
+                  <input type="number" id="h-bruto" min="1" placeholder="Ej: 1312511" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1" oninput="calcularLiquidoHonorario()">
                 </div>
                 <div>
                   <label class="text-slate-400">Tasa Retención SII (%)</label>
@@ -435,7 +423,6 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Formulario y Tabla Inversiones (7 Cols) -->
           <div class="lg:col-span-7 space-y-4">
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
               <h2 class="text-sm font-semibold uppercase text-sky-400 mb-3">➕ Registrar Activo / Inversión</h2>
@@ -487,7 +474,6 @@
             </div>
           </div>
 
-          <!-- Proyección Patrimonio (5 Cols) -->
           <div class="lg:col-span-5 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-sm font-bold uppercase text-purple-400">🚀 Proyección de Crecimiento Patrimonial</h3>
@@ -514,10 +500,14 @@
       </div>
       
       <form id="form-config" class="space-y-3.5 text-xs">
-        <div>
-          <label class="text-slate-300 font-semibold">URL del Logo de la Empresa</label>
-          <input type="text" id="cfg-logo-url" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-          <p class="text-[10px] text-slate-500 mt-0.5">Puedes usar URLs directas o enlaces compartidos de Google Drive.</p>
+        
+        <!-- Cargar Logo Local o Link -->
+        <div class="space-y-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <label class="text-slate-300 font-semibold block">Logo de la Empresa</label>
+          <div class="flex items-center gap-3">
+            <input type="file" id="cfg-logo-file" accept="image/*" class="w-full text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500 cursor-pointer" onchange="cargarLogoLocal(event)">
+          </div>
+          <p class="text-[10px] text-slate-500">Selecciona una imagen desde tu PC (se guarda en tu navegador).</p>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
@@ -556,7 +546,7 @@
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
           <h2 class="text-lg font-bold text-white">Importar Gastos desde Cartola Bancaria CSV</h2>
-          <p class="text-xs text-slate-400">Carga tu cartola de Banco Santander, BancoEstado, Banco de Chile, Bci, etc.</p>
+          <p class="text-xs text-slate-400">Carga tu cartola bancaria exportada</p>
         </div>
         <button onclick="cerrarModalBancoCSV()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
@@ -649,10 +639,10 @@
     const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
     // ==========================================
-    // CARGAR Y APLICAR CONFIGURACIONES LOCALES
+    // GESTIÓN DE CONFIGURACIÓN & LOGO LOCAL
     // ==========================================
     function aplicarConfiguraciones() {
-      const cfgLogo = localStorage.getItem('cfg_logo_url') || 'https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200';
+      const cfgLogo = localStorage.getItem('cfg_logo_local') || 'https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200';
       const cfgWsDrop = localStorage.getItem('cfg_ws_drop') || 'Dropshipping';
       const cfgWsPers = localStorage.getItem('cfg_ws_pers') || 'Honorarios & Personal';
       const cfgRetSii = localStorage.getItem('cfg_ret_sii') || '15.25';
@@ -664,11 +654,22 @@
       document.getElementById('h-ret-tasa').value = cfgRetSii;
       document.getElementById('inv-tasa').value = cfgTasaInv;
 
-      document.getElementById('cfg-logo-url').value = cfgLogo;
       document.getElementById('cfg-ws-drop').value = cfgWsDrop;
       document.getElementById('cfg-ws-pers').value = cfgWsPers;
       document.getElementById('cfg-ret-sii').value = cfgRetSii;
       document.getElementById('cfg-tasa-inv').value = cfgTasaInv;
+    }
+
+    function cargarLogoLocal(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Image = e.target.result;
+        localStorage.setItem('cfg_logo_local', base64Image);
+        document.getElementById('app-logo-img').src = base64Image;
+      };
+      reader.readAsDataURL(file);
     }
 
     function abrirModalConfig() { document.getElementById('modal-config').classList.remove('hidden'); }
@@ -676,7 +677,6 @@
 
     document.getElementById('form-config').addEventListener('submit', (e) => {
       e.preventDefault();
-      localStorage.setItem('cfg_logo_url', document.getElementById('cfg-logo-url').value.trim());
       localStorage.setItem('cfg_ws_drop', document.getElementById('cfg-ws-drop').value.trim());
       localStorage.setItem('cfg_ws_pers', document.getElementById('cfg-ws-pers').value.trim());
       localStorage.setItem('cfg_ret_sii', document.getElementById('cfg-ret-sii').value);
@@ -749,7 +749,7 @@
     }
 
     // ==========================================
-    // CARGAR DATOS GENERALES
+    // CARGAR DATOS
     // ==========================================
     async function cargarTodo() {
       const mesSeleccionado = document.getElementById('filtro-mes').value;
@@ -959,7 +959,6 @@
     function renderizarGraficosPersonal() {
       if (workspaceActivo !== 'personal') return;
 
-      // 1. Gráfico Flujo Ingresos vs Gastos
       const diasMap = {};
       datosPersonal.honorarios.forEach(h => {
         const dia = h.fecha.slice(8, 10);
@@ -993,7 +992,6 @@
         }
       });
 
-      // 2. Gráfico Categorías de Gasto
       const catMap = {};
       datosPersonal.gastos.forEach(g => {
         catMap[g.categoria] = (catMap[g.categoria] || 0) + Number(g.monto);
@@ -1052,7 +1050,10 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#94a3b8' } } },
-          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
+          scales: {
+            x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+            y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+          }
         }
       });
 
@@ -1105,7 +1106,7 @@
     }
 
     // ==========================================
-    // LECTOR DE BOLETAS SII EN PDF (ROBUSTO)
+    // LECTOR DE BOLETAS SII EN PDF (OPTIMIZADO)
     // ==========================================
     async function leerPDFBoleta(event) {
       const file = event.target.files[0];
@@ -1119,37 +1120,44 @@
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
-          fullText += textContent.items.map(item => item.str).join(' ') + ' ';
+          fullText += textContent.items.map(item => item.str).join(' ') + '\n';
         }
 
-        // Limpieza y matching flexible
-        const textoLimpio = fullText.replace(/\s+/g, ' ');
-
-        // Buscar fecha (DD/MM/YYYY o DD-MM-YYYY)
-        const matchFecha = textoLimpio.match(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/);
+        // 1. Extraer Fecha (DD/MM/YYYY)
+        const matchFecha = fullText.match(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/);
         if (matchFecha) {
           document.getElementById('h-fecha').value = `${matchFecha[3]}-${matchFecha[2]}-${matchFecha[1]}`;
         }
 
-        // Extraer montos
-        const matchBruto = textoLimpio.match(/(?:Total\s*Honorarios|Honorarios\s*Bruto)[^\d]*([\d\.]+)/i);
-        const matchRet = textoLimpio.match(/(?:Retenci[oó]n|Retenido)[^\d]*([\d\.]+)/i);
-
-        if (matchBruto) {
-          const montoBruto = parseInt(matchBruto[1].replace(/\./g, ''), 10);
-          if (!isNaN(montoBruto)) document.getElementById('h-bruto').value = montoBruto;
+        // 2. Extraer Cliente / Empresa
+        const matchCliente = fullText.match(/Señor\(es\):\s*([^\n\r]+?)(?:\s+Rut:|\s+Domicilio:|\n)/i);
+        if (matchCliente && matchCliente[1]) {
+          document.getElementById('h-cliente').value = matchCliente[1].replace(/Rut:.*$/i, '').trim();
         }
 
-        // Buscar nombre de cliente/empresa (después de "Señor(es)" o "Rut:")
-        const matchCliente = textoLimpio.match(/(?:Señor\(es\)|Para:)\s*([A-Za-z0-9\s\.\-]{3,40})/i);
-        if (matchCliente && matchCliente[1]) {
-          document.getElementById('h-cliente').value = matchCliente[1].trim();
+        // 3. Extraer Detalle / Glosa
+        const matchDetalle = fullText.match(/Por atención profesional:\s*([^\n\r]+?)(?:\s+[\d\.]+|\n)/i);
+        if (matchDetalle && matchDetalle[1]) {
+          document.getElementById('h-detalle').value = matchDetalle[1].trim();
+        }
+
+        // 4. Extraer Monto Bruto
+        const matchBruto = fullText.match(/Total Honorarios:\s*\$?:?\s*([\d\.]+)/i);
+        if (matchBruto) {
+          const brutoLimpio = parseInt(matchBruto[1].replace(/\./g, ''), 10);
+          if (!isNaN(brutoLimpio)) document.getElementById('h-bruto').value = brutoLimpio;
+        }
+
+        // 5. Extraer Tasa Retención
+        const matchRet = fullText.match(/([\d\.]+)\s*%\s*Impto\.\s*Retenido/i);
+        if (matchRet) {
+          document.getElementById('h-ret-tasa').value = matchRet[1];
         }
 
         calcularLiquidoHonorario();
-        alert("¡Boleta procesada con éxito! Revisa los campos y pulsa Guardar.");
+        alert("¡Boleta procesada y completada con éxito!");
       } catch (err) {
-        alert("No se pudo extraer el texto del PDF automáticamente. Puedes rellenar los datos manualmente.");
+        alert("Error al leer el PDF: " + err.message);
       }
     }
 
@@ -1160,7 +1168,7 @@
     }
 
     // ==========================================
-    // ENVÍO DE FORMULARIOS A SUPABASE CON VALIDACIÓN
+    // ENVÍO DE FORMULARIOS A SUPABASE
     // ==========================================
     document.getElementById('form-honorario').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1243,7 +1251,6 @@
       }
     });
 
-    // Form Drop Handlers
     document.getElementById('form-venta').addEventListener('submit', async (e) => {
       e.preventDefault();
       const nuevaVenta = {
