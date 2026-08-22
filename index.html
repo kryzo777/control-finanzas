@@ -952,7 +952,7 @@
 
         return `
           <tr class="hover:bg-slate-800/40">
-            <td class="p-2.5 text-slate-400">${h.fecha.slice(5)}</td>
+            <td class="p-2.5 text-slate-400">${h.fecha}</td>
             <td class="p-2.5"><div class="font-medium text-slate-200">${h.cliente_empresa}</div><div class="text-[10px] text-slate-500">${h.detalle_servicio}</div></td>
             <td class="p-2.5 text-right font-medium text-slate-300">${formatoCLP(bruto)}</td>
             <td class="p-2.5 text-right font-semibold text-emerald-400">${formatoCLP(liquido)}</td>
@@ -969,7 +969,7 @@
         if (g.tipo === 'fijo') totalGastosFijosPers += monto;
         return `
           <tr class="hover:bg-slate-800/40">
-            <td class="p-2 text-slate-400">${g.fecha.slice(5)}</td>
+            <td class="p-2 text-slate-400">${g.fecha}</td>
             <td class="p-2"><div class="font-medium text-slate-200">${g.descripcion}</div><div class="text-[10px] text-slate-500">${g.categoria}</div></td>
             <td class="p-2 text-right font-semibold text-rose-400">-${formatoCLP(monto)}</td>
             <td class="p-2 text-center"><button onclick="eliminarGastoPersonal(${g.id})" class="text-rose-400">✕</button></td>
@@ -1231,7 +1231,7 @@
 
         let fecha = new Date().toISOString().slice(0, 10);
         const matchFecha = fullText.match(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/);
-        if (matchFecha) fecha = `${matchFecha[3]}-${matchFecha[2]}-${matchFecha[1]}`;
+        if (matchFecha) fecha = `${matchFecha[3]}-${matchFecha[2].padStart(2, '0')}-${matchFecha[1].padStart(2, '0')}`;
 
         let cliente = 'Cliente';
         const matchCliente = fullText.match(/Señor\(es\):\s*([^\n\r]+?)(?:\s+Rut:|\s+Domicilio:|\n)/i);
