@@ -43,9 +43,14 @@
           <span>📁</span> Importar CSV
         </button>
 
-        <div class="flex items-center bg-slate-800 rounded-xl px-2.5 py-1.5 border border-slate-700">
-          <label class="text-xs text-slate-400 mr-2">Mes:</label>
-          <input type="month" id="filtro-mes" class="bg-transparent text-xs md:text-sm text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
+        <!-- FILTROS DE TIEMPO (MES / AÑO / TODO) -->
+        <div class="flex items-center bg-slate-800 rounded-xl px-2 py-1 border border-slate-700 gap-1.5 text-xs">
+          <select id="filtro-tipo" class="bg-transparent text-slate-300 focus:outline-none cursor-pointer" onchange="cambiarModoFiltro()">
+            <option value="mes">Por Mes:</option>
+            <option value="anio">Todo el Año</option>
+            <option value="todo">Historial Completo</option>
+          </select>
+          <input type="month" id="filtro-mes" class="bg-transparent text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
         </div>
 
         <button onclick="abrirModalConfig()" title="Configuración" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition">
@@ -222,7 +227,7 @@
           <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Fijos vs Variables</span>
         </div>
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Capacidad Ahorro / Mes</span>
+          <span class="text-slate-400 text-xs font-semibold uppercase">Capacidad Ahorro</span>
           <p id="kpi-pers-ahorro" class="text-xl font-bold text-sky-400 mt-1">$0</p>
           <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa: 0%</span>
         </div>
@@ -333,15 +338,16 @@
 
             </div>
 
-            <!-- Tabla de Ingresos / Boletas -->
+            <!-- Tabla de Ingresos / Boletas con Edición y Cambio de Estado -->
             <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
               <div class="p-3.5 border-b border-slate-800 flex justify-between items-center">
-                <h3 class="text-xs font-semibold uppercase text-slate-400">Historial de Ingresos & Boletas del Mes</h3>
+                <h3 class="text-xs font-semibold uppercase text-slate-400">Historial de Ingresos & Boletas</h3>
+                <span class="text-[10px] text-slate-500">Haz clic en el estado para cambiarlo</span>
               </div>
               <div class="overflow-x-auto max-h-80">
                 <table class="w-full text-left text-xs text-slate-300">
                   <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-                    <tr><th class="p-2.5">Fecha</th><th class="p-2.5">Origen / Detalle</th><th class="p-2.5 text-right">Bruto</th><th class="p-2.5 text-right">Líquido</th><th class="p-2.5 text-center">Estado</th><th class="p-2.5 text-center">x</th></tr>
+                    <tr><th class="p-2.5">Fecha</th><th class="p-2.5">Origen / Detalle</th><th class="p-2.5 text-right">Bruto</th><th class="p-2.5 text-right">Líquido</th><th class="p-2.5 text-center">Estado</th><th class="p-2.5 text-center">Acciones</th></tr>
                   </thead>
                   <tbody id="tabla-honorarios" class="divide-y divide-slate-800"></tbody>
                 </table>
@@ -356,12 +362,12 @@
                 <h2 class="text-sm font-semibold uppercase text-rose-400">💸 Gastos Personales</h2>
               </div>
 
-              <!-- Drag & Drop Cartola XLSX / CSV -->
+              <!-- Drag & Drop Cartola Bancaria (CSV / XLSX) -->
               <div id="dropzone-banco" class="border-2 border-dashed border-slate-700 hover:border-rose-500 bg-slate-950/60 p-3 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1" onclick="document.getElementById('input-banco-file').click()">
                 <span class="text-xl">💳</span>
-                <span class="text-xs font-semibold text-rose-400">Arrastra Cartola (.xlsx, .xls o .csv) aquí</span>
-                <span class="text-[10px] text-slate-500">Compatible con Santander, BancoEstado, BCI, Chile, etc.</span>
-                <input type="file" id="input-banco-file" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoBanco(event)">
+                <span class="text-xs font-semibold text-rose-400">Arrastra Cartola (.xlsx, .csv o .xls) aquí</span>
+                <span class="text-[10px] text-slate-500">Compatible con MercadoPago, Santander, BancoEstado, BCI, Chile, etc.</span>
+                <input type="file" id="input-banco-file" accept=".csv, .xlsx, .xls, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="hidden" onchange="procesarArchivoBanco(event)">
               </div>
 
               <form id="form-gasto-pers" class="grid grid-cols-2 gap-2.5 text-xs">
@@ -562,6 +568,37 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR BOLETA / INGRESO -->
+  <div id="modal-editar-honorario" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white">✏️ Editar Registro de Ingreso</h2>
+        <button onclick="cerrarModalEditarHonorario()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+      <form id="form-editar-honorario" class="space-y-3 text-xs">
+        <input type="hidden" id="edit-h-id">
+        <div><label class="text-slate-400">Fecha</label><input type="date" id="edit-h-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
+        <div><label class="text-slate-400">Origen / Cliente</label><input type="text" id="edit-h-cliente" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
+        <div><label class="text-slate-400">Glosa / Detalle</label><input type="text" id="edit-h-detalle" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="text-slate-400">Bruto ($)</label><input type="number" id="edit-h-bruto" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1"></div>
+          <div><label class="text-slate-400">Retención (%)</label><input type="number" step="0.01" id="edit-h-ret-tasa" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
+        </div>
+        <div>
+          <label class="text-slate-400">Estado de Pago</label>
+          <select id="edit-h-estado" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <option value="pendiente">Pendiente por cobrar</option>
+            <option value="pagada">Pagada / Depositada</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalEditarHonorario()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl transition">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL CARTOLA BANCO PREVIEW -->
   <div id="modal-banco-csv" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
@@ -585,7 +622,7 @@
       <div class="flex justify-between items-center pt-2 border-t border-slate-800">
         <span id="banco-contador" class="text-xs text-slate-400">0 cargos detectados</span>
         <div class="space-x-2">
-          <button onclick="cerrarModalBancoCSV()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white">Cancelar</button>
+          <button onclick="cerrarModalBancoCSV()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
           <button id="btn-confirmar-banco-csv" onclick="guardarBancoEnSupabase()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition">
             Confirmar y Cargar Gastos
           </button>
@@ -693,6 +730,17 @@
     document.getElementById('ie-fecha').valueAsDate = hoy;
 
     const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
+
+    function cambiarModoFiltro() {
+      const tipo = document.getElementById('filtro-tipo').value;
+      const inputMes = document.getElementById('filtro-mes');
+      if (tipo === 'mes') {
+        inputMes.classList.remove('hidden');
+      } else {
+        inputMes.classList.add('hidden');
+      }
+      cargarTodo();
+    }
 
     // ==========================================
     // CONFIGURACIÓN & LOGO LOCAL
@@ -836,20 +884,39 @@
     }
 
     // ==========================================
-    // CARGAR DATOS
+    // CARGAR DATOS CON FILTRO FLEXIBLE
     // ==========================================
     async function cargarTodo() {
-      const mesSeleccionado = document.getElementById('filtro-mes').value;
-      const [anio, mes] = mesSeleccionado.split('-');
-      const primerDia = `${anio}-${mes}-01`;
-      const ultimoDia = new Date(anio, mes, 0).toISOString().slice(0, 10);
+      const modoFiltro = document.getElementById('filtro-tipo').value;
+      const mesSeleccionado = document.getElementById('filtro-mes').value; // 'YYYY-MM'
+      const anioSeleccionado = mesSeleccionado.split('-')[0] || '2026';
+
+      let qVentas = db.from('ventas').select('*').order('fecha', { ascending: false });
+      let qAds = db.from('gasto_publicidad').select('*').order('fecha', { ascending: false });
+      let qHon = db.from('honorarios').select('*').order('fecha', { ascending: false });
+      let qGastos = db.from('gastos_personales').select('*').order('fecha', { ascending: false });
+
+      if (modoFiltro === 'mes') {
+        const [anio, mes] = mesSeleccionado.split('-');
+        const pDia = `${anio}-${mes}-01`;
+        const uDia = new Date(anio, mes, 0).toISOString().slice(0, 10);
+        qVentas = qVentas.gte('fecha', pDia).lte('fecha', uDia);
+        qAds = qAds.gte('fecha', pDia).lte('fecha', uDia);
+        qHon = qHon.gte('fecha', pDia).lte('fecha', uDia);
+        qGastos = qGastos.gte('fecha', pDia).lte('fecha', uDia);
+      } else if (modoFiltro === 'anio') {
+        qVentas = qVentas.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
+        qAds = qAds.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
+        qHon = qHon.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
+        qGastos = qGastos.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
+      }
 
       const [resVentas, resAds, resCostos, resHon, resGastosPers, resInv] = await Promise.all([
-        db.from('ventas').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
-        db.from('gasto_publicidad').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
+        qVentas,
+        qAds,
         db.from('costos_recurrentes').select('*').eq('activo', true),
-        db.from('honorarios').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
-        db.from('gastos_personales').select('*').gte('fecha', primerDia).lte('fecha', ultimoDia).order('fecha', { ascending: false }),
+        qHon,
+        qGastos,
         db.from('inversiones').select('*').order('created_at', { ascending: false })
       ]);
 
@@ -871,7 +938,7 @@
       const cuerpoVentas = document.getElementById('tabla-ventas');
 
       if (datosDrop.ventas.length === 0) {
-        cuerpoVentas.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin pedidos en este mes.</td></tr>';
+        cuerpoVentas.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin pedidos registrados en este período.</td></tr>';
       } else {
         cuerpoVentas.innerHTML = datosDrop.ventas.map(v => {
           const costoDropi = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
@@ -882,7 +949,7 @@
 
           return `
             <tr class="hover:bg-slate-800/40">
-              <td class="p-3 text-slate-400">${v.fecha.slice(5)}</td>
+              <td class="p-3 text-slate-400">${v.fecha}</td>
               <td class="p-3 font-medium text-slate-200">${v.cliente_detalle}</td>
               <td class="p-3 text-right font-medium text-emerald-400">${formatoCLP(ingreso)}</td>
               <td class="p-3 text-right text-rose-300">-${formatoCLP(costoDropi)}</td>
@@ -943,39 +1010,62 @@
 
     function procesarModuloPersonal() {
       let totalBruto = 0, totalLiquido = 0, totalRetencion = 0;
-      document.getElementById('tabla-honorarios').innerHTML = datosPersonal.honorarios.map(h => {
-        const bruto = Number(h.monto_bruto);
-        const ret = Number(h.retencion_porcentaje || 0);
-        const montoRet = bruto * (ret / 100);
-        const liquido = Number(h.monto_liquido) || (bruto - montoRet);
-        totalBruto += bruto; totalLiquido += liquido; totalRetencion += montoRet;
+      const cuerpoHon = document.getElementById('tabla-honorarios');
 
-        return `
-          <tr class="hover:bg-slate-800/40">
-            <td class="p-2.5 text-slate-400">${h.fecha}</td>
-            <td class="p-2.5"><div class="font-medium text-slate-200">${h.cliente_empresa}</div><div class="text-[10px] text-slate-500">${h.detalle_servicio}</div></td>
-            <td class="p-2.5 text-right font-medium text-slate-300">${formatoCLP(bruto)}</td>
-            <td class="p-2.5 text-right font-semibold text-emerald-400">${formatoCLP(liquido)}</td>
-            <td class="p-2.5 text-center"><span class="px-1.5 py-0.5 rounded text-[10px] ${h.estado === 'pagada' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${h.estado.toUpperCase()}</span></td>
-            <td class="p-2.5 text-center"><button onclick="eliminarHonorario(${h.id})" class="text-rose-400">✕</button></td>
-          </tr>
-        `;
-      }).join('');
+      if (datosPersonal.honorarios.length === 0) {
+        cuerpoHon.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin ingresos ni boletas registradas en este período.</td></tr>';
+      } else {
+        cuerpoHon.innerHTML = datosPersonal.honorarios.map(h => {
+          const bruto = Number(h.monto_bruto);
+          const ret = Number(h.retencion_porcentaje || 0);
+          const montoRet = bruto * (ret / 100);
+          const liquido = Number(h.monto_liquido) || (bruto - montoRet);
+          totalBruto += bruto; totalLiquido += liquido; totalRetencion += montoRet;
+          const esPagada = h.estado === 'pagada';
+
+          return `
+            <tr class="hover:bg-slate-800/40">
+              <td class="p-2.5 text-slate-400">${h.fecha}</td>
+              <td class="p-2.5">
+                <div class="font-medium text-slate-200">${h.cliente_empresa}</div>
+                <div class="text-[10px] text-slate-500">${h.detalle_servicio}</div>
+              </td>
+              <td class="p-2.5 text-right font-medium text-slate-300">${formatoCLP(bruto)}</td>
+              <td class="p-2.5 text-right font-semibold text-emerald-400">${formatoCLP(liquido)}</td>
+              <td class="p-2.5 text-center">
+                <button onclick="alternarEstadoHonorario(${h.id}, '${h.estado}')" class="px-2 py-0.5 rounded text-[10px] font-semibold transition cursor-pointer ${esPagada ? 'bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900' : 'bg-amber-950 text-amber-400 border border-amber-800 hover:bg-amber-900'}">
+                  ${esPagada ? 'PAGADA' : 'PENDIENTE'}
+                </button>
+              </td>
+              <td class="p-2.5 text-center space-x-1.5">
+                <button onclick="abrirModalEditarHonorario(${h.id})" class="text-sky-400 hover:text-sky-200 px-1.5 py-0.5 bg-sky-950/40 rounded border border-sky-800/50">✏️</button>
+                <button onclick="eliminarHonorario(${h.id})" class="text-rose-400 hover:text-rose-200 px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
 
       let totalGastosPers = 0, totalGastosFijosPers = 0;
-      document.getElementById('tabla-gastos-pers').innerHTML = datosPersonal.gastos.map(g => {
-        const monto = Number(g.monto);
-        totalGastosPers += monto;
-        if (g.tipo === 'fijo') totalGastosFijosPers += monto;
-        return `
-          <tr class="hover:bg-slate-800/40">
-            <td class="p-2 text-slate-400">${g.fecha}</td>
-            <td class="p-2"><div class="font-medium text-slate-200">${g.descripcion}</div><div class="text-[10px] text-slate-500">${g.categoria}</div></td>
-            <td class="p-2 text-right font-semibold text-rose-400">-${formatoCLP(monto)}</td>
-            <td class="p-2 text-center"><button onclick="eliminarGastoPersonal(${g.id})" class="text-rose-400">✕</button></td>
-          </tr>
-        `;
-      }).join('');
+      const cuerpoGastos = document.getElementById('tabla-gastos-pers');
+
+      if (datosPersonal.gastos.length === 0) {
+        cuerpoGastos.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Sin gastos registrados en este período.</td></tr>';
+      } else {
+        cuerpoGastos.innerHTML = datosPersonal.gastos.map(g => {
+          const monto = Number(g.monto);
+          totalGastosPers += monto;
+          if (g.tipo === 'fijo') totalGastosFijosPers += monto;
+          return `
+            <tr class="hover:bg-slate-800/40">
+              <td class="p-2 text-slate-400">${g.fecha}</td>
+              <td class="p-2"><div class="font-medium text-slate-200">${g.descripcion}</div><div class="text-[10px] text-slate-500">${g.categoria}</div></td>
+              <td class="p-2 text-right font-semibold text-rose-400">-${formatoCLP(monto)}</td>
+              <td class="p-2 text-center"><button onclick="eliminarGastoPersonal(${g.id})" class="text-rose-400 hover:text-rose-200">✕</button></td>
+            </tr>
+          `;
+        }).join('');
+      }
 
       const saldoAhorro = totalLiquido - totalGastosPers;
       document.getElementById('kpi-pers-ingresos').textContent = formatoCLP(totalLiquido);
@@ -1039,6 +1129,58 @@
     }
 
     // ==========================================
+    // ALTERNAR ESTADO Y EDITAR BOLETAS
+    // ==========================================
+    async function alternarEstadoHonorario(id, estadoActual) {
+      const nuevoEstado = estadoActual === 'pagada' ? 'pendiente' : 'pagada';
+      const { error } = await db.from('honorarios').update({ estado: nuevoEstado }).eq('id', id);
+      if (error) alert("Error al cambiar estado: " + error.message);
+      else cargarTodo();
+    }
+
+    function abrirModalEditarHonorario(id) {
+      const h = datosPersonal.honorarios.find(item => item.id === id);
+      if (!h) return;
+
+      document.getElementById('edit-h-id').value = h.id;
+      document.getElementById('edit-h-fecha').value = h.fecha;
+      document.getElementById('edit-h-cliente').value = h.cliente_empresa;
+      document.getElementById('edit-h-detalle').value = h.detalle_servicio;
+      document.getElementById('edit-h-bruto').value = h.monto_bruto;
+      document.getElementById('edit-h-ret-tasa').value = h.retencion_porcentaje || 0;
+      document.getElementById('edit-h-estado').value = h.estado;
+
+      document.getElementById('modal-editar-honorario').classList.remove('hidden');
+    }
+
+    function cerrarModalEditarHonorario() { document.getElementById('modal-editar-honorario').classList.add('hidden'); }
+
+    document.getElementById('form-editar-honorario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-h-id').value;
+      const bruto = Number(document.getElementById('edit-h-bruto').value);
+      const ret = Number(document.getElementById('edit-h-ret-tasa').value);
+      const liq = bruto - (bruto * (ret / 100));
+
+      const actualizacion = {
+        fecha: document.getElementById('edit-h-fecha').value,
+        cliente_empresa: document.getElementById('edit-h-cliente').value.trim(),
+        detalle_servicio: document.getElementById('edit-h-detalle').value.trim(),
+        monto_bruto: bruto,
+        retencion_porcentaje: ret,
+        monto_liquido: liq,
+        estado: document.getElementById('edit-h-estado').value
+      };
+
+      const { error } = await db.from('honorarios').update(actualizacion).eq('id', id);
+      if (error) alert("Error al actualizar: " + error.message);
+      else {
+        cerrarModalEditarHonorario();
+        cargarTodo();
+      }
+    });
+
+    // ==========================================
     // GRÁFICOS
     // ==========================================
     function renderizarGraficosPersonal() {
@@ -1046,17 +1188,17 @@
 
       const diasMap = {};
       datosPersonal.honorarios.forEach(h => {
-        const dia = h.fecha.slice(8, 10);
+        const dia = h.fecha.slice(8, 10) || h.fecha;
         if (!diasMap[dia]) diasMap[dia] = { ingresos: 0, gastos: 0 };
         diasMap[dia].ingresos += Number(h.monto_liquido || 0);
       });
       datosPersonal.gastos.forEach(g => {
-        const dia = g.fecha.slice(8, 10);
+        const dia = g.fecha.slice(8, 10) || g.fecha;
         if (!diasMap[dia]) diasMap[dia] = { ingresos: 0, gastos: 0 };
         diasMap[dia].gastos += Number(g.monto || 0);
       });
 
-      const labels = Object.keys(diasMap).sort((a, b) => Number(a) - Number(b));
+      const labels = Object.keys(diasMap).sort();
       const ctxFlujo = document.getElementById('chart-flujo-personal').getContext('2d');
       if (chartFlujoPersonal) chartFlujoPersonal.destroy();
 
@@ -1322,7 +1464,7 @@
     }
 
     // ==========================================
-    // IMPORTADOR BANCO MULTIFORMATO
+    // IMPORTADOR BANCO MULTIFORMATO (CSV / XLSX)
     // ==========================================
     function procesarArchivoBanco(event) {
       const file = event.target.files[0];
@@ -1332,64 +1474,64 @@
     async function procesarArchivoGenericoBanco(file) {
       const fileName = file.name.toLowerCase();
       
-      if (fileName.endsWith('.csv')) {
+      // Manejador CSV (Lectura directa como texto)
+      if (fileName.endsWith('.csv') || file.type.includes('csv') || file.type.includes('text')) {
         Papa.parse(file, {
           header: true,
           skipEmptyLines: true,
           complete: function(results) { analizarFilasBanco(results.data); }
         });
-      } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-        const data = await file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-        
-        let headerIndex = -1;
-        for (let i = 0; i < Math.min(jsonData.length, 15); i++) {
-          const rowStr = (jsonData[i] || []).join(' ').toLowerCase();
-          if (rowStr.includes('fecha') && (rowStr.includes('desc') || rowStr.includes('cargo') || rowStr.includes('monto') || rowStr.includes('detalle'))) {
-            headerIndex = i;
-            break;
-          }
+      } else {
+        // Manejador XLSX / XLS
+        try {
+          const data = await file.arrayBuffer();
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
+          analizarFilasBanco(jsonData);
+        } catch (err) {
+          // Si el XLSX venía como CSV renombrado o con error de compresión, intentar leer como texto
+          Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) { analizarFilasBanco(results.data); }
+          });
         }
-
-        if (headerIndex === -1) headerIndex = 0;
-        const headers = jsonData[headerIndex];
-        const rows = jsonData.slice(headerIndex + 1).map(row => {
-          const obj = {};
-          headers.forEach((h, idx) => { if (h) obj[String(h).trim()] = row[idx]; });
-          return obj;
-        });
-
-        analizarFilasBanco(rows);
       }
     }
 
     function analizarFilasBanco(data) {
       filasBancoImportar = [];
       data.forEach(row => {
-        let fecha = null, desc = 'Gasto Banco', cargo = null;
+        let fecha = null, desc = 'Gasto', cargo = null;
 
         for (let key in row) {
           const k = key.toLowerCase();
-          if (!fecha && k.includes('fecha')) fecha = row[key];
-          if (k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('movimiento') || k.includes('concepto')) desc = row[key];
-          if (!cargo && (k.includes('cargo') || k.includes('monto') || k.includes('debito') || k.includes('egreso'))) cargo = row[key];
+          if (!fecha && (k.includes('fecha') || k.includes('date'))) fecha = row[key];
+          if (k.includes('tipo') || k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('movimiento') || k.includes('concepto')) {
+            desc = row[key];
+          }
+          if (cargo === null && (k.includes('importe') || k.includes('cargo') || k.includes('monto') || k.includes('debito') || k.includes('egreso') || k.includes('valor'))) {
+            cargo = row[key];
+          }
         }
 
         if (cargo !== null && cargo !== undefined && cargo !== '') {
-          let montoLimpio = 0;
-          if (typeof cargo === 'number') montoLimpio = Math.abs(cargo);
-          else montoLimpio = Math.abs(parseInt(String(cargo).replace(/[^\d]/g, ''), 10) || 0);
+          let montoNum = 0;
+          if (typeof cargo === 'number') montoNum = cargo;
+          else montoNum = parseFloat(String(cargo).replace(/\./g, '').replace(',', '.')) || 0;
 
-          if (montoLimpio > 0) {
+          // Si el archivo trae importes negativos como gastos (ej: MercadoPago -4030, -35700)
+          const esGasto = montoNum < 0 || String(desc).toLowerCase().includes('pago') || String(desc).toLowerCase().includes('retiro');
+          const montoFinal = Math.abs(montoNum);
+
+          if (montoFinal > 0 && esGasto) {
             let fechaStr = new Date().toISOString().slice(0, 10);
             if (fecha) {
-              if (typeof fecha === 'number') {
-                const dateObj = new Date((fecha - (25567 + 2)) * 86400 * 1000);
-                fechaStr = dateObj.toISOString().slice(0, 10);
-              } else {
-                const matchF = String(fecha).match(/(\d{1,4})[\/\-](\d{1,2})[\/\-](\d{1,4})/);
+              if (typeof fecha === 'string' && fecha.includes('T')) {
+                fechaStr = fecha.split('T')[0];
+              } else if (typeof fecha === 'string') {
+                const matchF = fecha.match(/(\d{1,4})[\/\-](\d{1,2})[\/\-](\d{1,4})/);
                 if (matchF) {
                   if (matchF[1].length === 4) fechaStr = `${matchF[1]}-${matchF[2].padStart(2, '0')}-${matchF[3].padStart(2, '0')}`;
                   else fechaStr = `${matchF[3]}-${matchF[2].padStart(2, '0')}-${matchF[1].padStart(2, '0')}`;
@@ -1400,8 +1542,8 @@
             filasBancoImportar.push({
               fecha: fechaStr,
               categoria: 'Otros',
-              descripcion: String(desc || 'Gasto Banco').trim(),
-              monto: montoLimpio,
+              descripcion: String(desc || 'Gasto Operativo').trim(),
+              monto: montoFinal,
               tipo: 'variable'
             });
           }
@@ -1412,7 +1554,7 @@
       const cont = document.getElementById('banco-contador');
 
       if (filasBancoImportar.length === 0) {
-        alert("No se detectaron cargos de gastos en el archivo.");
+        alert("No se detectaron cargos de gastos en el archivo seleccionado.");
       } else {
         cont.textContent = `${filasBancoImportar.length} cargos detectados listos para importar`;
         tbody.innerHTML = filasBancoImportar.slice(0, 40).map(f => `
