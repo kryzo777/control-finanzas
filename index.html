@@ -43,7 +43,6 @@
           <span>📁</span> Importar CSV
         </button>
 
-        <!-- FILTROS DE TIEMPO FLEXIBLE -->
         <div class="flex items-center bg-slate-800 rounded-xl px-2.5 py-1 border border-slate-700 gap-1.5 text-xs">
           <select id="filtro-tipo" class="bg-transparent text-slate-300 focus:outline-none cursor-pointer" onchange="cambiarModoFiltro()">
             <option value="semana">Esta Semana</option>
@@ -223,7 +222,7 @@
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <span class="text-slate-400 text-xs font-semibold uppercase">2. Total Gastado</span>
           <p id="kpi-pers-gastos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
-          <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Gastos necesarios & variables</span>
+          <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Gastos registrados</span>
         </div>
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <span class="text-slate-400 text-xs font-semibold uppercase">3. Total Invertido</span>
@@ -240,7 +239,6 @@
       <!-- TAB 1: DASHBOARD FINANCIERO TOTAL -->
       <div id="tab-pers-dashboard" class="tab-pers-content space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Gráfico de Evolución Temporal -->
           <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-sm font-bold uppercase text-slate-300">📈 Evolución: Ingresos vs Gastos vs Inversión</h3>
@@ -249,7 +247,6 @@
             <div class="h-64 relative w-full"><canvas id="chart-flujo-personal"></canvas></div>
           </div>
 
-          <!-- Gráfico de Dona: Distribución del Dinero -->
           <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
             <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Gastos por Categoría</h3>
             <div class="h-56 relative flex items-center justify-center w-full"><canvas id="chart-gastos-cat"></canvas></div>
@@ -257,7 +254,6 @@
           </div>
         </div>
 
-        <!-- Panel de Regla Financiera Personal -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <span class="text-xs text-slate-400 font-semibold">% Destinado a Gastos de Vida</span>
@@ -277,101 +273,60 @@
         </div>
       </div>
 
-      <!-- TAB 2: AUDITORÍA DE CARTOLA BANCARIA -->
+      <!-- TAB 2: AUDITORÍA DE CARTOLA BANCARIA (LIBRO MAYOR CONSOLIDADO) -->
       <div id="tab-pers-auditoria_cartola" class="tab-pers-content hidden space-y-5">
         <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
           
+          <!-- Encabezado y Acciones -->
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-4">
             <div>
-              <h2 class="text-base font-bold text-white flex items-center gap-2"><span>🏦</span> Planilla de Auditoría Bancaria & Movimientos</h2>
-              <p class="text-xs text-slate-400">Arrastra tu cartola (.csv o .xlsx). Clasifica si es <strong>Gasto</strong>, <strong>Ingreso</strong> o <strong>Inversión</strong> y guárdalo en Supabase.</p>
+              <h2 class="text-base font-bold text-white flex items-center gap-2"><span>🏦</span> Libro Mayor Bancario & Movimientos Guardados</h2>
+              <p class="text-xs text-slate-400">Historial consolidado en tiempo real desde Supabase (Gastos, Ingresos e Inversiones).</p>
             </div>
             
-            <div class="flex items-center gap-2 w-full md:w-auto">
-              <label class="cursor-pointer bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
-                <span>📁 Subir Cartola (XLSX / CSV)</span>
-                <input type="file" id="input-cartola-directa" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoCartolaDirecto(event)">
-              </label>
-            </div>
-          </div>
-
-          <!-- Zona Drag & Drop -->
-          <div id="dropzone-cartola-full" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/60 p-5 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1" onclick="document.getElementById('input-cartola-directa').click()">
-            <span class="text-2xl">📥</span>
-            <span class="text-xs font-semibold text-sky-400">Arrastra tu archivo de cartola aquí (.xlsx, .xls o .csv)</span>
-            <span class="text-[11px] text-slate-500">Detecta automáticamente columnas de fecha, tipo de operación e importes</span>
-          </div>
-
-          <!-- Resumen de Métricas de la Cartola -->
-          <div id="resumen-cartola-panel" class="grid grid-cols-2 md:grid-cols-4 gap-3 hidden">
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Gastos en Cartola</span>
-              <p id="rc-gastos" class="text-lg font-bold text-rose-400 mt-0.5">$0</p>
-              <span id="rc-num-gastos" class="text-[10px] text-slate-500">0 operaciones</span>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Ingresos en Cartola</span>
-              <p id="rc-ingresos" class="text-lg font-bold text-emerald-400 mt-0.5">$0</p>
-              <span id="rc-num-ingresos" class="text-[10px] text-slate-500">0 operaciones</span>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Filas Seleccionadas</span>
-              <p id="rc-seleccionadas" class="text-lg font-bold text-sky-400 mt-0.5">0</p>
-              <span id="rc-monto-seleccionado" class="text-[10px] text-sky-300">Total: $0</span>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center gap-2">
-              <button id="btn-importar-cartola-supabase" onclick="importarMovimientosSeleccionados()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20">
-                ⚡ Guardar Seleccionados
-              </button>
-            </div>
-          </div>
-
-          <!-- Controles de la Planilla y Borrado Masivo -->
-          <div id="controles-cartola-panel" class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs hidden">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="text-slate-400">Filtrar:</span>
-              <button onclick="filtrarPlanillaCartola('todos')" id="f-cartola-todos" class="btn-fc px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold">Todos</button>
-              <button onclick="filtrarPlanillaCartola('gastos')" id="f-cartola-gastos" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Gastos / Pagos</button>
-              <button onclick="filtrarPlanillaCartola('ingresos')" id="f-cartola-ingresos" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Ingresos</button>
-              <button onclick="filtrarPlanillaCartola('inversiones')" id="f-cartola-inversiones" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-purple-300 hover:text-white">Inversiones</button>
-            </div>
-
-            <div class="flex items-center gap-2 w-full md:w-auto">
-              <button onclick="eliminarFilasSeleccionadasCartola()" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-lg transition flex items-center gap-1 font-medium">
-                <span>🗑️ Eliminar Seleccionados</span>
+              <button onclick="abrirModalSubirCartola()" class="bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-sky-600/20">
+                <span>➕ Cargar Nueva Cartola (XLSX/CSV)</span>
               </button>
-
-              <select id="destino-lote-cartola" class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-slate-200" onchange="aplicarDestinoLoteCartola()">
-                <option value="gasto_Supermercado/Comida">Gasto: Supermercado & Comida</option>
-                <option value="gasto_Servicios Básicos">Gasto: Servicios Básicos</option>
-                <option value="gasto_Transporte/Auto">Gasto: Transporte / Bencina</option>
-                <option value="gasto_Ocio/Personal">Gasto: Ocio / Personal</option>
-                <option value="gasto_Vivienda/Arriendo">Gasto: Vivienda / Arriendo</option>
-                <option value="gasto_Otros" selected>Gasto: Otros</option>
-                <option value="inversion">🚀 Inversión (Aporte)</option>
-                <option value="ingreso">💵 Ingreso Líquido</option>
-              </select>
-              <button onclick="aplicarDestinoLoteCartola()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-200">Aplicar</button>
+              <button onclick="eliminarMovimientosConsolidadosSeleccionados()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1">
+                <span>🗑️ Eliminar Marcados</span>
+              </button>
             </div>
           </div>
 
-          <!-- Tabla Planilla de Movimientos -->
+          <!-- Controles de Búsqueda y Filtros Rápidos -->
+          <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-slate-400">Ver:</span>
+              <button onclick="filtrarPlanillaConsolidada('todos')" id="f-con-todos" class="btn-fc-con px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold">Todos</button>
+              <button onclick="filtrarPlanillaConsolidada('gastos')" id="f-con-gastos" class="btn-fc-con px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">💸 Gastos</button>
+              <button onclick="filtrarPlanillaConsolidada('ingresos')" id="f-con-ingresos" class="btn-fc-con px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">💵 Ingresos</button>
+              <button onclick="filtrarPlanillaConsolidada('inversiones')" id="f-con-inversiones" class="btn-fc-con px-2.5 py-1 rounded-lg bg-slate-800 text-purple-300 hover:text-white">🚀 Inversiones</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <input type="text" id="buscador-cartola" placeholder="🔍 Buscar comercio o detalle..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 w-full md:w-64" oninput="renderizarPlanillaConsolidada()">
+            </div>
+          </div>
+
+          <!-- Tabla Planilla Consolidada de la Base de Datos -->
           <div class="overflow-x-auto border border-slate-800 rounded-xl max-h-[500px]">
             <table class="w-full text-left text-xs text-slate-300">
               <thead class="bg-slate-950 sticky top-0 text-slate-400 border-b border-slate-800">
                 <tr>
                   <th class="p-3 w-10 text-center">
-                    <input type="checkbox" id="check-cartola-all" checked onchange="toggleSeleccionarTodosCartola(this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+                    <input type="checkbox" id="check-con-all" onchange="toggleSeleccionarTodosConsolidados(this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
                   </th>
                   <th class="p-3">Fecha</th>
-                  <th class="p-3">Detalle Movimiento</th>
-                  <th class="p-3">Destino Financiero</th>
-                  <th class="p-3">Categoría / Activo</th>
-                  <th class="p-3 text-right">Importe ($)</th>
+                  <th class="p-3">Detalle / Comercio</th>
+                  <th class="p-3">Tipo / Destino</th>
+                  <th class="p-3">Categoría</th>
+                  <th class="p-3 text-right">Monto ($)</th>
+                  <th class="p-3 text-center">Acciones</th>
                 </tr>
               </thead>
-              <tbody id="planilla-cartola-body" class="divide-y divide-slate-800 bg-slate-900/40">
-                <tr><td colspan="6" class="p-8 text-center text-slate-500">Carga tu archivo de cartola para auditar los movimientos.</td></tr>
+              <tbody id="planilla-consolidada-body" class="divide-y divide-slate-800 bg-slate-900/40">
+                <tr><td colspan="7" class="p-8 text-center text-slate-500">Cargando movimientos de la base de datos...</td></tr>
               </tbody>
             </table>
           </div>
@@ -383,7 +338,6 @@
       <div id="tab-pers-ingresos_gastos" class="tab-pers-content hidden space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
-          <!-- Boletas SII (7 Cols) -->
           <div class="lg:col-span-7 space-y-4">
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
               <div class="flex border-b border-slate-800 pb-2 justify-between items-center">
@@ -599,6 +553,58 @@
 
   </div>
 
+  <!-- MODAL PARA SUBIR NUEVA CARTOLA (XLSX / CSV) -->
+  <div id="modal-subir-cartola" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2"><span>📥</span> Importar Movimientos de Cartola Bancaria</h2>
+          <p class="text-xs text-slate-400">Previsualiza y selecciona qué movimientos deseas ingresar a tu base de datos</p>
+        </div>
+        <button onclick="cerrarModalSubirCartola()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div id="dropzone-cartola-full" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/60 p-4 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1" onclick="document.getElementById('input-cartola-directa').click()">
+        <span class="text-2xl">📁</span>
+        <span class="text-xs font-semibold text-sky-400">Arrastra tu archivo aquí (.xlsx, .xls o .csv) o haz clic para seleccionarlo</span>
+        <input type="file" id="input-cartola-directa" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoCartolaDirecto(event)">
+      </div>
+
+      <div id="resumen-cartola-modal" class="grid grid-cols-3 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs hidden">
+        <div><span class="text-slate-400">Gastos Detectados:</span> <strong id="rm-gastos" class="text-rose-400">$0</strong></div>
+        <div><span class="text-slate-400">Ingresos Detectados:</span> <strong id="rm-ingresos" class="text-emerald-400">$0</strong></div>
+        <div><span class="text-slate-400">Seleccionados:</span> <strong id="rm-seleccionados" class="text-sky-400">0</strong></div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto border border-slate-800 rounded-xl bg-slate-950/60 min-h-[220px]">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 sticky top-0 text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="p-2.5 w-8 text-center">
+                <input type="checkbox" id="check-modal-all" checked onchange="toggleSeleccionarTodosModal(this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0">
+              </th>
+              <th class="p-2.5">Fecha</th>
+              <th class="p-2.5">Detalle</th>
+              <th class="p-2.5">Destino</th>
+              <th class="p-2.5">Categoría</th>
+              <th class="p-2.5 text-right">Monto ($)</th>
+            </tr>
+          </thead>
+          <tbody id="modal-cartola-preview-body" class="divide-y divide-slate-800">
+            <tr><td colspan="6" class="p-6 text-center text-slate-500">Selecciona o arrastra un archivo para ver los movimientos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+        <button onclick="cerrarModalSubirCartola()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white">Cancelar</button>
+        <button id="btn-importar-modal-supabase" onclick="guardarMovimientosModalEnSupabase()" disabled class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-xs transition">
+          ⚡ Confirmar e Insertar en la Base de Datos
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL CONFIRMAR BOLETA PDF SII -->
   <div id="modal-confirmar-boleta" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4">
@@ -766,9 +772,12 @@
     let datosPersonal = { honorarios: [], gastos: [], inversiones: [] };
     let filasParaImportar = [];
     
-    // Movimientos cargados en la auditoría
-    let movimientosCartola = [];
-    let filtroCartolaTipo = 'todos';
+    // Movimientos del libro mayor consolidado
+    let listaConsolidada = [];
+    let filtroConsolidadoTipo = 'todos';
+
+    // Buffer del modal para subir cartolas nuevas
+    let bufferModalCartola = [];
 
     let chartEvolucion = null;
     let chartDistribucion = null;
@@ -776,7 +785,6 @@
     let chartGastosCat = null;
     let chartInversiones = null;
 
-    // Inicializar fechas con tiempo local
     const hoy = new Date();
     const hoyAnio = hoy.getFullYear();
     const hoyMes = String(hoy.getMonth() + 1).padStart(2, '0');
@@ -787,7 +795,6 @@
     document.getElementById('v-fecha').value = hoyFechaStr;
     document.getElementById('ads-fecha').value = hoyFechaStr;
     document.getElementById('h-fecha').value = hoyFechaStr;
-    document.getElementById('gp-fecha').value = hoyFechaStr;
     document.getElementById('ie-fecha').value = hoyFechaStr;
     document.getElementById('inv-fecha').value = hoyFechaStr;
 
@@ -924,6 +931,7 @@
       }
 
       if (tab === 'dashboard') setTimeout(renderizarGraficosPersonal, 60);
+      if (tab === 'auditoria_cartola') renderizarPlanillaConsolidada();
       if (tab === 'inversiones') setTimeout(renderizarGraficoInversiones, 60);
     }
 
@@ -1009,6 +1017,7 @@
       procesarModuloDropshipping();
       procesarModuloPersonal();
       procesarModuloInversiones();
+      construirListaConsolidada();
     }
 
     function procesarModuloDropshipping() {
@@ -1145,13 +1154,11 @@
         }).join('');
       }
 
-      // Inversiones aportadas en el período filtrado
       let totalInvertidoPeriodo = datosPersonal.inversiones.reduce((acc, inv) => acc + Number(inv.capital_invertido || 0), 0);
 
       const saldoAhorro = totalLiquido - totalGastosPers - totalInvertidoPeriodo;
       const tasaAhorro = totalLiquido > 0 ? ((saldoAhorro / totalLiquido) * 100).toFixed(1) : 0;
 
-      // Actualizar KPIs
       document.getElementById('kpi-pers-ingresos').textContent = formatoCLP(totalLiquido);
       document.getElementById('kpi-pers-bruto').textContent = `Bruto: ${formatoCLP(totalBruto)}`;
       document.getElementById('kpi-pers-retencion').textContent = formatoCLP(totalRetencion);
@@ -1166,7 +1173,6 @@
       elAhorro.className = `text-xl font-bold mt-1 ${saldoAhorro >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
       document.getElementById('kpi-pers-capacidad').textContent = `Tasa de Ahorro: ${tasaAhorro}%`;
 
-      // Regla Financiera Personal (%)
       if (totalLiquido > 0) {
         document.getElementById('kpi-pct-gastos').textContent = `${((totalGastosPers / totalLiquido) * 100).toFixed(1)}%`;
         document.getElementById('kpi-pct-inversion').textContent = `${((totalInvertidoPeriodo / totalLiquido) * 100).toFixed(1)}%`;
@@ -1230,83 +1236,153 @@
       setTimeout(renderizarGraficoInversiones, 60);
     }
 
-    // ==========================================
-    // ALTERNAR ESTADO Y EDITAR BOLETAS
-    // ==========================================
-    async function alternarEstadoHonorario(id, estadoActual) {
-      const nuevoEstado = estadoActual === 'pagada' ? 'pendiente' : 'pagada';
-      const { error } = await db.from('honorarios').update({ estado: nuevoEstado }).eq('id', id);
-      if (error) alert("Error al cambiar estado: " + error.message);
+    // =========================================================
+    // LIBRO MAYOR CONSOLIDADO (CONECTADO A SUPABASE)
+    // =========================================================
+    function construirListaConsolidada() {
+      listaConsolidada = [];
+
+      // 1. Agregar Gastos
+      datosPersonal.gastos.forEach(g => {
+        listaConsolidada.push({
+          idReal: g.id,
+          tabla: 'gastos_personales',
+          tipo: 'gasto',
+          fecha: g.fecha,
+          detalle: g.descripcion,
+          categoria: g.categoria || 'Otros',
+          monto: Number(g.monto),
+          seleccionado: false
+        });
+      });
+
+      // 2. Agregar Ingresos / Honorarios
+      datosPersonal.honorarios.forEach(h => {
+        listaConsolidada.push({
+          idReal: h.id,
+          tabla: 'honorarios',
+          tipo: 'ingreso',
+          fecha: h.fecha,
+          detalle: `${h.cliente_empresa} (${h.detalle_servicio || 'Honorarios'})`,
+          categoria: 'Ingreso Líquido',
+          monto: Number(h.monto_liquido || h.monto_bruto),
+          seleccionado: false
+        });
+      });
+
+      // 3. Agregar Inversiones
+      datosPersonal.inversiones.forEach(inv => {
+        listaConsolidada.push({
+          idReal: inv.id,
+          tabla: 'inversiones',
+          tipo: 'inversion',
+          fecha: inv.fecha || inv.created_at.slice(0, 10),
+          detalle: `${inv.nombre} (${inv.tipo})`,
+          categoria: 'Inversión / Aporte',
+          monto: Number(inv.capital_invertido),
+          seleccionado: false
+        });
+      });
+
+      // Ordenar por fecha descendente
+      listaConsolidada.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+      renderizarPlanillaConsolidada();
+    }
+
+    function renderizarPlanillaConsolidada() {
+      const tbody = document.getElementById('planilla-consolidada-body');
+      if (!tbody) return;
+
+      const busqueda = (document.getElementById('buscador-cartola')?.value || '').toLowerCase().trim();
+
+      const filtrados = listaConsolidada.filter(item => {
+        if (filtroConsolidadoTipo === 'gastos' && item.tipo !== 'gasto') return false;
+        if (filtroConsolidadoTipo === 'ingresos' && item.tipo !== 'ingreso') return false;
+        if (filtroConsolidadoTipo === 'inversiones' && item.tipo !== 'inversion') return false;
+        if (busqueda && !item.detalle.toLowerCase().includes(busqueda) && !item.categoria.toLowerCase().includes(busqueda)) return false;
+        return true;
+      });
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-500">No hay movimientos guardados que coincidan con la búsqueda o filtro.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map((item, idx) => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-3 text-center">
+            <input type="checkbox" ${item.seleccionado ? 'checked' : ''} onchange="toggleSeleccionConsolidado(${idx}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+          </td>
+          <td class="p-3 text-slate-400 font-mono">${item.fecha}</td>
+          <td class="p-3 font-medium text-slate-200">${item.detalle}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${item.tipo==='gasto'?'bg-rose-950 text-rose-400 border border-rose-800':(item.tipo==='inversion'?'bg-purple-950 text-purple-400 border border-purple-800':'bg-emerald-950 text-emerald-400 border border-emerald-800')}">
+              ${item.tipo.toUpperCase()}
+            </span>
+          </td>
+          <td class="p-3 text-slate-300">${item.categoria}</td>
+          <td class="p-3 text-right font-semibold ${item.tipo==='gasto'?'text-rose-400':(item.tipo==='inversion'?'text-purple-400':'text-emerald-400')}">
+            ${item.tipo==='gasto' ? '-' : '+'}${formatoCLP(item.monto)}
+          </td>
+          <td class="p-3 text-center">
+            <button onclick="eliminarFilaConsolidadaIndividual('${item.tabla}', ${item.idReal})" class="text-rose-400 hover:text-rose-200 text-xs px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function toggleSeleccionConsolidado(idx, checked) {
+      listaConsolidada[idx].seleccionado = checked;
+    }
+
+    function toggleSeleccionarTodosConsolidados(checked) {
+      listaConsolidada.forEach(item => item.seleccionado = checked);
+      renderizarPlanillaConsolidada();
+    }
+
+    function filtrarPlanillaConsolidada(tipo) {
+      filtroConsolidadoTipo = tipo;
+      document.querySelectorAll('.btn-fc-con').forEach(b => {
+        b.className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white';
+      });
+      document.getElementById(`f-con-${tipo}`).className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold';
+      renderizarPlanillaConsolidada();
+    }
+
+    async function eliminarFilaConsolidadaIndividual(tabla, id) {
+      if (!confirm("¿Eliminar este movimiento de la base de datos?")) return;
+      const { error } = await db.from(tabla).delete().eq('id', id);
+      if (error) alert("Error al eliminar: " + error.message);
       else cargarTodo();
     }
 
-    function abrirModalEditarHonorario(id) {
-      const h = datosPersonal.honorarios.find(item => item.id === id);
-      if (!h) return;
+    async function eliminarMovimientosConsolidadosSeleccionados() {
+      const seleccionados = listaConsolidada.filter(item => item.seleccionado);
+      if (seleccionados.length === 0) {
+        alert("Selecciona al menos un movimiento con la casilla de verificación.");
+        return;
+      }
 
-      document.getElementById('edit-h-id').value = h.id;
-      document.getElementById('edit-h-fecha').value = h.fecha;
-      document.getElementById('edit-h-cliente').value = h.cliente_empresa;
-      document.getElementById('edit-h-detalle').value = h.detalle_servicio;
-      document.getElementById('edit-h-bruto').value = h.monto_bruto;
-      document.getElementById('edit-h-ret-tasa').value = h.retencion_porcentaje || 0;
-      document.getElementById('edit-h-estado').value = h.estado;
+      if (!confirm(`¿Eliminar definitivamente ${seleccionados.length} movimientos de la base de datos?`)) return;
 
-      document.getElementById('modal-editar-honorario').classList.remove('hidden');
+      for (const item of seleccionados) {
+        await db.from(item.tabla).delete().eq('id', item.idReal);
+      }
+
+      alert("Movimientos eliminados correctamente.");
+      cargarTodo();
     }
 
-    function cerrarModalEditarHonorario() { document.getElementById('modal-editar-honorario').classList.add('hidden'); }
+    // =========================================================
+    // MODAL DE CARGA DE NUEVAS CARTOLAS (XLSX / CSV)
+    // =========================================================
+    function abrirModalSubirCartola() {
+      document.getElementById('modal-subir-cartola').classList.remove('hidden');
+    }
 
-    document.getElementById('form-editar-honorario').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('edit-h-id').value;
-      const bruto = Number(document.getElementById('edit-h-bruto').value);
-      const ret = Number(document.getElementById('edit-h-ret-tasa').value);
-      const liq = bruto - (bruto * (ret / 100));
-
-      const actualizacion = {
-        fecha: document.getElementById('edit-h-fecha').value,
-        cliente_empresa: document.getElementById('edit-h-cliente').value.trim(),
-        detalle_servicio: document.getElementById('edit-h-detalle').value.trim(),
-        monto_bruto: bruto,
-        retencion_porcentaje: ret,
-        monto_liquido: liq,
-        estado: document.getElementById('edit-h-estado').value
-      };
-
-      const { error } = await db.from('honorarios').update(actualizacion).eq('id', id);
-      if (error) alert("Error al actualizar: " + error.message);
-      else {
-        cerrarModalEditarHonorario();
-        cargarTodo();
-      }
-    });
-
-    // ==========================================
-    // PLANILLA AUDITORÍA CARTOLA
-    // ==========================================
-    function setupDragAndDrop() {
-      const dzPdf = document.getElementById('dropzone-pdf');
-      const dzCartola = document.getElementById('dropzone-cartola-full');
-
-      if (dzPdf) {
-        ['dragenter', 'dragover'].forEach(n => { dzPdf.addEventListener(n, (e) => { e.preventDefault(); dzPdf.classList.add('border-emerald-400', 'bg-emerald-950/20'); }); });
-        ['dragleave', 'drop'].forEach(n => { dzPdf.addEventListener(n, (e) => { e.preventDefault(); dzPdf.classList.remove('border-emerald-400', 'bg-emerald-950/20'); }); });
-        dzPdf.addEventListener('drop', (e) => {
-          const file = e.dataTransfer.files[0];
-          if (file && file.name.toLowerCase().endsWith('.pdf')) procesarArchivoPDF(file);
-          else alert('Por favor arrastra un archivo PDF válido.');
-        });
-      }
-
-      if (dzCartola) {
-        ['dragenter', 'dragover'].forEach(n => { dzCartola.addEventListener(n, (e) => { e.preventDefault(); dzCartola.classList.add('border-sky-400', 'bg-sky-950/20'); }); });
-        ['dragleave', 'drop'].forEach(n => { dzCartola.addEventListener(n, (e) => { e.preventDefault(); dzCartola.classList.remove('border-sky-400', 'bg-sky-950/20'); }); });
-        dzCartola.addEventListener('drop', (e) => {
-          const file = e.dataTransfer.files[0];
-          if (file) procesarArchivoCartolaGenerico(file);
-        });
-      }
+    function cerrarModalSubirCartola() {
+      document.getElementById('modal-subir-cartola').classList.add('hidden');
+      bufferModalCartola = [];
     }
 
     function procesarArchivoCartolaDirecto(event) {
@@ -1316,8 +1392,8 @@
 
     async function procesarArchivoCartolaGenerico(file) {
       const fileName = file.name.toLowerCase();
-
       const reader = new FileReader();
+
       reader.onload = function(e) {
         const textContent = e.target.result;
         if (textContent.includes(',') || textContent.includes(';') || textContent.includes('\t') || fileName.endsWith('.csv')) {
@@ -1326,7 +1402,7 @@
             skipEmptyLines: true,
             complete: function(results) {
               if (results.data && results.data.length > 0) {
-                cargarMovimientosEnPlanilla(results.data);
+                analizarDatosParaModalCartola(results.data);
                 return;
               }
               parsearComoBinarioCartola(file);
@@ -1346,27 +1422,24 @@
         const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
-        cargarMovimientosEnPlanilla(jsonData);
+        analizarDatosParaModalCartola(jsonData);
       } catch (err) {
-        alert("No se pudo leer el archivo de cartola: " + err.message);
+        alert("Error al leer el archivo: " + err.message);
       }
     }
 
-    function cargarMovimientosEnPlanilla(data) {
-      movimientosCartola = [];
+    function analizarDatosParaModalCartola(data) {
+      bufferModalCartola = [];
       let totalGastos = 0;
       let totalIngresos = 0;
-      let countGastos = 0;
-      let countIngresos = 0;
 
       data.forEach((row, idx) => {
-        let fecha = null, desc = 'Movimiento', cargo = null, numMov = '-';
+        let fecha = null, desc = 'Movimiento', cargo = null;
 
         for (let key in row) {
           const k = key.toLowerCase();
           if (!fecha && (k.includes('fecha') || k.includes('date'))) fecha = row[key];
           if (k.includes('tipo') || k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('concepto')) desc = row[key];
-          if (k.includes('número') || k.includes('numero') || k.includes('movimiento') || k.includes('id')) numMov = row[key] || '-';
           if (cargo === null && (k.includes('importe') || k.includes('cargo') || k.includes('monto') || k.includes('debito') || k.includes('egreso') || k.includes('valor') || k.includes('abono'))) {
             cargo = row[key];
           }
@@ -1396,22 +1469,16 @@
 
             let destino = esGasto ? 'gasto' : 'ingreso';
 
-            if (esGasto) {
-              totalGastos += montoFinal;
-              countGastos++;
-            } else {
-              totalIngresos += montoFinal;
-              countIngresos++;
-            }
+            if (esGasto) totalGastos += montoFinal;
+            else totalIngresos += montoFinal;
 
-            movimientosCartola.push({
+            bufferModalCartola.push({
               idTemporal: idx,
               fecha: fechaStr,
               descripcion: String(desc || 'Movimiento').trim(),
-              numMovimiento: String(numMov).trim(),
               monto: montoFinal,
               esGasto: esGasto,
-              destinoFinanciero: destino, // 'gasto', 'inversion', 'ingreso'
+              destinoFinanciero: destino,
               categoria: 'Otros',
               seleccionado: true
             });
@@ -1419,158 +1486,78 @@
         }
       });
 
-      if (movimientosCartola.length === 0) {
+      if (bufferModalCartola.length === 0) {
         alert("No se detectaron movimientos válidos en el archivo.");
         return;
       }
 
-      document.getElementById('resumen-cartola-panel').classList.remove('hidden');
-      document.getElementById('controles-cartola-panel').classList.remove('hidden');
+      document.getElementById('resumen-cartola-modal').classList.remove('hidden');
+      document.getElementById('rm-gastos').textContent = formatoCLP(totalGastos);
+      document.getElementById('rm-ingresos').textContent = formatoCLP(totalIngresos);
+      document.getElementById('rm-seleccionados').textContent = bufferModalCartola.length;
+      document.getElementById('btn-importar-modal-supabase').disabled = false;
 
-      document.getElementById('rc-gastos').textContent = formatoCLP(totalGastos);
-      document.getElementById('rc-num-gastos').textContent = `${countGastos} operaciones`;
-      document.getElementById('rc-ingresos').textContent = formatoCLP(totalIngresos);
-      document.getElementById('rc-num-ingresos').textContent = `${countIngresos} operaciones`;
-
-      actualizarConteoSeleccionadosCartola();
-      renderizarPlanillaCartola();
+      renderizarBufferModal();
     }
 
-    function renderizarPlanillaCartola() {
-      const tbody = document.getElementById('planilla-cartola-body');
-      const filtrados = movimientosCartola.filter(m => {
-        if (filtroCartolaTipo === 'gastos') return m.destinoFinanciero === 'gasto';
-        if (filtroCartolaTipo === 'ingresos') return m.destinoFinanciero === 'ingreso';
-        if (filtroCartolaTipo === 'inversiones') return m.destinoFinanciero === 'inversion';
-        return true;
-      });
-
-      if (filtrados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No hay movimientos que coincidan con el filtro.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = filtrados.map(m => `
-        <tr class="hover:bg-slate-800/50 transition ${m.seleccionado ? 'bg-slate-800/20' : 'opacity-60'}">
-          <td class="p-3 text-center">
-            <input type="checkbox" ${m.seleccionado ? 'checked' : ''} onchange="toggleSeleccionItemCartola(${m.idTemporal}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+    function renderizarBufferModal() {
+      const tbody = document.getElementById('modal-cartola-preview-body');
+      tbody.innerHTML = bufferModalCartola.map(m => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-2.5 text-center">
+            <input type="checkbox" ${m.seleccionado ? 'checked' : ''} onchange="toggleItemBufferModal(${m.idTemporal}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0">
           </td>
-          <td class="p-3 text-slate-400 font-mono">${m.fecha}</td>
-          <td class="p-3">
-            <div class="font-medium text-slate-200">${m.descripcion}</div>
-            <div class="text-[10px] text-slate-500">Ref: ${m.numMovimiento}</div>
-          </td>
-          <td class="p-3">
-            <select class="bg-slate-800 border border-slate-700 rounded-lg p-1 text-xs font-semibold focus:outline-none ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}" onchange="cambiarDestinoFilaCartola(${m.idTemporal}, this.value)">
-              <option value="gasto" ${m.destinoFinanciero==='gasto'?'selected':''}>💸 Gasto Personal</option>
-              <option value="inversion" ${m.destinoFinanciero==='inversion'?'selected':''}>🚀 Inversión (Aporte)</option>
-              <option value="ingreso" ${m.destinoFinanciero==='ingreso'?'selected':''}>💵 Ingreso Líquido</option>
+          <td class="p-2.5 text-slate-400 font-mono">${m.fecha}</td>
+          <td class="p-2.5 font-medium text-slate-200">${m.descripcion}</td>
+          <td class="p-2.5">
+            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
+              <option value="gasto" ${m.destinoFinanciero==='gasto'?'selected':''}>💸 Gasto</option>
+              <option value="inversion" ${m.destinoFinanciero==='inversion'?'selected':''}>🚀 Inversión</option>
+              <option value="ingreso" ${m.destinoFinanciero==='ingreso'?'selected':''}>💵 Ingreso</option>
             </select>
           </td>
-          <td class="p-3">
-            <select class="bg-slate-800 border border-slate-700 rounded-lg p-1 text-slate-200 text-xs focus:outline-none" onchange="actualizarCategoriaItemCartola(${m.idTemporal}, this.value)">
-              <option value="Supermercado/Comida" ${m.categoria==='Supermercado/Comida'?'selected':''}>Supermercado & Comida</option>
-              <option value="Servicios Básicos" ${m.categoria==='Servicios Básicos'?'selected':''}>Servicios Básicos</option>
-              <option value="Transporte/Auto" ${m.categoria==='Transporte/Auto'?'selected':''}>Transporte / Auto</option>
-              <option value="Ocio/Personal" ${m.categoria==='Ocio/Personal'?'selected':''}>Ocio / Personal</option>
-              <option value="Vivienda/Arriendo" ${m.categoria==='Vivienda/Arriendo'?'selected':''}>Vivienda / Arriendo</option>
-              <option value="Otros" ${m.categoria==='Otros'?'selected':''}>Otros</option>
+          <td class="p-2.5">
+            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200" onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).categoria = this.value">
+              <option value="Otros">Otros</option>
+              <option value="Supermercado/Comida">Supermercado & Comida</option>
+              <option value="Servicios Básicos">Servicios Básicos</option>
+              <option value="Transporte/Auto">Transporte / Auto</option>
+              <option value="Ocio/Personal">Ocio / Personal</option>
+              <option value="Vivienda/Arriendo">Vivienda / Arriendo</option>
             </select>
           </td>
-          <td class="p-3 text-right font-semibold ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}">
+          <td class="p-2.5 text-right font-semibold ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}">
             ${m.destinoFinanciero==='gasto' ? '-' : '+'}${formatoCLP(m.monto)}
           </td>
         </tr>
       `).join('');
     }
 
-    function toggleSeleccionItemCartola(idTemporal, checked) {
-      const item = movimientosCartola.find(m => m.idTemporal === idTemporal);
+    function toggleItemBufferModal(id, checked) {
+      const item = bufferModalCartola.find(m => m.idTemporal === id);
       if (item) item.seleccionado = checked;
-      actualizarConteoSeleccionadosCartola();
+      document.getElementById('rm-seleccionados').textContent = bufferModalCartola.filter(m => m.seleccionado).length;
     }
 
-    function cambiarDestinoFilaCartola(idTemporal, dest) {
-      const item = movimientosCartola.find(m => m.idTemporal === idTemporal);
+    function cambiarDestinoBufferModal(id, dest) {
+      const item = bufferModalCartola.find(m => m.idTemporal === id);
       if (item) item.destinoFinanciero = dest;
-      actualizarConteoSeleccionadosCartola();
-      renderizarPlanillaCartola();
+      renderizarBufferModal();
     }
 
-    function actualizarCategoriaItemCartola(idTemporal, cat) {
-      const item = movimientosCartola.find(m => m.idTemporal === idTemporal);
-      if (item) item.categoria = cat;
+    function toggleSeleccionarTodosModal(checked) {
+      bufferModalCartola.forEach(m => m.seleccionado = checked);
+      document.getElementById('rm-seleccionados').textContent = checked ? bufferModalCartola.length : 0;
+      renderizarBufferModal();
     }
 
-    function toggleSeleccionarTodosCartola(checked) {
-      movimientosCartola.forEach(m => {
-        if (filtroCartolaTipo === 'gastos' && m.destinoFinanciero !== 'gasto') return;
-        if (filtroCartolaTipo === 'ingresos' && m.destinoFinanciero !== 'ingreso') return;
-        if (filtroCartolaTipo === 'inversiones' && m.destinoFinanciero !== 'inversion') return;
-        m.seleccionado = checked;
-      });
-      actualizarConteoSeleccionadosCartola();
-      renderizarPlanillaCartola();
-    }
-
-    function filtrarPlanillaCartola(tipo) {
-      filtroCartolaTipo = tipo;
-      document.querySelectorAll('.btn-fc').forEach(b => {
-        b.className = 'btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white';
-      });
-      document.getElementById(`f-cartola-${tipo}`).className = 'btn-fc px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold';
-      renderizarPlanillaCartola();
-    }
-
-    function aplicarDestinoLoteCartola() {
-      const val = document.getElementById('destino-lote-cartola').value;
-      movimientosCartola.forEach(m => {
-        if (m.seleccionado) {
-          if (val.startsWith('gasto_')) {
-            m.destinoFinanciero = 'gasto';
-            m.categoria = val.replace('gasto_', '');
-          } else {
-            m.destinoFinanciero = val;
-          }
-        }
-      });
-      renderizarPlanillaCartola();
-      actualizarConteoSeleccionadosCartola();
-    }
-
-    function eliminarFilasSeleccionadasCartola() {
-      const antes = movimientosCartola.length;
-      movimientosCartola = movimientosCartola.filter(m => !m.seleccionado);
-      const eliminados = antes - movimientosCartola.length;
-
-      if (eliminados === 0) {
-        alert("No hay filas marcadas para eliminar.");
-        return;
-      }
-
-      alert(`Se descartaron ${eliminados} movimientos de la planilla.`);
-      actualizarConteoSeleccionadosCartola();
-      renderizarPlanillaCartola();
-    }
-
-    function actualizarConteoSeleccionadosCartola() {
-      const seleccionados = movimientosCartola.filter(m => m.seleccionado);
-      const totalMonto = seleccionados.reduce((acc, m) => acc + (m.destinoFinanciero === 'gasto' ? -m.monto : m.monto), 0);
-
-      document.getElementById('rc-seleccionadas').textContent = seleccionados.length;
-      document.getElementById('rc-monto-seleccionado').textContent = `Neto: ${formatoCLP(totalMonto)}`;
-
-      const btn = document.getElementById('btn-importar-cartola-supabase');
-      btn.disabled = seleccionados.length === 0;
-    }
-
-    async function importarMovimientosSeleccionados() {
-      const seleccionados = movimientosCartola.filter(m => m.seleccionado);
+    async function guardarMovimientosModalEnSupabase() {
+      const seleccionados = bufferModalCartola.filter(m => m.seleccionado);
       if (seleccionados.length === 0) return;
 
-      const btn = document.getElementById('btn-importar-cartola-supabase');
+      const btn = document.getElementById('btn-importar-modal-supabase');
       btn.disabled = true;
-      btn.textContent = 'Guardando...';
+      btn.textContent = 'Insertando en Supabase...';
 
       const gastosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'gasto').map(m => ({
         fecha: m.fecha,
@@ -1618,17 +1605,13 @@
       }
 
       btn.disabled = false;
-      btn.textContent = '⚡ Guardar Seleccionados';
+      btn.textContent = '⚡ Confirmar e Insertar en la Base de Datos';
 
       if (errores.length > 0) {
-        alert("Hubo un error al guardar:\n" + errores.join('\n'));
+        alert("Error al insertar:\n" + errores.join('\n'));
       } else {
-        alert(`¡Guardado exitoso! Se importaron ${seleccionados.length} movimientos en total:\n• ${gastosParaInsertar.length} Gastos\n• ${inversionesParaInsertar.length} Inversiones\n• ${ingresosParaInsertar.length} Ingresos`);
-        
-        movimientosCartola = movimientosCartola.filter(m => !m.seleccionado);
-        actualizarConteoSeleccionadosCartola();
-        renderizarPlanillaCartola();
-
+        alert(`¡Éxito! Se insertaron ${seleccionados.length} movimientos en la base de datos.`);
+        cerrarModalSubirCartola();
         cargarTodo();
       }
     }
@@ -1636,6 +1619,30 @@
     // ==========================================
     // LECTOR DE BOLETAS PDF SII
     // ==========================================
+    function setupDragAndDrop() {
+      const dzPdf = document.getElementById('dropzone-pdf');
+      const dzCartolaModal = document.getElementById('dropzone-cartola-full');
+
+      if (dzPdf) {
+        ['dragenter', 'dragover'].forEach(n => { dzPdf.addEventListener(n, (e) => { e.preventDefault(); dzPdf.classList.add('border-emerald-400', 'bg-emerald-950/20'); }); });
+        ['dragleave', 'drop'].forEach(n => { dzPdf.addEventListener(n, (e) => { e.preventDefault(); dzPdf.classList.remove('border-emerald-400', 'bg-emerald-950/20'); }); });
+        dzPdf.addEventListener('drop', (e) => {
+          const file = e.dataTransfer.files[0];
+          if (file && file.name.toLowerCase().endsWith('.pdf')) procesarArchivoPDF(file);
+          else alert('Por favor arrastra un archivo PDF válido.');
+        });
+      }
+
+      if (dzCartolaModal) {
+        ['dragenter', 'dragover'].forEach(n => { dzCartolaModal.addEventListener(n, (e) => { e.preventDefault(); dzCartolaModal.classList.add('border-sky-400', 'bg-sky-950/20'); }); });
+        ['dragleave', 'drop'].forEach(n => { dzCartolaModal.addEventListener(n, (e) => { e.preventDefault(); dzCartolaModal.classList.remove('border-sky-400', 'bg-sky-950/20'); }); });
+        dzCartolaModal.addEventListener('drop', (e) => {
+          const file = e.dataTransfer.files[0];
+          if (file) procesarArchivoCartolaGenerico(file);
+        });
+      }
+    }
+
     function procesarPDFSubido(event) {
       const file = event.target.files[0];
       if (file) procesarArchivoPDF(file);
@@ -1873,7 +1880,6 @@
       const canvasCat = document.getElementById('chart-gastos-cat');
       if (!canvasFlujo || !canvasCat) return;
 
-      // 1. Gráfico de Evolución Temporal
       const fechasMap = {};
 
       datosPersonal.honorarios.forEach(h => {
@@ -1918,7 +1924,7 @@
               pointBackgroundColor: '#34d399'
             },
             {
-              label: 'Gastos de Vida ($)',
+              label: 'Gastos ($)',
               data: dataGastos,
               borderColor: '#f87171',
               backgroundColor: 'rgba(248, 113, 113, 0.1)',
@@ -1948,7 +1954,6 @@
         }
       });
 
-      // 2. Gráfico de Dona: Distribución de Gastos
       const catMap = {};
       datosPersonal.gastos.forEach(g => { catMap[g.categoria] = (catMap[g.categoria] || 0) + Number(g.monto); });
       const catLabels = Object.keys(catMap);
