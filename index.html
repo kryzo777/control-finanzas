@@ -32,10 +32,10 @@
       <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
         <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
           <button onclick="cambiarWorkspace('dropshipping')" id="btn-ws-drop" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition">
-            🛍️ <span id="label-ws-drop">Dropshipping</span>
+            🛍️ <span id="label-ws-drop">Negocio</span>
           </button>
           <button onclick="cambiarWorkspace('personal')" id="btn-ws-pers" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
-            👤 <span id="label-ws-pers">Honorarios & Personal</span>
+            👤 <span id="label-ws-pers">Finanzas Personales</span>
           </button>
         </div>
 
@@ -111,11 +111,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
             <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Tendencia Diaria: Ventas vs Costos Variables</h3>
-            <div class="h-64 relative"><canvas id="chart-evolucion"></canvas></div>
+            <div class="h-64 relative w-full"><canvas id="chart-evolucion"></canvas></div>
           </div>
           <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
             <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Costos</h3>
-            <div class="h-56 relative flex items-center justify-center"><canvas id="chart-distribucion"></canvas></div>
+            <div class="h-56 relative flex items-center justify-center w-full"><canvas id="chart-distribucion"></canvas></div>
             <div id="distribucion-leyenda" class="text-xs text-slate-400 grid grid-cols-3 text-center pt-3 border-t border-slate-800/80 gap-1"></div>
           </div>
         </div>
@@ -213,7 +213,7 @@
         </button>
       </nav>
 
-      <!-- KPIs Personal Consolidados (Gano, Gasto, Invierto, Ahorro) -->
+      <!-- KPIs Personal Consolidados -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
           <span class="text-slate-400 text-xs font-semibold uppercase">1. Total Ganado (Líquido)</span>
@@ -240,24 +240,24 @@
       <!-- TAB 1: DASHBOARD FINANCIERO TOTAL -->
       <div id="tab-pers-dashboard" class="tab-pers-content space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Gráfico Comparativo: Ganado vs Gastado vs Invertido -->
+          <!-- Gráfico de Evolución Temporal (Líneas con Área) -->
           <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-sm font-bold uppercase text-slate-300">📊 Comparativa: Ganado vs Gastado vs Invertido</h3>
+              <h3 class="text-sm font-bold uppercase text-slate-300">📈 Evolución: Ingresos vs Gastos vs Inversión</h3>
               <span class="text-xs text-slate-500" id="label-periodo-dashboard">Período Seleccionado</span>
             </div>
-            <div class="h-64 relative"><canvas id="chart-flujo-personal"></canvas></div>
+            <div class="h-64 relative w-full"><canvas id="chart-flujo-personal"></canvas></div>
           </div>
 
           <!-- Gráfico de Dona: Distribución del Dinero -->
           <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
             <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Gastos por Categoría</h3>
-            <div class="h-56 relative flex items-center justify-center"><canvas id="chart-gastos-cat"></canvas></div>
+            <div class="h-56 relative flex items-center justify-center w-full"><canvas id="chart-gastos-cat"></canvas></div>
             <div id="gastos-cat-leyenda" class="text-xs text-slate-400 text-center pt-3 border-t border-slate-800/80"></div>
           </div>
         </div>
 
-        <!-- Panel de Regla Financiera y Resumen de Control -->
+        <!-- Panel de Regla Financiera Personal -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <span class="text-xs text-slate-400 font-semibold">% Destinado a Gastos de Vida</span>
@@ -265,9 +265,9 @@
             <span class="text-[10px] text-slate-500">De tus ingresos totales</span>
           </div>
           <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 font-semibold">% Destinado a Inversión / Futuro</span>
+            <span class="text-xs text-slate-400 font-semibold">% Destinado a Inversión / Patrimonio</span>
             <p id="kpi-pct-inversion" class="text-lg font-bold text-purple-400 mt-1">0%</p>
-            <span class="text-[10px] text-slate-500">Aportes a tu patrimonio</span>
+            <span class="text-[10px] text-slate-500">Aportes a tu futuro</span>
           </div>
           <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <span class="text-xs text-slate-400 font-semibold">% Flujo Libre Restante</span>
@@ -277,14 +277,14 @@
         </div>
       </div>
 
-      <!-- TAB 2: AUDITORÍA DE CARTOLA BANCARIA (PLANILLA CENTRAL) -->
+      <!-- TAB 2: AUDITORÍA DE CARTOLA BANCARIA -->
       <div id="tab-pers-auditoria_cartola" class="tab-pers-content hidden space-y-5">
         <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
           
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-4">
             <div>
               <h2 class="text-base font-bold text-white flex items-center gap-2"><span>🏦</span> Planilla de Auditoría Bancaria & Movimientos</h2>
-              <p class="text-xs text-slate-400">Arrastra tu cartola (.csv o .xlsx). Clasifica si es <strong>Gasto</strong>, <strong>Ingreso</strong> o <strong>Inversión</strong> y envíalo con 1 clic.</p>
+              <p class="text-xs text-slate-400">Arrastra tu cartola (.csv o .xlsx). Clasifica si es <strong>Gasto</strong>, <strong>Ingreso</strong> o <strong>Inversión</strong> y guárdalo en Supabase.</p>
             </div>
             
             <div class="flex items-center gap-2 w-full md:w-auto">
@@ -381,7 +381,7 @@
         </div>
       </div>
 
-      <!-- TAB 3: BOLETAS & HONORARIOS SII (LIMPIO) -->
+      <!-- TAB 3: BOLETAS & HONORARIOS SII -->
       <div id="tab-pers-ingresos_gastos" class="tab-pers-content hidden space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
@@ -427,7 +427,7 @@
                   </div>
                   <div>
                     <label class="text-slate-400">Retención SII (%)</label>
-                    <input type="number" id="h-ret-tasa" step="0.01" value="15.25" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="calcularLiquidoHonorario()">
+                    <input type="number" step="0.01" id="h-ret-tasa" value="15.25" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="calcularLiquidoHonorario()">
                   </div>
                   <div>
                     <label class="text-slate-400">Líquido a Recibir</label>
@@ -591,7 +591,7 @@
               <h3 class="text-sm font-bold uppercase text-purple-400">🚀 Proyección de Crecimiento Patrimonial</h3>
               <p class="text-xs text-slate-400 mt-1">Simulación con interés compuesto continuo</p>
             </div>
-            <div class="h-64 relative"><canvas id="chart-inversiones"></canvas></div>
+            <div class="h-64 relative w-full"><canvas id="chart-inversiones"></canvas></div>
             <div id="simulacion-texto" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1"></div>
           </div>
         </div>
@@ -700,11 +700,11 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="text-slate-300 font-semibold">Workspace 1</label>
-            <input type="text" id="cfg-ws-drop" value="Dropshipping" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <input type="text" id="cfg-ws-drop" value="Negocio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
           </div>
           <div>
             <label class="text-slate-300 font-semibold">Workspace 2</label>
-            <input type="text" id="cfg-ws-pers" value="Honorarios & Personal" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <input type="text" id="cfg-ws-pers" value="Finanzas Personales" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -805,8 +805,8 @@
     // ==========================================
     function aplicarConfiguraciones() {
       const cfgLogo = localStorage.getItem('cfg_logo_local') || 'https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200';
-      const cfgWsDrop = localStorage.getItem('cfg_ws_drop') || 'Dropshipping';
-      const cfgWsPers = localStorage.getItem('cfg_ws_pers') || 'Honorarios & Personal';
+      const cfgWsDrop = localStorage.getItem('cfg_ws_drop') || 'Negocio';
+      const cfgWsPers = localStorage.getItem('cfg_ws_pers') || 'Finanzas Personales';
       const cfgRetSii = localStorage.getItem('cfg_ret_sii') || '15.25';
       const cfgTasaInv = localStorage.getItem('cfg_tasa_inv') || '8.0';
 
@@ -869,7 +869,7 @@
         btnCsv.classList.remove('hidden');
         tit.textContent = localStorage.getItem('cfg_ws_drop') || 'Tienda Dropshipping & E-commerce';
         sub.textContent = 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
-        renderizarGraficosDrop();
+        setTimeout(renderizarGraficosDrop, 60);
       } else {
         btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition';
         btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
@@ -878,7 +878,7 @@
         btnCsv.classList.add('hidden');
         tit.textContent = localStorage.getItem('cfg_ws_pers') || 'Servicios Profesionales, Finanzas & Patrimonio';
         sub.textContent = 'Boletas de Honorarios, Gastos Personales e Inversiones';
-        renderizarGraficosPersonal();
+        setTimeout(renderizarGraficosPersonal, 60);
       }
     }
 
@@ -895,7 +895,7 @@
         btn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
         btn.classList.remove('border-transparent', 'text-slate-400');
       }
-      if (tab === 'dashboard') renderizarGraficosDrop();
+      if (tab === 'dashboard') setTimeout(renderizarGraficosDrop, 60);
     }
 
     function cambiarTabPers(tab) {
@@ -919,8 +919,8 @@
         btn.classList.remove('border-transparent', 'text-slate-400');
       }
 
-      if (tab === 'dashboard') renderizarGraficosPersonal();
-      if (tab === 'inversiones') renderizarGraficoInversiones();
+      if (tab === 'dashboard') setTimeout(renderizarGraficosPersonal, 60);
+      if (tab === 'inversiones') setTimeout(renderizarGraficoInversiones, 60);
     }
 
     function cambiarSubTabIngreso(tipo) {
@@ -966,7 +966,7 @@
         qAds = qAds.gte('fecha', pSemana).lte('fecha', uSemana);
         qHon = qHon.gte('fecha', pSemana).lte('fecha', uSemana);
         qGastos = qGastos.gte('fecha', pSemana).lte('fecha', uSemana);
-        document.getElementById('label-periodo-dashboard').textContent = `Semana ${pSemana} a ${uSemana}`;
+        document.getElementById('label-periodo-dashboard').textContent = `Semana: ${pSemana} a ${uSemana}`;
       } else if (modoFiltro === 'mes') {
         const [anio, mes] = mesSeleccionado.split('-');
         const pDia = `${anio}-${mes}-01`;
@@ -1080,7 +1080,7 @@
       elUt.className = `text-xl font-bold mt-1 ${utilidadNeta >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
       document.getElementById('kpi-margen-neto').textContent = `Margen: ${margenPct}%`;
 
-      renderizarGraficosDrop();
+      setTimeout(renderizarGraficosDrop, 60);
     }
 
     function procesarModuloPersonal() {
@@ -1141,13 +1141,13 @@
         }).join('');
       }
 
-      // Inversión realizada en el período
+      // Inversiones aportadas en el período
       let totalInvertidoPeriodo = datosPersonal.inversiones.reduce((acc, inv) => acc + Number(inv.capital_invertido || 0), 0);
 
       const saldoAhorro = totalLiquido - totalGastosPers - totalInvertidoPeriodo;
       const tasaAhorro = totalLiquido > 0 ? ((saldoAhorro / totalLiquido) * 100).toFixed(1) : 0;
 
-      // Actualizar KPIs de Finanzas Personales
+      // Actualizar KPIs
       document.getElementById('kpi-pers-ingresos').textContent = formatoCLP(totalLiquido);
       document.getElementById('kpi-pers-bruto').textContent = `Bruto: ${formatoCLP(totalBruto)}`;
       document.getElementById('kpi-pers-retencion').textContent = formatoCLP(totalRetencion);
@@ -1162,7 +1162,7 @@
       elAhorro.className = `text-xl font-bold mt-1 ${saldoAhorro >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
       document.getElementById('kpi-pers-capacidad').textContent = `Tasa de Ahorro: ${tasaAhorro}%`;
 
-      // Regla de Finanzas Personales (%)
+      // Regla Financiera Personal (%)
       if (totalLiquido > 0) {
         document.getElementById('kpi-pct-gastos').textContent = `${((totalGastosPers / totalLiquido) * 100).toFixed(1)}%`;
         document.getElementById('kpi-pct-inversion').textContent = `${((totalInvertidoPeriodo / totalLiquido) * 100).toFixed(1)}%`;
@@ -1173,7 +1173,7 @@
         document.getElementById('kpi-pct-libre').textContent = '0%';
       }
 
-      renderizarGraficosPersonal(totalLiquido, totalGastosPers, totalInvertidoPeriodo);
+      setTimeout(renderizarGraficosPersonal, 60);
     }
 
     function procesarModuloInversiones() {
@@ -1223,7 +1223,7 @@
       document.getElementById('kpi-inv-rentabilidad').textContent = `${gananciaTotal >= 0 ? '+' : ''}${rentabilidadTotalPct}% de retorno`;
       document.getElementById('kpi-inv-proyeccion-10').textContent = formatoCLP(Math.round(proyeccion10));
 
-      renderizarGraficoInversiones(totalValorActual, tasaPonderada);
+      setTimeout(renderizarGraficoInversiones, 60);
     }
 
     // ==========================================
@@ -1279,7 +1279,7 @@
     });
 
     // ==========================================
-    // PLANILLA AUDITORÍA CARTOLA (CON INVERSIONES)
+    // PLANILLA AUDITORÍA CARTOLA
     // ==========================================
     function setupDragAndDrop() {
       const dzPdf = document.getElementById('dropzone-pdf');
@@ -1387,15 +1387,13 @@
             }
 
             const descStr = String(desc || 'Movimiento').toLowerCase();
-            const esInversion = descStr.includes('inversion') || descStr.includes('inversión') || descStr.includes('fintual') || descStr.includes('racional') || descStr.includes('buda');
             const esGasto = montoNum < 0 || descStr.includes('pago') || descStr.includes('retiro');
             const montoFinal = Math.abs(montoNum);
 
-            let destino = 'gasto';
-            if (esInversion) destino = 'inversion';
-            else if (!esGasto) destino = 'ingreso';
+            // Destino por defecto (elegible por el usuario en cada fila)
+            let destino = esGasto ? 'gasto' : 'ingreso';
 
-            if (esGasto && !esInversion) {
+            if (esGasto) {
               totalGastos += montoFinal;
               countGastos++;
             } else {
@@ -1410,7 +1408,7 @@
               numMovimiento: String(numMov).trim(),
               monto: montoFinal,
               esGasto: esGasto,
-              destinoFinanciero: destino, // 'gasto', 'ingreso', 'inversion'
+              destinoFinanciero: destino, // 'gasto', 'inversion', 'ingreso'
               categoria: 'Otros',
               seleccionado: true
             });
@@ -1529,7 +1527,7 @@
             m.destinoFinanciero = 'gasto';
             m.categoria = val.replace('gasto_', '');
           } else {
-            m.destinoFinanciero = val; // 'inversion' o 'ingreso'
+            m.destinoFinanciero = val;
           }
         }
       });
@@ -1537,7 +1535,6 @@
       actualizarConteoSeleccionadosCartola();
     }
 
-    // ELIMINAR FILAS SELECCIONADAS DE LA PLANILLA TEMPORAL
     function eliminarFilasSeleccionadasCartola() {
       const antes = movimientosCartola.length;
       movimientosCartola = movimientosCartola.filter(m => !m.seleccionado);
@@ -1592,7 +1589,7 @@
         estado: 'pagada'
       }));
 
-      // 3. Inversiones (Aportes)
+      // 3. Inversiones
       const inversionesParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'inversion').map(m => ({
         fecha: m.fecha,
         nombre: m.descripcion,
@@ -1626,11 +1623,14 @@
       if (errores.length > 0) {
         alert("Hubo un error al guardar:\n" + errores.join('\n'));
       } else {
-        alert(`¡Éxito! Se importaron ${seleccionados.length} movimientos en total:\n• ${gastosParaInsertar.length} Gastos\n• ${inversionesParaInsertar.length} Inversiones\n• ${ingresosParaInsertar.length} Ingresos`);
-        if (seleccionados.length > 0) {
-          document.getElementById('filtro-mes').value = seleccionados[0].fecha.slice(0, 7);
-        }
-        cambiarTabPers('dashboard');
+        alert(`¡Guardado exitoso! Se importaron ${seleccionados.length} movimientos en total:\n• ${gastosParaInsertar.length} Gastos\n• ${inversionesParaInsertar.length} Inversiones\n• ${ingresosParaInsertar.length} Ingresos`);
+        
+        // Quitar los importados de la planilla
+        movimientosCartola = movimientosCartola.filter(m => !m.seleccionado);
+        actualizarConteoSeleccionadosCartola();
+        renderizarPlanillaCartola();
+
+        // Actualizar datos de fondo para que al ir al dashboard estén listos
         cargarTodo();
       }
     }
@@ -1796,24 +1796,6 @@
       }
     });
 
-    document.getElementById('form-gasto-pers').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const { error } = await db.from('gastos_personales').insert([{
-        fecha: document.getElementById('gp-fecha').value,
-        categoria: document.getElementById('gp-categoria').value,
-        descripcion: document.getElementById('gp-desc').value.trim(),
-        monto: Number(document.getElementById('gp-monto').value),
-        tipo: document.getElementById('gp-tipo').value
-      }]);
-
-      if (error) alert("Error: " + error.message);
-      else {
-        document.getElementById('gp-desc').value = '';
-        document.getElementById('gp-monto').value = '';
-        cargarTodo();
-      }
-    });
-
     document.getElementById('form-inversion').addEventListener('submit', async (e) => {
       e.preventDefault();
       const { error } = await db.from('inversiones').insert([{
@@ -1884,64 +1866,130 @@
     }
 
     // ==========================================
-    // GRÁFICOS VISUALES
+    // GRÁFICOS VISUALES OPTIMIZADOS
     // ==========================================
-    function renderizarGraficosPersonal(totalIngresos, totalGastos, totalInvertido) {
+    function renderizarGraficosPersonal() {
       if (workspaceActivo !== 'personal') return;
 
-      const ctxFlujo = document.getElementById('chart-flujo-personal').getContext('2d');
+      const canvasFlujo = document.getElementById('chart-flujo-personal');
+      const canvasCat = document.getElementById('chart-gastos-cat');
+      if (!canvasFlujo || !canvasCat) return;
+
+      // 1. Gráfico de Evolución Temporal (Agrupado por Fecha)
+      const fechasMap = {};
+
+      datosPersonal.honorarios.forEach(h => {
+        const f = h.fecha;
+        if (!fechasMap[f]) fechasMap[f] = { ingresos: 0, gastos: 0, inversiones: 0 };
+        fechasMap[f].ingresos += Number(h.monto_liquido || 0);
+      });
+
+      datosPersonal.gastos.forEach(g => {
+        const f = g.fecha;
+        if (!fechasMap[f]) fechasMap[f] = { ingresos: 0, gastos: 0, inversiones: 0 };
+        fechasMap[f].gastos += Number(g.monto || 0);
+      });
+
+      datosPersonal.inversiones.forEach(inv => {
+        const f = inv.fecha || inv.created_at.slice(0, 10);
+        if (!fechasMap[f]) fechasMap[f] = { ingresos: 0, gastos: 0, inversiones: 0 };
+        fechasMap[f].inversiones += Number(inv.capital_invertido || 0);
+      });
+
+      const fechasOrdenadas = Object.keys(fechasMap).sort();
+      const labels = fechasOrdenadas.length > 0 ? fechasOrdenadas.map(f => f.slice(5)) : ['Sin datos'];
+      const dataIngresos = fechasOrdenadas.map(f => fechasMap[f].ingresos);
+      const dataGastos = fechasOrdenadas.map(f => fechasMap[f].gastos);
+      const dataInversiones = fechasOrdenadas.map(f => fechasMap[f].inversiones);
+
+      const ctxFlujo = canvasFlujo.getContext('2d');
       if (chartFlujoPersonal) chartFlujoPersonal.destroy();
 
       chartFlujoPersonal = new Chart(ctxFlujo, {
-        type: 'bar',
+        type: 'line',
         data: {
-          labels: ['Ingresos Ganados', 'Gastos Totales', 'Inversión Aportada'],
-          datasets: [{
-            label: 'Monto ($)',
-            data: [totalIngresos || 0, totalGastos || 0, totalInvertido || 0],
-            backgroundColor: ['#34d399', '#f87171', '#c084fc'],
-            borderRadius: 6
-          }]
+          labels: labels,
+          datasets: [
+            {
+              label: 'Ingresos Ganados ($)',
+              data: dataIngresos,
+              borderColor: '#34d399',
+              backgroundColor: 'rgba(52, 211, 153, 0.15)',
+              fill: true,
+              tension: 0.3,
+              pointBackgroundColor: '#34d399'
+            },
+            {
+              label: 'Gastos de Vida ($)',
+              data: dataGastos,
+              borderColor: '#f87171',
+              backgroundColor: 'rgba(248, 113, 113, 0.1)',
+              fill: true,
+              tension: 0.3,
+              pointBackgroundColor: '#f87171'
+            },
+            {
+              label: 'Aporte Inversión ($)',
+              data: dataInversiones,
+              borderColor: '#c084fc',
+              backgroundColor: 'transparent',
+              borderDash: [5, 5],
+              tension: 0.3,
+              pointBackgroundColor: '#c084fc'
+            }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } }
+          plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+            y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+          }
         }
       });
 
+      // 2. Gráfico de Dona: Distribución de Gastos
       const catMap = {};
       datosPersonal.gastos.forEach(g => { catMap[g.categoria] = (catMap[g.categoria] || 0) + Number(g.monto); });
       const catLabels = Object.keys(catMap);
       const catData = Object.values(catMap);
-      const ctxCat = document.getElementById('chart-gastos-cat').getContext('2d');
+      const ctxCat = canvasCat.getContext('2d');
       if (chartGastosCat) chartGastosCat.destroy();
 
       chartGastosCat = new Chart(ctxCat, {
         type: 'doughnut',
         data: {
-          labels: catLabels,
-          datasets: [{ data: catData, backgroundColor: ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#34d399', '#f97316', '#64748b', '#e2e8f0'], borderWidth: 0 }]
+          labels: catLabels.length > 0 ? catLabels : ['Sin gastos'],
+          datasets: [{
+            data: catData.length > 0 ? catData : [1],
+            backgroundColor: catData.length > 0 ? ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#34d399', '#f97316', '#64748b', '#e2e8f0'] : ['#334155'],
+            borderWidth: 0
+          }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
       });
 
-      document.getElementById('gastos-cat-leyenda').innerHTML = catLabels.map((c, i) => `
+      document.getElementById('gastos-cat-leyenda').innerHTML = catLabels.length > 0 ? catLabels.map((c, i) => `
         <span class="inline-block mr-2 mb-1"><span class="inline-block w-2 h-2 rounded-full mr-1" style="background-color: ${['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#34d399', '#f97316', '#64748b', '#e2e8f0'][i % 8]}"></span>${c}: ${formatoCLP(catData[i])}</span>
-      `).join('');
+      `).join('') : '<span class="text-slate-500">Sin gastos en este período</span>';
     }
 
-    function renderizarGraficoInversiones(valorBase, tasa) {
+    function renderizarGraficoInversiones() {
       if (workspaceActivo !== 'personal') return;
-      const v0 = valorBase || 0;
-      const r = (tasa || 8.0) / 100;
+      const canvasInv = document.getElementById('chart-inversiones');
+      if (!canvasInv) return;
+
+      let totalValorActual = datosPersonal.inversiones.reduce((acc, inv) => acc + Number(inv.valor_actual || 0), 0);
+      const v0 = totalValorActual || 0;
+      const r = 0.08;
 
       const labels = ['Hoy', 'Año 1', 'Año 2', 'Año 3', 'Año 5', 'Año 7', 'Año 10'];
       const anios = [0, 1, 2, 3, 5, 7, 10];
       const dataProyeccion = anios.map(a => Math.round(v0 * Math.pow(1 + r, a)));
 
-      const ctxInv = document.getElementById('chart-inversiones').getContext('2d');
+      const ctxInv = canvasInv.getContext('2d');
       if (chartInversiones) chartInversiones.destroy();
 
       chartInversiones = new Chart(ctxInv, {
@@ -1962,12 +2010,15 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#94a3b8' } } },
-          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
+          scales: {
+            x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+            y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+          }
         }
       });
 
       document.getElementById('simulacion-texto').innerHTML = `
-        <div>📌 Tasa estimada promedio: <strong class="text-purple-400">${(r*100).toFixed(1)}% anual</strong></div>
+        <div>📌 Tasa estimada promedio: <strong class="text-purple-400">8.0% anual</strong></div>
         <div>En 5 años tu cartera crecería a: <strong class="text-sky-400">${formatoCLP(dataProyeccion[4])}</strong></div>
         <div>En 10 años tu cartera alcanzaría: <strong class="text-emerald-400">${formatoCLP(dataProyeccion[6])}</strong></div>
       `;
@@ -1975,40 +2026,53 @@
 
     function renderizarGraficosDrop() {
       if (workspaceActivo !== 'dropshipping') return;
+      const canvasEvo = document.getElementById('chart-evolucion');
+      const canvasDist = document.getElementById('chart-distribucion');
+      if (!canvasEvo || !canvasDist) return;
+
       const diasMap = {};
       datosDrop.ventas.forEach(v => {
-        const dia = v.fecha.slice(8, 10);
+        const dia = v.fecha.slice(8, 10) || v.fecha;
         if (!diasMap[dia]) diasMap[dia] = { ventas: 0, costos: 0 };
         const costoDirecto = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
         diasMap[dia].ventas += Number(v.ingreso_total || 0);
         diasMap[dia].costos += costoDirecto;
       });
 
-      const labels = Object.keys(diasMap).sort((a, b) => Number(a) - Number(b));
-      const ctxEvolucion = document.getElementById('chart-evolucion').getContext('2d');
+      const labels = Object.keys(diasMap).sort();
+      const ctxEvolucion = canvasEvo.getContext('2d');
       if (chartEvolucion) chartEvolucion.destroy();
 
       chartEvolucion = new Chart(ctxEvolucion, {
         type: 'line',
         data: {
-          labels: labels.map(d => `Día ${d}`),
+          labels: labels.length > 0 ? labels.map(d => `Día ${d}`) : ['Sin datos'],
           datasets: [
             { label: 'Ventas ($)', data: labels.map(d => diasMap[d].ventas), borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true, tension: 0.3 },
             { label: 'Costos Dropi ($)', data: labels.map(d => diasMap[d].costos), borderColor: '#f87171', borderDash: [5, 5], tension: 0.3 }
           ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } } }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
+        }
       });
 
       let totalCostosDropi = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0), 0);
       let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
       let totalFijosMes = datosDrop.costos.reduce((acc, c) => acc + Number(c.monto)/(c.frecuencia_dias===90?3:(c.frecuencia_dias===365?12:1)), 0);
 
-      const ctxDistribucion = document.getElementById('chart-distribucion').getContext('2d');
+      const ctxDistribucion = canvasDist.getContext('2d');
       if (chartDistribucion) chartDistribucion.destroy();
+
       chartDistribucion = new Chart(ctxDistribucion, {
         type: 'doughnut',
-        data: { labels: ['Dropi', 'Meta Ads', 'Fijos'], datasets: [{ data: [totalCostosDropi, totalAds, totalFijosMes], backgroundColor: ['#fbbf24', '#818cf8', '#f43f5e'] }] },
+        data: {
+          labels: ['Dropi', 'Meta Ads', 'Fijos'],
+          datasets: [{ data: [totalCostosDropi, totalAds, totalFijosMes], backgroundColor: ['#fbbf24', '#818cf8', '#f43f5e'], borderWidth: 0 }]
+        },
         options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
       });
       document.getElementById('distribucion-leyenda').innerHTML = `<div>Dropi: ${formatoCLP(totalCostosDropi)}</div><div>Ads: ${formatoCLP(totalAds)}</div><div>Fijos: ${formatoCLP(totalFijosMes)}</div>`;
