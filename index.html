@@ -43,9 +43,11 @@
           <span>📁</span> Importar CSV
         </button>
 
-        <div class="flex items-center bg-slate-800 rounded-xl px-2 py-1 border border-slate-700 gap-1.5 text-xs">
+        <!-- FILTROS DE TIEMPO FLEXIBLE -->
+        <div class="flex items-center bg-slate-800 rounded-xl px-2.5 py-1 border border-slate-700 gap-1.5 text-xs">
           <select id="filtro-tipo" class="bg-transparent text-slate-300 focus:outline-none cursor-pointer" onchange="cambiarModoFiltro()">
-            <option value="mes">Por Mes:</option>
+            <option value="semana">Esta Semana</option>
+            <option value="mes" selected>Por Mes:</option>
             <option value="anio">Todo el Año</option>
             <option value="todo">Historial Completo</option>
           </select>
@@ -198,63 +200,192 @@
     <div id="workspace-personal" class="space-y-5 hidden">
       <nav class="flex border-b border-slate-800 gap-2 text-xs md:text-sm font-medium">
         <button onclick="cambiarTabPers('dashboard')" id="tab-pers-dash-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-emerald-500 text-emerald-400 font-semibold transition">
-          📊 Dashboard Patrimonial
-        </button>
-        <button onclick="cambiarTabPers('ingresos_gastos')" id="tab-pers-ing-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          📑 Boletas & Gastos
+          📊 Dashboard Financiero Total
         </button>
         <button onclick="cambiarTabPers('auditoria_cartola')" id="tab-pers-cartola-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
           <span>🏦</span> Auditoría de Cartola Bancaria
         </button>
+        <button onclick="cambiarTabPers('ingresos_gastos')" id="tab-pers-ing-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+          📄 Boletas & Honorarios SII
+        </button>
         <button onclick="cambiarTabPers('inversiones')" id="tab-pers-inv-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          🚀 Inversiones & Proyección
+          🚀 Inversiones & Patrimonio
         </button>
       </nav>
 
-      <!-- KPIs Personal -->
+      <!-- KPIs Personal Consolidados (Gano, Gasto, Invierto, Ahorro) -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Ingresos Líquidos</span>
+          <span class="text-slate-400 text-xs font-semibold uppercase">1. Total Ganado (Líquido)</span>
           <p id="kpi-pers-ingresos" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
-          <span id="kpi-pers-bruto" class="text-[11px] text-slate-500">Bruto: $0</span>
+          <span id="kpi-pers-bruto" class="text-[11px] text-slate-500">Honorarios + Extras</span>
         </div>
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Retención SII</span>
-          <p id="kpi-pers-retencion" class="text-xl font-bold text-amber-400 mt-1">$0</p>
-          <span class="text-[11px] text-slate-500">Impuesto retenido</span>
-        </div>
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Gastos Personales Totales</span>
+          <span class="text-slate-400 text-xs font-semibold uppercase">2. Total Gastado</span>
           <p id="kpi-pers-gastos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
-          <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Fijos vs Variables</span>
+          <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Gastos necesarios & variables</span>
         </div>
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Capacidad Ahorro</span>
+          <span class="text-slate-400 text-xs font-semibold uppercase">3. Total Invertido</span>
+          <p id="kpi-pers-invertido-periodo" class="text-xl font-bold text-purple-400 mt-1">$0</p>
+          <span class="text-[11px] text-slate-500">Aportes a fondos y ETFs</span>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+          <span class="text-slate-400 text-xs font-semibold uppercase">4. Flujo Libre / Saldo Neto</span>
           <p id="kpi-pers-ahorro" class="text-xl font-bold text-sky-400 mt-1">$0</p>
-          <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa: 0%</span>
+          <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa de Ahorro: 0%</span>
         </div>
       </div>
 
-      <!-- TAB 1: DASHBOARD PATRIMONIAL -->
+      <!-- TAB 1: DASHBOARD FINANCIERO TOTAL -->
       <div id="tab-pers-dashboard" class="tab-pers-content space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Gráfico Comparativo: Ganado vs Gastado vs Invertido -->
           <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Flujo de Caja: Ingresos Líquidos vs Gastos</h3>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-sm font-bold uppercase text-slate-300">📊 Comparativa: Ganado vs Gastado vs Invertido</h3>
+              <span class="text-xs text-slate-500" id="label-periodo-dashboard">Período Seleccionado</span>
+            </div>
             <div class="h-64 relative"><canvas id="chart-flujo-personal"></canvas></div>
           </div>
+
+          <!-- Gráfico de Dona: Distribución del Dinero -->
           <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
-            <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Gastos</h3>
+            <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Gastos por Categoría</h3>
             <div class="h-56 relative flex items-center justify-center"><canvas id="chart-gastos-cat"></canvas></div>
             <div id="gastos-cat-leyenda" class="text-xs text-slate-400 text-center pt-3 border-t border-slate-800/80"></div>
           </div>
         </div>
+
+        <!-- Panel de Regla Financiera y Resumen de Control -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">% Destinado a Gastos de Vida</span>
+            <p id="kpi-pct-gastos" class="text-lg font-bold text-rose-400 mt-1">0%</p>
+            <span class="text-[10px] text-slate-500">De tus ingresos totales</span>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">% Destinado a Inversión / Futuro</span>
+            <p id="kpi-pct-inversion" class="text-lg font-bold text-purple-400 mt-1">0%</p>
+            <span class="text-[10px] text-slate-500">Aportes a tu patrimonio</span>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">% Flujo Libre Restante</span>
+            <p id="kpi-pct-libre" class="text-lg font-bold text-sky-400 mt-1">0%</p>
+            <span class="text-[10px] text-slate-500">Fondo de emergencia o excedente</span>
+          </div>
+        </div>
       </div>
 
-      <!-- TAB 2: BOLETAS, INGRESOS EXTRA & GASTOS -->
+      <!-- TAB 2: AUDITORÍA DE CARTOLA BANCARIA (PLANILLA CENTRAL) -->
+      <div id="tab-pers-auditoria_cartola" class="tab-pers-content hidden space-y-5">
+        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
+          
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2"><span>🏦</span> Planilla de Auditoría Bancaria & Movimientos</h2>
+              <p class="text-xs text-slate-400">Arrastra tu cartola (.csv o .xlsx). Clasifica si es <strong>Gasto</strong>, <strong>Ingreso</strong> o <strong>Inversión</strong> y envíalo con 1 clic.</p>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full md:w-auto">
+              <label class="cursor-pointer bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                <span>📁 Subir Cartola (XLSX / CSV)</span>
+                <input type="file" id="input-cartola-directa" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoCartolaDirecto(event)">
+              </label>
+            </div>
+          </div>
+
+          <!-- Zona Drag & Drop -->
+          <div id="dropzone-cartola-full" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/60 p-5 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1" onclick="document.getElementById('input-cartola-directa').click()">
+            <span class="text-2xl">📥</span>
+            <span class="text-xs font-semibold text-sky-400">Arrastra tu archivo de cartola aquí (.xlsx, .xls o .csv)</span>
+            <span class="text-[11px] text-slate-500">Detecta automáticamente columnas de fecha, tipo de operación e importes</span>
+          </div>
+
+          <!-- Resumen de Métricas de la Cartola -->
+          <div id="resumen-cartola-panel" class="grid grid-cols-2 md:grid-cols-4 gap-3 hidden">
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Gastos en Cartola</span>
+              <p id="rc-gastos" class="text-lg font-bold text-rose-400 mt-0.5">$0</p>
+              <span id="rc-num-gastos" class="text-[10px] text-slate-500">0 operaciones</span>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Ingresos en Cartola</span>
+              <p id="rc-ingresos" class="text-lg font-bold text-emerald-400 mt-0.5">$0</p>
+              <span id="rc-num-ingresos" class="text-[10px] text-slate-500">0 operaciones</span>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Filas Seleccionadas</span>
+              <p id="rc-seleccionadas" class="text-lg font-bold text-sky-400 mt-0.5">0</p>
+              <span id="rc-monto-seleccionado" class="text-[10px] text-sky-300">Total: $0</span>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center gap-2">
+              <button id="btn-importar-cartola-supabase" onclick="importarMovimientosSeleccionados()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20">
+                ⚡ Guardar Seleccionados
+              </button>
+            </div>
+          </div>
+
+          <!-- Controles de la Planilla y Borrado Masivo -->
+          <div id="controles-cartola-panel" class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs hidden">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-slate-400">Filtrar:</span>
+              <button onclick="filtrarPlanillaCartola('todos')" id="f-cartola-todos" class="btn-fc px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold">Todos</button>
+              <button onclick="filtrarPlanillaCartola('gastos')" id="f-cartola-gastos" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Gastos / Pagos</button>
+              <button onclick="filtrarPlanillaCartola('ingresos')" id="f-cartola-ingresos" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Ingresos</button>
+              <button onclick="filtrarPlanillaCartola('inversiones')" id="f-cartola-inversiones" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-purple-300 hover:text-white">Inversiones</button>
+            </div>
+
+            <div class="flex items-center gap-2 w-full md:w-auto">
+              <!-- Botón Eliminar Seleccionados -->
+              <button onclick="eliminarFilasSeleccionadasCartola()" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-lg transition flex items-center gap-1 font-medium">
+                <span>🗑️ Eliminar Seleccionados</span>
+              </button>
+
+              <!-- Asignar destino / categoría en lote -->
+              <select id="destino-lote-cartola" class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-slate-200" onchange="aplicarDestinoLoteCartola()">
+                <option value="gasto_Supermercado/Comida">Gasto: Supermercado & Comida</option>
+                <option value="gasto_Servicios Básicos">Gasto: Servicios Básicos</option>
+                <option value="gasto_Transporte/Auto">Gasto: Transporte / Bencina</option>
+                <option value="gasto_Ocio/Personal">Gasto: Ocio / Personal</option>
+                <option value="gasto_Vivienda/Arriendo">Gasto: Vivienda / Arriendo</option>
+                <option value="gasto_Otros" selected>Gasto: Otros</option>
+                <option value="inversion">🚀 Inversión (Aporte)</option>
+                <option value="ingreso">💵 Ingreso Líquido</option>
+              </select>
+              <button onclick="aplicarDestinoLoteCartola()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-200">Aplicar</button>
+            </div>
+          </div>
+
+          <!-- Tabla Planilla de Movimientos -->
+          <div class="overflow-x-auto border border-slate-800 rounded-xl max-h-[500px]">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950 sticky top-0 text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="p-3 w-10 text-center">
+                    <input type="checkbox" id="check-cartola-all" checked onchange="toggleSeleccionarTodosCartola(this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+                  </th>
+                  <th class="p-3">Fecha</th>
+                  <th class="p-3">Detalle Movimiento</th>
+                  <th class="p-3">Destino Financiero</th>
+                  <th class="p-3">Categoría / Activo</th>
+                  <th class="p-3 text-right">Importe ($)</th>
+                </tr>
+              </thead>
+              <tbody id="planilla-cartola-body" class="divide-y divide-slate-800 bg-slate-900/40">
+                <tr><td colspan="6" class="p-8 text-center text-slate-500">Carga tu archivo de cartola para auditar los movimientos.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: BOLETAS & HONORARIOS SII (LIMPIO) -->
       <div id="tab-pers-ingresos_gastos" class="tab-pers-content hidden space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
-          <!-- Columna Izquierda: Ingresos con Sub-Pestañas (7 Cols) -->
+          <!-- Boletas SII (7 Cols) -->
           <div class="lg:col-span-7 space-y-4">
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
               <div class="flex border-b border-slate-800 pb-2 justify-between items-center">
@@ -355,52 +486,14 @@
             </div>
           </div>
 
-          <!-- Columna Derecha: Gastos Personales (5 Cols) -->
+          <!-- Historial de Gastos Personales Registrados (5 Cols) -->
           <div class="lg:col-span-5 space-y-4">
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
-              <h2 class="text-sm font-semibold uppercase text-rose-400">💸 Registrar Gasto Manual</h2>
-              <form id="form-gasto-pers" class="grid grid-cols-2 gap-2.5 text-xs">
-                <div>
-                  <label class="text-slate-400">Fecha</label>
-                  <input type="date" id="gp-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                </div>
-                <div>
-                  <label class="text-slate-400">Categoría</label>
-                  <select id="gp-categoria" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                    <option value="Vivienda/Arriendo">Vivienda / Arriendo / GGCC</option>
-                    <option value="Servicios Básicos">Servicios (Luz, Agua, Gas, Net)</option>
-                    <option value="Supermercado/Comida">Supermercado & Alimentación</option>
-                    <option value="Transporte/Auto">Transporte / Bencina / Tag</option>
-                    <option value="Salud/Seguros">Salud / Seguros / Farmacia</option>
-                    <option value="Educación/Cursos">Educación & Formación</option>
-                    <option value="Ocio/Personal">Ocio / Salidas / Personal</option>
-                    <option value="Otros">Otros</option>
-                  </select>
-                </div>
-                <div class="col-span-2">
-                  <label class="text-slate-400">Descripción</label>
-                  <input type="text" id="gp-desc" placeholder="Ej: Supermercado Líder" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                </div>
-                <div>
-                  <label class="text-slate-400">Monto ($)</label>
-                  <input type="number" id="gp-monto" min="1" placeholder="Ej: 45000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-rose-400 font-semibold mt-1">
-                </div>
-                <div>
-                  <label class="text-slate-400">Tipo de Gasto</label>
-                  <select id="gp-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                    <option value="fijo">Fijo Mensual</option>
-                    <option value="variable">Variable / Diario</option>
-                  </select>
-                </div>
-                <button type="submit" class="col-span-2 bg-rose-600 hover:bg-rose-500 font-medium py-2 rounded-xl text-white transition text-xs mt-1">
-                  Guardar Gasto
-                </button>
-              </form>
-            </div>
-
             <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-              <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Gastos Registrados</h3></div>
-              <div class="overflow-x-auto max-h-80">
+              <div class="p-3.5 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-xs font-semibold uppercase text-slate-400">Gastos Registrados en el Período</h3>
+                <span id="badge-total-gastos-lista" class="text-xs font-bold text-rose-400">$0</span>
+              </div>
+              <div class="overflow-x-auto max-h-[500px]">
                 <table class="w-full text-left text-xs text-slate-300">
                   <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
                     <tr><th class="p-2">Fecha</th><th class="p-2">Detalle</th><th class="p-2 text-right">Monto</th><th class="p-2 text-center">x</th></tr>
@@ -414,103 +507,7 @@
         </div>
       </div>
 
-      <!-- TAB 3: AUDITORÍA DE CARTOLA BANCARIA (NUEVA PLANILLA) -->
-      <div id="tab-pers-auditoria_cartola" class="tab-pers-content hidden space-y-5">
-        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
-          
-          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-4">
-            <div>
-              <h2 class="text-base font-bold text-white flex items-center gap-2"><span>🏦</span> Planilla de Auditoría Bancaria & Movimientos</h2>
-              <p class="text-xs text-slate-400">Arrastra tu cartola de MercadoPago, Santander, BancoEstado, etc. Filtra, audita y envía a finanzas con 1 clic.</p>
-            </div>
-            
-            <div class="flex items-center gap-2 w-full md:w-auto">
-              <label class="cursor-pointer bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
-                <span>📁 Subir Cartola (XLSX / CSV)</span>
-                <input type="file" id="input-cartola-directa" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoCartolaDirecto(event)">
-              </label>
-            </div>
-          </div>
-
-          <!-- Zona Drag & Drop -->
-          <div id="dropzone-cartola-full" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/60 p-5 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1" onclick="document.getElementById('input-cartola-directa').click()">
-            <span class="text-2xl">📥</span>
-            <span class="text-xs font-semibold text-sky-400">Arrastra tu archivo de movimientos aquí (.xlsx, .xls o .csv)</span>
-            <span class="text-[11px] text-slate-500">Detecta automáticamente columnas de fecha, tipo de operación e importes positivos/negativos</span>
-          </div>
-
-          <!-- Resumen de Métricas de la Cartola -->
-          <div id="resumen-cartola-panel" class="grid grid-cols-2 md:grid-cols-4 gap-3 hidden">
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Total Gastos Detectados</span>
-              <p id="rc-gastos" class="text-lg font-bold text-rose-400 mt-0.5">$0</p>
-              <span id="rc-num-gastos" class="text-[10px] text-slate-500">0 operaciones</span>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Total Ingresos Detectados</span>
-              <p id="rc-ingresos" class="text-lg font-bold text-emerald-400 mt-0.5">$0</p>
-              <span id="rc-num-ingresos" class="text-[10px] text-slate-500">0 operaciones</span>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Filas Seleccionadas</span>
-              <p id="rc-seleccionadas" class="text-lg font-bold text-sky-400 mt-0.5">0</p>
-              <span id="rc-monto-seleccionado" class="text-[10px] text-sky-300">Total: $0</span>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center">
-              <button id="btn-importar-cartola-supabase" onclick="importarMovimientosSeleccionados()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20">
-                ⚡ Guardar Seleccionados en Finanzas
-              </button>
-            </div>
-          </div>
-
-          <!-- Controles de la Planilla -->
-          <div id="controles-cartola-panel" class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs hidden">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="text-slate-400">Filtrar por:</span>
-              <button onclick="filtrarPlanillaCartola('todos')" id="f-cartola-todos" class="btn-fc px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold">Todos</button>
-              <button onclick="filtrarPlanillaCartola('gastos')" id="f-cartola-gastos" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Solo Gastos / Pagos</button>
-              <button onclick="filtrarPlanillaCartola('ingresos')" id="f-cartola-ingresos" class="btn-fc px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Solo Ingresos</button>
-            </div>
-
-            <div class="flex items-center gap-2 w-full md:w-auto">
-              <span class="text-slate-400">Categoría lote:</span>
-              <select id="categoria-lote-cartola" class="bg-slate-800 border border-slate-700 rounded-lg p-1 text-slate-200" onchange="aplicarCategoriaLoteCartola()">
-                <option value="Supermercado/Comida">Supermercado & Comida</option>
-                <option value="Servicios Básicos">Servicios Básicos</option>
-                <option value="Transporte/Auto">Transporte / Bencina</option>
-                <option value="Ocio/Personal">Ocio / Personal</option>
-                <option value="Vivienda/Arriendo">Vivienda / Arriendo</option>
-                <option value="Otros" selected>Otros</option>
-              </select>
-              <button onclick="aplicarCategoriaLoteCartola()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-200">Aplicar</button>
-            </div>
-          </div>
-
-          <!-- Tabla Planilla de Movimientos -->
-          <div class="overflow-x-auto border border-slate-800 rounded-xl max-h-[500px]">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-950 sticky top-0 text-slate-400 border-b border-slate-800">
-                <tr>
-                  <th class="p-3 w-10 text-center">
-                    <input type="checkbox" id="check-cartola-all" checked onchange="toggleSeleccionarTodosCartola(this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
-                  </th>
-                  <th class="p-3">Fecha</th>
-                  <th class="p-3">Tipo Operación / Detalle</th>
-                  <th class="p-3">N° Movimiento</th>
-                  <th class="p-3">Categoría a Asignar</th>
-                  <th class="p-3 text-right">Importe ($)</th>
-                </tr>
-              </thead>
-              <tbody id="planilla-cartola-body" class="divide-y divide-slate-800 bg-slate-900/40">
-                <tr><td colspan="6" class="p-8 text-center text-slate-500">Carga o arrastra un archivo de cartola bancaria para visualizar la planilla.</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- TAB 4: INVERSIONES & PROYECCIÓN -->
+      <!-- TAB 4: INVERSIONES & PROYECCIÓN PATRIMONIAL -->
       <div id="tab-pers-inversiones" class="tab-pers-content hidden space-y-5">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
@@ -536,8 +533,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-7 space-y-4">
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-              <h2 class="text-sm font-semibold uppercase text-sky-400 mb-3">➕ Registrar Activo / Inversión</h2>
+              <h2 class="text-sm font-semibold uppercase text-sky-400 mb-3">➕ Registrar Activo / Inversión Manual</h2>
               <form id="form-inversion" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                <div>
+                  <label class="text-slate-400">Fecha Aporte</label>
+                  <input type="date" id="inv-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                </div>
                 <div class="col-span-2">
                   <label class="text-slate-400">Nombre Activo / Instrumento</label>
                   <input type="text" id="inv-nombre" placeholder="Ej: ETF VOO (S&P 500) o Fintual Risky" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
@@ -577,7 +578,7 @@
               <div class="overflow-x-auto max-h-80">
                 <table class="w-full text-left text-xs text-slate-300">
                   <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-                    <tr><th class="p-2.5">Activo</th><th class="p-2.5 text-right">Invertido</th><th class="p-2.5 text-right">Actual</th><th class="p-2.5 text-right">Retorno</th><th class="p-2.5 text-center">x</th></tr>
+                    <tr><th class="p-2.5">Fecha</th><th class="p-2.5">Activo</th><th class="p-2.5 text-right">Invertido</th><th class="p-2.5 text-right">Actual</th><th class="p-2.5 text-right">Retorno</th><th class="p-2.5 text-center">x</th></tr>
                   </thead>
                   <tbody id="tabla-inversiones" class="divide-y divide-slate-800"></tbody>
                 </table>
@@ -756,7 +757,7 @@
 
   <script>
     // ==========================================
-    // CLIENTE SUPABASE & VARIABLES
+    // CLIENTE SUPABASE & VARIABLES GLOBALES
     // ==========================================
     const SUPABASE_URL = 'https://eturayylryyhkgkmdris.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0dXJheXlscnl5aGtna21kcmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNjAxODEsImV4cCI6MjEwMjkzNjE4MX0.dShnzpUkrtBOvL2oIPoDg6LVif9D0EjbNTSYUxNTHd0';
@@ -767,7 +768,7 @@
     let datosPersonal = { honorarios: [], gastos: [], inversiones: [] };
     let filasParaImportar = [];
     
-    // Movimientos de la cartola bancaria en auditoría
+    // Movimientos cargados en la auditoría
     let movimientosCartola = [];
     let filtroCartolaTipo = 'todos';
 
@@ -784,6 +785,7 @@
     document.getElementById('h-fecha').valueAsDate = hoy;
     document.getElementById('gp-fecha').valueAsDate = hoy;
     document.getElementById('ie-fecha').valueAsDate = hoy;
+    document.getElementById('inv-fecha').valueAsDate = hoy;
 
     const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
@@ -952,8 +954,20 @@
       let qAds = db.from('gasto_publicidad').select('*').order('fecha', { ascending: false });
       let qHon = db.from('honorarios').select('*').order('fecha', { ascending: false });
       let qGastos = db.from('gastos_personales').select('*').order('fecha', { ascending: false });
+      let qInv = db.from('inversiones').select('*').order('created_at', { ascending: false });
 
-      if (modoFiltro === 'mes') {
+      if (modoFiltro === 'semana') {
+        const d = new Date();
+        const first = d.getDate() - d.getDay() + 1;
+        const pSemana = new Date(d.setDate(first)).toISOString().slice(0, 10);
+        const uSemana = new Date(d.setDate(first + 6)).toISOString().slice(0, 10);
+
+        qVentas = qVentas.gte('fecha', pSemana).lte('fecha', uSemana);
+        qAds = qAds.gte('fecha', pSemana).lte('fecha', uSemana);
+        qHon = qHon.gte('fecha', pSemana).lte('fecha', uSemana);
+        qGastos = qGastos.gte('fecha', pSemana).lte('fecha', uSemana);
+        document.getElementById('label-periodo-dashboard').textContent = `Semana ${pSemana} a ${uSemana}`;
+      } else if (modoFiltro === 'mes') {
         const [anio, mes] = mesSeleccionado.split('-');
         const pDia = `${anio}-${mes}-01`;
         const uDia = new Date(anio, mes, 0).toISOString().slice(0, 10);
@@ -961,11 +975,15 @@
         qAds = qAds.gte('fecha', pDia).lte('fecha', uDia);
         qHon = qHon.gte('fecha', pDia).lte('fecha', uDia);
         qGastos = qGastos.gte('fecha', pDia).lte('fecha', uDia);
+        document.getElementById('label-periodo-dashboard').textContent = `Mes: ${mesSeleccionado}`;
       } else if (modoFiltro === 'anio') {
         qVentas = qVentas.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
         qAds = qAds.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
         qHon = qHon.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
         qGastos = qGastos.gte('fecha', `${anioSeleccionado}-01-01`).lte('fecha', `${anioSeleccionado}-12-31`);
+        document.getElementById('label-periodo-dashboard').textContent = `Año: ${anioSeleccionado}`;
+      } else {
+        document.getElementById('label-periodo-dashboard').textContent = `Historial Completo`;
       }
 
       const [resVentas, resAds, resCostos, resHon, resGastosPers, resInv] = await Promise.all([
@@ -974,7 +992,7 @@
         db.from('costos_recurrentes').select('*').eq('activo', true),
         qHon,
         qGastos,
-        db.from('inversiones').select('*').order('created_at', { ascending: false })
+        qInv
       ]);
 
       datosDrop.ventas = resVentas.data || [];
@@ -1070,7 +1088,7 @@
       const cuerpoHon = document.getElementById('tabla-honorarios');
 
       if (datosPersonal.honorarios.length === 0) {
-        cuerpoHon.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin ingresos ni boletas registradas en este período.</td></tr>';
+        cuerpoHon.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin ingresos registrados en este período.</td></tr>';
       } else {
         cuerpoHon.innerHTML = datosPersonal.honorarios.map(h => {
           const bruto = Number(h.monto_bruto);
@@ -1103,7 +1121,7 @@
         }).join('');
       }
 
-      let totalGastosPers = 0, totalGastosFijosPers = 0;
+      let totalGastosPers = 0;
       const cuerpoGastos = document.getElementById('tabla-gastos-pers');
 
       if (datosPersonal.gastos.length === 0) {
@@ -1112,7 +1130,6 @@
         cuerpoGastos.innerHTML = datosPersonal.gastos.map(g => {
           const monto = Number(g.monto);
           totalGastosPers += monto;
-          if (g.tipo === 'fijo') totalGastosFijosPers += monto;
           return `
             <tr class="hover:bg-slate-800/40">
               <td class="p-2 text-slate-400">${g.fecha}</td>
@@ -1124,16 +1141,39 @@
         }).join('');
       }
 
-      const saldoAhorro = totalLiquido - totalGastosPers;
+      // Inversión realizada en el período
+      let totalInvertidoPeriodo = datosPersonal.inversiones.reduce((acc, inv) => acc + Number(inv.capital_invertido || 0), 0);
+
+      const saldoAhorro = totalLiquido - totalGastosPers - totalInvertidoPeriodo;
+      const tasaAhorro = totalLiquido > 0 ? ((saldoAhorro / totalLiquido) * 100).toFixed(1) : 0;
+
+      // Actualizar KPIs de Finanzas Personales
       document.getElementById('kpi-pers-ingresos').textContent = formatoCLP(totalLiquido);
       document.getElementById('kpi-pers-bruto').textContent = `Bruto: ${formatoCLP(totalBruto)}`;
       document.getElementById('kpi-pers-retencion').textContent = formatoCLP(totalRetencion);
+      
       document.getElementById('kpi-pers-gastos').textContent = formatoCLP(totalGastosPers);
-      document.getElementById('kpi-pers-gastos-fijos').textContent = `Fijos: ${formatoCLP(totalGastosFijosPers)}`;
-      document.getElementById('kpi-pers-ahorro').textContent = formatoCLP(saldoAhorro);
-      document.getElementById('kpi-pers-capacidad').textContent = `Tasa: ${totalLiquido > 0 ? ((saldoAhorro / totalLiquido) * 100).toFixed(1) : 0}%`;
+      document.getElementById('badge-total-gastos-lista').textContent = `Total: ${formatoCLP(totalGastosPers)}`;
+      
+      document.getElementById('kpi-pers-invertido-periodo').textContent = formatoCLP(totalInvertidoPeriodo);
 
-      renderizarGraficosPersonal();
+      const elAhorro = document.getElementById('kpi-pers-ahorro');
+      elAhorro.textContent = formatoCLP(saldoAhorro);
+      elAhorro.className = `text-xl font-bold mt-1 ${saldoAhorro >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
+      document.getElementById('kpi-pers-capacidad').textContent = `Tasa de Ahorro: ${tasaAhorro}%`;
+
+      // Regla de Finanzas Personales (%)
+      if (totalLiquido > 0) {
+        document.getElementById('kpi-pct-gastos').textContent = `${((totalGastosPers / totalLiquido) * 100).toFixed(1)}%`;
+        document.getElementById('kpi-pct-inversion').textContent = `${((totalInvertidoPeriodo / totalLiquido) * 100).toFixed(1)}%`;
+        document.getElementById('kpi-pct-libre').textContent = `${tasaAhorro}%`;
+      } else {
+        document.getElementById('kpi-pct-gastos').textContent = '0%';
+        document.getElementById('kpi-pct-inversion').textContent = '0%';
+        document.getElementById('kpi-pct-libre').textContent = '0%';
+      }
+
+      renderizarGraficosPersonal(totalLiquido, totalGastosPers, totalInvertidoPeriodo);
     }
 
     function procesarModuloInversiones() {
@@ -1141,7 +1181,7 @@
 
       const cuerpoInv = document.getElementById('tabla-inversiones');
       if (datosPersonal.inversiones.length === 0) {
-        cuerpoInv.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Sin inversiones registradas.</td></tr>';
+        cuerpoInv.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin inversiones registradas.</td></tr>';
       } else {
         cuerpoInv.innerHTML = datosPersonal.inversiones.map(inv => {
           const cap = Number(inv.capital_invertido);
@@ -1155,9 +1195,10 @@
 
           return `
             <tr class="hover:bg-slate-800/40">
+              <td class="p-2.5 text-slate-400">${inv.fecha || inv.created_at.slice(0,10)}</td>
               <td class="p-2.5">
                 <div class="font-medium text-slate-200">${inv.nombre}</div>
-                <div class="text-[10px] text-slate-500">${inv.tipo} • ${inv.plataforma || 'N/A'}</div>
+                <div class="text-[10px] text-slate-500">${inv.tipo} • ${inv.plataforma || 'Broker'}</div>
               </td>
               <td class="p-2.5 text-right text-slate-400">${formatoCLP(cap)}</td>
               <td class="p-2.5 text-right font-semibold text-sky-400">${formatoCLP(act)}</td>
@@ -1238,7 +1279,7 @@
     });
 
     // ==========================================
-    // PLANILLA AUDITORÍA CARTOLA BANCARIA (NUEVO)
+    // PLANILLA AUDITORÍA CARTOLA (CON INVERSIONES)
     // ==========================================
     function setupDragAndDrop() {
       const dzPdf = document.getElementById('dropzone-pdf');
@@ -1272,7 +1313,6 @@
     async function procesarArchivoCartolaGenerico(file) {
       const fileName = file.name.toLowerCase();
 
-      // Intentar primero como CSV/Texto
       const reader = new FileReader();
       reader.onload = function(e) {
         const textContent = e.target.result;
@@ -1346,10 +1386,16 @@
               }
             }
 
-            const esGasto = montoNum < 0 || String(desc).toLowerCase().includes('pago') || String(desc).toLowerCase().includes('retiro');
+            const descStr = String(desc || 'Movimiento').toLowerCase();
+            const esInversion = descStr.includes('inversion') || descStr.includes('inversión') || descStr.includes('fintual') || descStr.includes('racional') || descStr.includes('buda');
+            const esGasto = montoNum < 0 || descStr.includes('pago') || descStr.includes('retiro');
             const montoFinal = Math.abs(montoNum);
 
-            if (esGasto) {
+            let destino = 'gasto';
+            if (esInversion) destino = 'inversion';
+            else if (!esGasto) destino = 'ingreso';
+
+            if (esGasto && !esInversion) {
               totalGastos += montoFinal;
               countGastos++;
             } else {
@@ -1364,9 +1410,9 @@
               numMovimiento: String(numMov).trim(),
               monto: montoFinal,
               esGasto: esGasto,
-              tipoOperacionOriginal: esGasto ? 'Gasto / Pago' : 'Ingreso / Abono',
+              destinoFinanciero: destino, // 'gasto', 'ingreso', 'inversion'
               categoria: 'Otros',
-              seleccionado: true // Por defecto seleccionados
+              seleccionado: true
             });
           }
         }
@@ -1377,7 +1423,6 @@
         return;
       }
 
-      // Mostrar Paneles
       document.getElementById('resumen-cartola-panel').classList.remove('hidden');
       document.getElementById('controles-cartola-panel').classList.remove('hidden');
 
@@ -1393,8 +1438,9 @@
     function renderizarPlanillaCartola() {
       const tbody = document.getElementById('planilla-cartola-body');
       const filtrados = movimientosCartola.filter(m => {
-        if (filtroCartolaTipo === 'gastos') return m.esGasto;
-        if (filtroCartolaTipo === 'ingresos') return !m.esGasto;
+        if (filtroCartolaTipo === 'gastos') return m.destinoFinanciero === 'gasto';
+        if (filtroCartolaTipo === 'ingresos') return m.destinoFinanciero === 'ingreso';
+        if (filtroCartolaTipo === 'inversiones') return m.destinoFinanciero === 'inversion';
         return true;
       });
 
@@ -1411,9 +1457,15 @@
           <td class="p-3 text-slate-400 font-mono">${m.fecha}</td>
           <td class="p-3">
             <div class="font-medium text-slate-200">${m.descripcion}</div>
-            <div class="text-[10px] ${m.esGasto ? 'text-rose-400' : 'text-emerald-400'}">${m.tipoOperacionOriginal}</div>
+            <div class="text-[10px] text-slate-500">Ref: ${m.numMovimiento}</div>
           </td>
-          <td class="p-3 text-slate-500 font-mono text-[11px]">${m.numMovimiento}</td>
+          <td class="p-3">
+            <select class="bg-slate-800 border border-slate-700 rounded-lg p-1 text-xs font-semibold focus:outline-none ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}" onchange="cambiarDestinoFilaCartola(${m.idTemporal}, this.value)">
+              <option value="gasto" ${m.destinoFinanciero==='gasto'?'selected':''}>💸 Gasto Personal</option>
+              <option value="inversion" ${m.destinoFinanciero==='inversion'?'selected':''}>🚀 Inversión (Aporte)</option>
+              <option value="ingreso" ${m.destinoFinanciero==='ingreso'?'selected':''}>💵 Ingreso Líquido</option>
+            </select>
+          </td>
           <td class="p-3">
             <select class="bg-slate-800 border border-slate-700 rounded-lg p-1 text-slate-200 text-xs focus:outline-none" onchange="actualizarCategoriaItemCartola(${m.idTemporal}, this.value)">
               <option value="Supermercado/Comida" ${m.categoria==='Supermercado/Comida'?'selected':''}>Supermercado & Comida</option>
@@ -1424,8 +1476,8 @@
               <option value="Otros" ${m.categoria==='Otros'?'selected':''}>Otros</option>
             </select>
           </td>
-          <td class="p-3 text-right font-semibold ${m.esGasto ? 'text-rose-400' : 'text-emerald-400'}">
-            ${m.esGasto ? '-' : '+'}${formatoCLP(m.monto)}
+          <td class="p-3 text-right font-semibold ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}">
+            ${m.destinoFinanciero==='gasto' ? '-' : '+'}${formatoCLP(m.monto)}
           </td>
         </tr>
       `).join('');
@@ -1437,6 +1489,13 @@
       actualizarConteoSeleccionadosCartola();
     }
 
+    function cambiarDestinoFilaCartola(idTemporal, dest) {
+      const item = movimientosCartola.find(m => m.idTemporal === idTemporal);
+      if (item) item.destinoFinanciero = dest;
+      actualizarConteoSeleccionadosCartola();
+      renderizarPlanillaCartola();
+    }
+
     function actualizarCategoriaItemCartola(idTemporal, cat) {
       const item = movimientosCartola.find(m => m.idTemporal === idTemporal);
       if (item) item.categoria = cat;
@@ -1444,8 +1503,9 @@
 
     function toggleSeleccionarTodosCartola(checked) {
       movimientosCartola.forEach(m => {
-        if (filtroCartolaTipo === 'gastos' && !m.esGasto) return;
-        if (filtroCartolaTipo === 'ingresos' && m.esGasto) return;
+        if (filtroCartolaTipo === 'gastos' && m.destinoFinanciero !== 'gasto') return;
+        if (filtroCartolaTipo === 'ingresos' && m.destinoFinanciero !== 'ingreso') return;
+        if (filtroCartolaTipo === 'inversiones' && m.destinoFinanciero !== 'inversion') return;
         m.seleccionado = checked;
       });
       actualizarConteoSeleccionadosCartola();
@@ -1461,17 +1521,41 @@
       renderizarPlanillaCartola();
     }
 
-    function aplicarCategoriaLoteCartola() {
-      const cat = document.getElementById('categoria-lote-cartola').value;
+    function aplicarDestinoLoteCartola() {
+      const val = document.getElementById('destino-lote-cartola').value;
       movimientosCartola.forEach(m => {
-        if (m.seleccionado) m.categoria = cat;
+        if (m.seleccionado) {
+          if (val.startsWith('gasto_')) {
+            m.destinoFinanciero = 'gasto';
+            m.categoria = val.replace('gasto_', '');
+          } else {
+            m.destinoFinanciero = val; // 'inversion' o 'ingreso'
+          }
+        }
       });
+      renderizarPlanillaCartola();
+      actualizarConteoSeleccionadosCartola();
+    }
+
+    // ELIMINAR FILAS SELECCIONADAS DE LA PLANILLA TEMPORAL
+    function eliminarFilasSeleccionadasCartola() {
+      const antes = movimientosCartola.length;
+      movimientosCartola = movimientosCartola.filter(m => !m.seleccionado);
+      const eliminados = antes - movimientosCartola.length;
+
+      if (eliminados === 0) {
+        alert("No hay filas marcadas para eliminar.");
+        return;
+      }
+
+      alert(`Se descartaron ${eliminados} movimientos de la planilla.`);
+      actualizarConteoSeleccionadosCartola();
       renderizarPlanillaCartola();
     }
 
     function actualizarConteoSeleccionadosCartola() {
       const seleccionados = movimientosCartola.filter(m => m.seleccionado);
-      const totalMonto = seleccionados.reduce((acc, m) => acc + (m.esGasto ? -m.monto : m.monto), 0);
+      const totalMonto = seleccionados.reduce((acc, m) => acc + (m.destinoFinanciero === 'gasto' ? -m.monto : m.monto), 0);
 
       document.getElementById('rc-seleccionadas').textContent = seleccionados.length;
       document.getElementById('rc-monto-seleccionado').textContent = `Neto: ${formatoCLP(totalMonto)}`;
@@ -1486,10 +1570,10 @@
 
       const btn = document.getElementById('btn-importar-cartola-supabase');
       btn.disabled = true;
-      btn.textContent = 'Guardando en Supabase...';
+      btn.textContent = 'Guardando...';
 
-      // Separar Gastos de Ingresos
-      const gastosParaInsertar = seleccionados.filter(m => m.esGasto).map(m => ({
+      // 1. Gastos
+      const gastosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'gasto').map(m => ({
         fecha: m.fecha,
         categoria: m.categoria,
         descripcion: m.descripcion,
@@ -1497,14 +1581,26 @@
         tipo: 'variable'
       }));
 
-      const ingresosParaInsertar = seleccionados.filter(m => !m.esGasto).map(m => ({
+      // 2. Ingresos
+      const ingresosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'ingreso').map(m => ({
         fecha: m.fecha,
         cliente_empresa: m.descripcion,
-        detalle_servicio: 'Ingreso Cartola Bancaria',
+        detalle_servicio: 'Ingreso Bancario',
         monto_bruto: m.monto,
         retencion_porcentaje: 0,
         monto_liquido: m.monto,
         estado: 'pagada'
+      }));
+
+      // 3. Inversiones (Aportes)
+      const inversionesParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'inversion').map(m => ({
+        fecha: m.fecha,
+        nombre: m.descripcion,
+        tipo: 'Fondo / ETF',
+        capital_invertido: m.monto,
+        valor_actual: m.monto,
+        rentabilidad_anual_estimada: 8.0,
+        plataforma: 'Broker / Cartola'
       }));
 
       let errores = [];
@@ -1519,24 +1615,28 @@
         if (errI) errores.push('Ingresos: ' + errI.message);
       }
 
+      if (inversionesParaInsertar.length > 0) {
+        const { error: errInv } = await db.from('inversiones').insert(inversionesParaInsertar);
+        if (errInv) errores.push('Inversiones: ' + errInv.message);
+      }
+
       btn.disabled = false;
-      btn.textContent = '⚡ Guardar Seleccionados en Finanzas';
+      btn.textContent = '⚡ Guardar Seleccionados';
 
       if (errores.length > 0) {
-        alert("Hubo un detalle al guardar:\n" + errores.join('\n'));
+        alert("Hubo un error al guardar:\n" + errores.join('\n'));
       } else {
-        alert(`¡Éxito! Se importaron ${seleccionados.length} movimientos (${gastosParaInsertar.length} gastos y ${ingresosParaInsertar.length} ingresos).`);
+        alert(`¡Éxito! Se importaron ${seleccionados.length} movimientos en total:\n• ${gastosParaInsertar.length} Gastos\n• ${inversionesParaInsertar.length} Inversiones\n• ${ingresosParaInsertar.length} Ingresos`);
         if (seleccionados.length > 0) {
           document.getElementById('filtro-mes').value = seleccionados[0].fecha.slice(0, 7);
         }
-        // Cambiar a la pestaña de boletas y gastos para ver el resultado
-        cambiarTabPers('ingresos_gastos');
+        cambiarTabPers('dashboard');
         cargarTodo();
       }
     }
 
     // ==========================================
-    // LECTOR DE BOLETAS PDF SII (CON FUNCIÓN DIRECTA)
+    // LECTOR DE BOLETAS PDF SII (CON CONFIRMACIÓN)
     // ==========================================
     function procesarPDFSubido(event) {
       const file = event.target.files[0];
@@ -1575,7 +1675,6 @@
         const matchRet = fullText.match(/([\d\.]+)\s*%\s*Impto\.\s*Retenido/i);
         if (matchRet) retTasa = parseFloat(matchRet[1]) || 15.25;
 
-        // Cargar al Modal
         document.getElementById('mb-fecha').value = fecha;
         document.getElementById('mb-cliente').value = cliente;
         document.getElementById('mb-detalle').value = detalle;
@@ -1584,7 +1683,6 @@
         document.getElementById('mb-pagada').checked = false;
         recalcularModalBoleta();
 
-        // Precargar en el formulario manual
         document.getElementById('h-fecha').value = fecha;
         document.getElementById('h-cliente').value = cliente;
         document.getElementById('h-detalle').value = detalle;
@@ -1719,6 +1817,7 @@
     document.getElementById('form-inversion').addEventListener('submit', async (e) => {
       e.preventDefault();
       const { error } = await db.from('inversiones').insert([{
+        fecha: document.getElementById('inv-fecha').value,
         nombre: document.getElementById('inv-nombre').value.trim(),
         tipo: document.getElementById('inv-tipo').value,
         capital_invertido: Number(document.getElementById('inv-capital').value),
@@ -1782,6 +1881,137 @@
       const bruto = Number(document.getElementById('h-bruto').value || 0);
       const tasa = Number(document.getElementById('h-ret-tasa').value || 15.25);
       document.getElementById('h-liquido-calc').value = formatoCLP(bruto - (bruto * (tasa / 100)));
+    }
+
+    // ==========================================
+    // GRÁFICOS VISUALES
+    // ==========================================
+    function renderizarGraficosPersonal(totalIngresos, totalGastos, totalInvertido) {
+      if (workspaceActivo !== 'personal') return;
+
+      const ctxFlujo = document.getElementById('chart-flujo-personal').getContext('2d');
+      if (chartFlujoPersonal) chartFlujoPersonal.destroy();
+
+      chartFlujoPersonal = new Chart(ctxFlujo, {
+        type: 'bar',
+        data: {
+          labels: ['Ingresos Ganados', 'Gastos Totales', 'Inversión Aportada'],
+          datasets: [{
+            label: 'Monto ($)',
+            data: [totalIngresos || 0, totalGastos || 0, totalInvertido || 0],
+            backgroundColor: ['#34d399', '#f87171', '#c084fc'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } } }
+        }
+      });
+
+      const catMap = {};
+      datosPersonal.gastos.forEach(g => { catMap[g.categoria] = (catMap[g.categoria] || 0) + Number(g.monto); });
+      const catLabels = Object.keys(catMap);
+      const catData = Object.values(catMap);
+      const ctxCat = document.getElementById('chart-gastos-cat').getContext('2d');
+      if (chartGastosCat) chartGastosCat.destroy();
+
+      chartGastosCat = new Chart(ctxCat, {
+        type: 'doughnut',
+        data: {
+          labels: catLabels,
+          datasets: [{ data: catData, backgroundColor: ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#34d399', '#f97316', '#64748b', '#e2e8f0'], borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+      });
+
+      document.getElementById('gastos-cat-leyenda').innerHTML = catLabels.map((c, i) => `
+        <span class="inline-block mr-2 mb-1"><span class="inline-block w-2 h-2 rounded-full mr-1" style="background-color: ${['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#34d399', '#f97316', '#64748b', '#e2e8f0'][i % 8]}"></span>${c}: ${formatoCLP(catData[i])}</span>
+      `).join('');
+    }
+
+    function renderizarGraficoInversiones(valorBase, tasa) {
+      if (workspaceActivo !== 'personal') return;
+      const v0 = valorBase || 0;
+      const r = (tasa || 8.0) / 100;
+
+      const labels = ['Hoy', 'Año 1', 'Año 2', 'Año 3', 'Año 5', 'Año 7', 'Año 10'];
+      const anios = [0, 1, 2, 3, 5, 7, 10];
+      const dataProyeccion = anios.map(a => Math.round(v0 * Math.pow(1 + r, a)));
+
+      const ctxInv = document.getElementById('chart-inversiones').getContext('2d');
+      if (chartInversiones) chartInversiones.destroy();
+
+      chartInversiones = new Chart(ctxInv, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Patrimonio Proyectado ($)',
+            data: dataProyeccion,
+            borderColor: '#c084fc',
+            backgroundColor: 'rgba(192, 132, 252, 0.12)',
+            fill: true,
+            tension: 0.35,
+            pointBackgroundColor: '#a855f7'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
+        }
+      });
+
+      document.getElementById('simulacion-texto').innerHTML = `
+        <div>📌 Tasa estimada promedio: <strong class="text-purple-400">${(r*100).toFixed(1)}% anual</strong></div>
+        <div>En 5 años tu cartera crecería a: <strong class="text-sky-400">${formatoCLP(dataProyeccion[4])}</strong></div>
+        <div>En 10 años tu cartera alcanzaría: <strong class="text-emerald-400">${formatoCLP(dataProyeccion[6])}</strong></div>
+      `;
+    }
+
+    function renderizarGraficosDrop() {
+      if (workspaceActivo !== 'dropshipping') return;
+      const diasMap = {};
+      datosDrop.ventas.forEach(v => {
+        const dia = v.fecha.slice(8, 10);
+        if (!diasMap[dia]) diasMap[dia] = { ventas: 0, costos: 0 };
+        const costoDirecto = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
+        diasMap[dia].ventas += Number(v.ingreso_total || 0);
+        diasMap[dia].costos += costoDirecto;
+      });
+
+      const labels = Object.keys(diasMap).sort((a, b) => Number(a) - Number(b));
+      const ctxEvolucion = document.getElementById('chart-evolucion').getContext('2d');
+      if (chartEvolucion) chartEvolucion.destroy();
+
+      chartEvolucion = new Chart(ctxEvolucion, {
+        type: 'line',
+        data: {
+          labels: labels.map(d => `Día ${d}`),
+          datasets: [
+            { label: 'Ventas ($)', data: labels.map(d => diasMap[d].ventas), borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true, tension: 0.3 },
+            { label: 'Costos Dropi ($)', data: labels.map(d => diasMap[d].costos), borderColor: '#f87171', borderDash: [5, 5], tension: 0.3 }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } } }
+      });
+
+      let totalCostosDropi = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0), 0);
+      let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
+      let totalFijosMes = datosDrop.costos.reduce((acc, c) => acc + Number(c.monto)/(c.frecuencia_dias===90?3:(c.frecuencia_dias===365?12:1)), 0);
+
+      const ctxDistribucion = document.getElementById('chart-distribucion').getContext('2d');
+      if (chartDistribucion) chartDistribucion.destroy();
+      chartDistribucion = new Chart(ctxDistribucion, {
+        type: 'doughnut',
+        data: { labels: ['Dropi', 'Meta Ads', 'Fijos'], datasets: [{ data: [totalCostosDropi, totalAds, totalFijosMes], backgroundColor: ['#fbbf24', '#818cf8', '#f43f5e'] }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+      });
+      document.getElementById('distribucion-leyenda').innerHTML = `<div>Dropi: ${formatoCLP(totalCostosDropi)}</div><div>Ads: ${formatoCLP(totalAds)}</div><div>Fijos: ${formatoCLP(totalFijosMes)}</div>`;
     }
 
     // Eliminaciones
