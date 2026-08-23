@@ -23,7 +23,7 @@
         </div>
         <div>
           <h1 id="header-titulo-principal" class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            Tienda Dropshipping & E-commerce
+            Negocio
           </h1>
           <p id="header-subtitulo-principal" class="text-slate-400 text-xs">Unit Economics, Dropi, Meta Ads y Utilidad Real</p>
         </div>
@@ -110,7 +110,7 @@
       <div id="tab-drop-dashboard" class="tab-drop-content space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Tendencia Diaria: Ventas vs Costos Variables</h3>
+            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Tendencia: Ventas vs Costos Variables</h3>
             <div class="h-64 relative w-full"><canvas id="chart-evolucion"></canvas></div>
           </div>
           <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
@@ -240,7 +240,7 @@
       <!-- TAB 1: DASHBOARD FINANCIERO TOTAL -->
       <div id="tab-pers-dashboard" class="tab-pers-content space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Gráfico de Evolución Temporal (Líneas con Área) -->
+          <!-- Gráfico de Evolución Temporal -->
           <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-sm font-bold uppercase text-slate-300">📈 Evolución: Ingresos vs Gastos vs Inversión</h3>
@@ -337,12 +337,10 @@
             </div>
 
             <div class="flex items-center gap-2 w-full md:w-auto">
-              <!-- Botón Eliminar Seleccionados -->
               <button onclick="eliminarFilasSeleccionadasCartola()" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-lg transition flex items-center gap-1 font-medium">
                 <span>🗑️ Eliminar Seleccionados</span>
               </button>
 
-              <!-- Asignar destino / categoría en lote -->
               <select id="destino-lote-cartola" class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-slate-200" onchange="aplicarDestinoLoteCartola()">
                 <option value="gasto_Supermercado/Comida">Gasto: Supermercado & Comida</option>
                 <option value="gasto_Servicios Básicos">Gasto: Servicios Básicos</option>
@@ -427,7 +425,7 @@
                   </div>
                   <div>
                     <label class="text-slate-400">Retención SII (%)</label>
-                    <input type="number" step="0.01" id="h-ret-tasa" value="15.25" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="calcularLiquidoHonorario()">
+                    <input type="number" id="h-ret-tasa" step="0.01" value="15.25" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="calcularLiquidoHonorario()">
                   </div>
                   <div>
                     <label class="text-slate-400">Líquido a Recibir</label>
@@ -778,14 +776,20 @@
     let chartGastosCat = null;
     let chartInversiones = null;
 
+    // Inicializar fechas con tiempo local
     const hoy = new Date();
-    document.getElementById('filtro-mes').value = hoy.toISOString().slice(0, 7);
-    document.getElementById('v-fecha').valueAsDate = hoy;
-    document.getElementById('ads-fecha').valueAsDate = hoy;
-    document.getElementById('h-fecha').valueAsDate = hoy;
-    document.getElementById('gp-fecha').valueAsDate = hoy;
-    document.getElementById('ie-fecha').valueAsDate = hoy;
-    document.getElementById('inv-fecha').valueAsDate = hoy;
+    const hoyAnio = hoy.getFullYear();
+    const hoyMes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const hoyDia = String(hoy.getDate()).padStart(2, '0');
+    const hoyFechaStr = `${hoyAnio}-${hoyMes}-${hoyDia}`;
+
+    document.getElementById('filtro-mes').value = `${hoyAnio}-${hoyMes}`;
+    document.getElementById('v-fecha').value = hoyFechaStr;
+    document.getElementById('ads-fecha').value = hoyFechaStr;
+    document.getElementById('h-fecha').value = hoyFechaStr;
+    document.getElementById('gp-fecha').value = hoyFechaStr;
+    document.getElementById('ie-fecha').value = hoyFechaStr;
+    document.getElementById('inv-fecha').value = hoyFechaStr;
 
     const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
@@ -867,7 +871,7 @@
         wsDrop.classList.remove('hidden');
         wsPers.classList.add('hidden');
         btnCsv.classList.remove('hidden');
-        tit.textContent = localStorage.getItem('cfg_ws_drop') || 'Tienda Dropshipping & E-commerce';
+        tit.textContent = localStorage.getItem('cfg_ws_drop') || 'Negocio';
         sub.textContent = 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
         setTimeout(renderizarGraficosDrop, 60);
       } else {
@@ -876,7 +880,7 @@
         wsDrop.classList.add('hidden');
         wsPers.classList.remove('hidden');
         btnCsv.classList.add('hidden');
-        tit.textContent = localStorage.getItem('cfg_ws_pers') || 'Servicios Profesionales, Finanzas & Patrimonio';
+        tit.textContent = localStorage.getItem('cfg_ws_pers') || 'Finanzas Personales';
         sub.textContent = 'Boletas de Honorarios, Gastos Personales e Inversiones';
         setTimeout(renderizarGraficosPersonal, 60);
       }
@@ -1141,7 +1145,7 @@
         }).join('');
       }
 
-      // Inversiones aportadas en el período
+      // Inversiones aportadas en el período filtrado
       let totalInvertidoPeriodo = datosPersonal.inversiones.reduce((acc, inv) => acc + Number(inv.capital_invertido || 0), 0);
 
       const saldoAhorro = totalLiquido - totalGastosPers - totalInvertidoPeriodo;
@@ -1374,7 +1378,7 @@
           else montoNum = parseFloat(String(cargo).replace(/\./g, '').replace(',', '.')) || 0;
 
           if (montoNum !== 0) {
-            let fechaStr = new Date().toISOString().slice(0, 10);
+            let fechaStr = hoyFechaStr;
             if (fecha) {
               if (typeof fecha === 'string' && fecha.includes('T')) fechaStr = fecha.split('T')[0];
               else if (typeof fecha === 'string') {
@@ -1390,7 +1394,6 @@
             const esGasto = montoNum < 0 || descStr.includes('pago') || descStr.includes('retiro');
             const montoFinal = Math.abs(montoNum);
 
-            // Destino por defecto (elegible por el usuario en cada fila)
             let destino = esGasto ? 'gasto' : 'ingreso';
 
             if (esGasto) {
@@ -1569,7 +1572,6 @@
       btn.disabled = true;
       btn.textContent = 'Guardando...';
 
-      // 1. Gastos
       const gastosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'gasto').map(m => ({
         fecha: m.fecha,
         categoria: m.categoria,
@@ -1578,7 +1580,6 @@
         tipo: 'variable'
       }));
 
-      // 2. Ingresos
       const ingresosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'ingreso').map(m => ({
         fecha: m.fecha,
         cliente_empresa: m.descripcion,
@@ -1589,7 +1590,6 @@
         estado: 'pagada'
       }));
 
-      // 3. Inversiones
       const inversionesParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'inversion').map(m => ({
         fecha: m.fecha,
         nombre: m.descripcion,
@@ -1625,18 +1625,16 @@
       } else {
         alert(`¡Guardado exitoso! Se importaron ${seleccionados.length} movimientos en total:\n• ${gastosParaInsertar.length} Gastos\n• ${inversionesParaInsertar.length} Inversiones\n• ${ingresosParaInsertar.length} Ingresos`);
         
-        // Quitar los importados de la planilla
         movimientosCartola = movimientosCartola.filter(m => !m.seleccionado);
         actualizarConteoSeleccionadosCartola();
         renderizarPlanillaCartola();
 
-        // Actualizar datos de fondo para que al ir al dashboard estén listos
         cargarTodo();
       }
     }
 
     // ==========================================
-    // LECTOR DE BOLETAS PDF SII (CON CONFIRMACIÓN)
+    // LECTOR DE BOLETAS PDF SII
     // ==========================================
     function procesarPDFSubido(event) {
       const file = event.target.files[0];
@@ -1655,7 +1653,7 @@
           fullText += textContent.items.map(item => item.str).join(' ') + '\n';
         }
 
-        let fecha = new Date().toISOString().slice(0, 10);
+        let fecha = hoyFechaStr;
         const matchFecha = fullText.match(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/);
         if (matchFecha) fecha = `${matchFecha[3]}-${matchFecha[2].padStart(2, '0')}-${matchFecha[1].padStart(2, '0')}`;
 
@@ -1866,7 +1864,7 @@
     }
 
     // ==========================================
-    // GRÁFICOS VISUALES OPTIMIZADOS
+    // GRÁFICOS VISUALES
     // ==========================================
     function renderizarGraficosPersonal() {
       if (workspaceActivo !== 'personal') return;
@@ -1875,7 +1873,7 @@
       const canvasCat = document.getElementById('chart-gastos-cat');
       if (!canvasFlujo || !canvasCat) return;
 
-      // 1. Gráfico de Evolución Temporal (Agrupado por Fecha)
+      // 1. Gráfico de Evolución Temporal
       const fechasMap = {};
 
       datosPersonal.honorarios.forEach(h => {
@@ -2032,7 +2030,7 @@
 
       const diasMap = {};
       datosDrop.ventas.forEach(v => {
-        const dia = v.fecha.slice(8, 10) || v.fecha;
+        const dia = v.fecha;
         if (!diasMap[dia]) diasMap[dia] = { ventas: 0, costos: 0 };
         const costoDirecto = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
         diasMap[dia].ventas += Number(v.ingreso_total || 0);
@@ -2046,7 +2044,7 @@
       chartEvolucion = new Chart(ctxEvolucion, {
         type: 'line',
         data: {
-          labels: labels.length > 0 ? labels.map(d => `Día ${d}`) : ['Sin datos'],
+          labels: labels.length > 0 ? labels.map(d => d.slice(5)) : ['Sin datos'],
           datasets: [
             { label: 'Ventas ($)', data: labels.map(d => diasMap[d].ventas), borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true, tension: 0.3 },
             { label: 'Costos Dropi ($)', data: labels.map(d => diasMap[d].costos), borderColor: '#f87171', borderDash: [5, 5], tension: 0.3 }
@@ -2108,7 +2106,7 @@
 
       data.forEach(row => {
         if (row['Name'] && row['Total'] !== undefined && row['Total'] !== '') {
-          let fecha = new Date().toISOString().slice(0, 10);
+          let fecha = hoyFechaStr;
           if (row['Created at']) fecha = row['Created at'].slice(0, 10);
 
           const cliente = row['Shipping Name'] || row['Billing Name'] || 'Cliente';
