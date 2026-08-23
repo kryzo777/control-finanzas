@@ -1,0 +1,6 @@
+{
+  "name": "Suite Financiera Empresarial & Personal",
+  "description": "Panel de control financiero empresarial y personal con métricas de e-commerce, Dropi, Meta Ads, boletas de honorarios SII, gastos e inversiones.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

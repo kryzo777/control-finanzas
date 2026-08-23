@@ -998,21 +998,25 @@
         document.getElementById('label-periodo-dashboard').textContent = `Historial Completo`;
       }
 
-      const [resVentas, resAds, resCostos, resHon, resGastosPers, resInv] = await Promise.all([
-        qVentas,
-        qAds,
-        db.from('costos_recurrentes').select('*').eq('activo', true),
-        qHon,
-        qGastos,
-        qInv
-      ]);
+      try {
+        const [resVentas, resAds, resCostos, resHon, resGastosPers, resInv] = await Promise.all([
+          qVentas,
+          qAds,
+          db.from('costos_recurrentes').select('*').eq('activo', true),
+          qHon,
+          qGastos,
+          qInv
+        ]);
 
-      datosDrop.ventas = resVentas.data || [];
-      datosDrop.ads = resAds.data || [];
-      datosDrop.costos = resCostos.data || [];
-      datosPersonal.honorarios = resHon.data || [];
-      datosPersonal.gastos = resGastosPers.data || [];
-      datosPersonal.inversiones = resInv.data || [];
+        datosDrop.ventas = resVentas?.data || [];
+        datosDrop.ads = resAds?.data || [];
+        datosDrop.costos = resCostos?.data || [];
+        datosPersonal.honorarios = resHon?.data || [];
+        datosPersonal.gastos = resGastosPers?.data || [];
+        datosPersonal.inversiones = resInv?.data || [];
+      } catch (err) {
+        console.warn('Error al cargar datos desde Supabase:', err);
+      }
 
       procesarModuloDropshipping();
       procesarModuloPersonal();
@@ -1161,7 +1165,8 @@
 
       document.getElementById('kpi-pers-ingresos').textContent = formatoCLP(totalLiquido);
       document.getElementById('kpi-pers-bruto').textContent = `Bruto: ${formatoCLP(totalBruto)}`;
-      document.getElementById('kpi-pers-retencion').textContent = formatoCLP(totalRetencion);
+      const elRet = document.getElementById('kpi-pers-retencion');
+      if (elRet) elRet.textContent = formatoCLP(totalRetencion);
       
       document.getElementById('kpi-pers-gastos').textContent = formatoCLP(totalGastosPers);
       document.getElementById('badge-total-gastos-lista').textContent = `Total: ${formatoCLP(totalGastosPers)}`;
@@ -1276,7 +1281,7 @@
           idReal: inv.id,
           tabla: 'inversiones',
           tipo: 'inversion',
-          fecha: inv.fecha || inv.created_at.slice(0, 10),
+          fecha: inv.fecha || (inv.created_at ? inv.created_at.slice(0, 10) : hoyFechaStr),
           detalle: `${inv.nombre} (${inv.tipo})`,
           categoria: 'Inversión / Aporte',
           monto: Number(inv.capital_invertido),
@@ -1305,13 +1310,16 @@
 
       if (filtrados.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-500">No hay movimientos guardados que coincidan con la búsqueda o filtro.</td></tr>';
+        actualizarEstadoCheckAllConsolidado();
         return;
       }
 
-      tbody.innerHTML = filtrados.map((item, idx) => `
+      tbody.innerHTML = filtrados.map((item) => {
+        const uniqueKey = `${item.tabla}_${item.idReal}`;
+        return `
         <tr class="hover:bg-slate-800/40 transition">
           <td class="p-3 text-center">
-            <input type="checkbox" ${item.seleccionado ? 'checked' : ''} onchange="toggleSeleccionConsolidado(${idx}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+            <input type="checkbox" ${item.seleccionado ? 'checked' : ''} onchange="toggleSeleccionConsolidado('${uniqueKey}', this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
           </td>
           <td class="p-3 text-slate-400 font-mono">${item.fecha}</td>
           <td class="p-3 font-medium text-slate-200">${item.detalle}</td>
@@ -1325,18 +1333,51 @@
             ${item.tipo==='gasto' ? '-' : '+'}${formatoCLP(item.monto)}
           </td>
           <td class="p-3 text-center">
-            <button onclick="eliminarFilaConsolidadaIndividual('${item.tabla}', ${item.idReal})" class="text-rose-400 hover:text-rose-200 text-xs px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50">✕</button>
+            <button onclick="eliminarFilaConsolidadaIndividual('${item.tabla}', ${item.idReal})" class="text-rose-400 hover:text-rose-200 text-xs px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50 cursor-pointer" title="Eliminar este movimiento">✕</button>
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
+
+      actualizarEstadoCheckAllConsolidado();
     }
 
-    function toggleSeleccionConsolidado(idx, checked) {
-      listaConsolidada[idx].seleccionado = checked;
+    function toggleSeleccionConsolidado(uniqueKey, checked) {
+      const item = listaConsolidada.find(x => `${x.tabla}_${x.idReal}` === uniqueKey);
+      if (item) {
+        item.seleccionado = checked;
+      }
+      actualizarEstadoCheckAllConsolidado();
+    }
+
+    function actualizarEstadoCheckAllConsolidado() {
+      const checkAll = document.getElementById('check-con-all');
+      if (!checkAll) return;
+      const busqueda = (document.getElementById('buscador-cartola')?.value || '').toLowerCase().trim();
+      const filtrados = listaConsolidada.filter(item => {
+        if (filtroConsolidadoTipo === 'gastos' && item.tipo !== 'gasto') return false;
+        if (filtroConsolidadoTipo === 'ingresos' && item.tipo !== 'ingreso') return false;
+        if (filtroConsolidadoTipo === 'inversiones' && item.tipo !== 'inversion') return false;
+        if (busqueda && !item.detalle.toLowerCase().includes(busqueda) && !item.categoria.toLowerCase().includes(busqueda)) return false;
+        return true;
+      });
+      if (filtrados.length === 0) {
+        checkAll.checked = false;
+      } else {
+        checkAll.checked = filtrados.every(item => item.seleccionado);
+      }
     }
 
     function toggleSeleccionarTodosConsolidados(checked) {
-      listaConsolidada.forEach(item => item.seleccionado = checked);
+      const busqueda = (document.getElementById('buscador-cartola')?.value || '').toLowerCase().trim();
+      const filtrados = listaConsolidada.filter(item => {
+        if (filtroConsolidadoTipo === 'gastos' && item.tipo !== 'gasto') return false;
+        if (filtroConsolidadoTipo === 'ingresos' && item.tipo !== 'ingreso') return false;
+        if (filtroConsolidadoTipo === 'inversiones' && item.tipo !== 'inversion') return false;
+        if (busqueda && !item.detalle.toLowerCase().includes(busqueda) && !item.categoria.toLowerCase().includes(busqueda)) return false;
+        return true;
+      });
+      filtrados.forEach(item => item.seleccionado = checked);
       renderizarPlanillaConsolidada();
     }
 
@@ -1345,15 +1386,25 @@
       document.querySelectorAll('.btn-fc-con').forEach(b => {
         b.className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white';
       });
-      document.getElementById(`f-con-${tipo}`).className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold';
+      const btnActivo = document.getElementById(`f-con-${tipo}`);
+      if (btnActivo) btnActivo.className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold';
       renderizarPlanillaConsolidada();
     }
 
     async function eliminarFilaConsolidadaIndividual(tabla, id) {
       if (!confirm("¿Eliminar este movimiento de la base de datos?")) return;
-      const { error } = await db.from(tabla).delete().eq('id', id);
-      if (error) alert("Error al eliminar: " + error.message);
-      else cargarTodo();
+      try {
+        const { error } = await db.from(tabla).delete().eq('id', id);
+        if (error) {
+          alert("Error al eliminar: " + error.message);
+        }
+      } catch (err) {
+        console.error("Error al eliminar:", err);
+      }
+      if (tabla === 'gastos_personales') datosPersonal.gastos = datosPersonal.gastos.filter(x => x.id != id);
+      if (tabla === 'honorarios') datosPersonal.honorarios = datosPersonal.honorarios.filter(x => x.id != id);
+      if (tabla === 'inversiones') datosPersonal.inversiones = datosPersonal.inversiones.filter(x => x.id != id);
+      await cargarTodo();
     }
 
     async function eliminarMovimientosConsolidadosSeleccionados() {
@@ -1363,14 +1414,48 @@
         return;
       }
 
-      if (!confirm(`¿Eliminar definitivamente ${seleccionados.length} movimientos de la base de datos?`)) return;
+      if (!confirm(`¿Eliminar definitivamente ${seleccionados.length} movimientos seleccionados de la base de datos?`)) return;
 
-      for (const item of seleccionados) {
-        await db.from(item.tabla).delete().eq('id', item.idReal);
+      const porTabla = {};
+      seleccionados.forEach(item => {
+        if (!porTabla[item.tabla]) porTabla[item.tabla] = [];
+        porTabla[item.tabla].push(item.idReal);
+      });
+
+      let errores = [];
+      for (const tabla of Object.keys(porTabla)) {
+        const ids = porTabla[tabla];
+        try {
+          const { error } = await db.from(tabla).delete().in('id', ids);
+          if (error) {
+            for (const singleId of ids) {
+              const { error: singleErr } = await db.from(tabla).delete().eq('id', singleId);
+              if (singleErr) errores.push(`${tabla} (#${singleId}): ${singleErr.message}`);
+            }
+          }
+        } catch (err) {
+          errores.push(`${tabla}: ${err.message}`);
+        }
       }
 
-      alert("Movimientos eliminados correctamente.");
-      cargarTodo();
+      const idsGastos = new Set(porTabla['gastos_personales'] || []);
+      const idsHon = new Set(porTabla['honorarios'] || []);
+      const idsInv = new Set(porTabla['inversiones'] || []);
+
+      datosPersonal.gastos = datosPersonal.gastos.filter(g => !idsGastos.has(g.id));
+      datosPersonal.honorarios = datosPersonal.honorarios.filter(h => !idsHon.has(h.id));
+      datosPersonal.inversiones = datosPersonal.inversiones.filter(inv => !idsInv.has(inv.id));
+
+      if (errores.length > 0) {
+        alert("Advertencia al eliminar algunos registros:\n" + errores.join('\n'));
+      } else {
+        alert(`¡Éxito! Se eliminaron ${seleccionados.length} movimientos correctamente.`);
+      }
+
+      const checkAll = document.getElementById('check-con-all');
+      if (checkAll) checkAll.checked = false;
+
+      await cargarTodo();
     }
 
     // =========================================================
