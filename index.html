@@ -6405,6 +6405,73 @@
     }
 
     // =========================================================
+    // CONTROL DE MÓDULOS DESPLEGABLES
+    // =========================================================
+    function toggleDesplegableHonorarios() {
+      const cont = document.getElementById('contenedor-form-honorarios');
+      const text = document.getElementById('btn-toggle-hon-text');
+      const icon = document.getElementById('btn-toggle-hon-icon');
+      if (!cont) return;
+
+      const estaOculto = cont.classList.contains('hidden');
+      if (estaOculto) {
+        cont.classList.remove('hidden');
+        if (text) text.innerHTML = '<span>Plegar</span><span id="btn-toggle-hon-icon" class="text-xs transition-transform duration-200">▲</span>';
+      } else {
+        cont.classList.add('hidden');
+        if (text) text.innerHTML = '<span>Desplegar</span><span id="btn-toggle-hon-icon" class="text-xs transition-transform duration-200">▼</span>';
+      }
+    }
+
+    function toggleDesplegableKpisPersonal() {
+      const cont = document.getElementById('contenedor-kpis-personal');
+      const text = document.getElementById('btn-toggle-kpi-pers-text');
+      const icon = document.getElementById('btn-toggle-kpi-pers-icon');
+      if (!cont) return;
+
+      const estaOculto = cont.classList.contains('hidden');
+      if (estaOculto) {
+        cont.classList.remove('hidden');
+        if (text) text.innerHTML = '<span>Plegar</span><span id="btn-toggle-kpi-pers-icon" class="text-xs transition-transform duration-200">▲</span>';
+      } else {
+        cont.classList.add('hidden');
+        if (text) text.innerHTML = '<span>Desplegar</span><span id="btn-toggle-kpi-pers-icon" class="text-xs transition-transform duration-200">▼</span>';
+      }
+    }
+
+    function toggleDesplegableKpisTarjetas() {
+      const cont = document.getElementById('contenedor-kpis-tarjetas');
+      const text = document.getElementById('btn-toggle-kpi-tarjetas-text');
+      const icon = document.getElementById('btn-toggle-kpi-tarjetas-icon');
+      if (!cont) return;
+
+      const estaOculto = cont.classList.contains('hidden');
+      if (estaOculto) {
+        cont.classList.remove('hidden');
+        if (text) text.innerHTML = '<span>Plegar</span><span id="btn-toggle-kpi-tarjetas-icon" class="text-xs transition-transform duration-200">▲</span>';
+      } else {
+        cont.classList.add('hidden');
+        if (text) text.innerHTML = '<span>Desplegar</span><span id="btn-toggle-kpi-tarjetas-icon" class="text-xs transition-transform duration-200">▼</span>';
+      }
+    }
+
+    function toggleDesplegableInversion() {
+      const cont = document.getElementById('contenedor-form-inversion');
+      const text = document.getElementById('btn-toggle-inv-text');
+      const icon = document.getElementById('btn-toggle-inv-icon');
+      if (!cont) return;
+
+      const estaOculto = cont.classList.contains('hidden');
+      if (estaOculto) {
+        cont.classList.remove('hidden');
+        if (text) text.innerHTML = '<span>Plegar</span><span id="btn-toggle-inv-icon" class="text-xs transition-transform duration-200">▲</span>';
+      } else {
+        cont.classList.add('hidden');
+        if (text) text.innerHTML = '<span>Desplegar</span><span id="btn-toggle-inv-icon" class="text-xs transition-transform duration-200">▼</span>';
+      }
+    }
+
+    // =========================================================
     // SISTEMA DE GESTIÓN MULTI-TARJETAS & CUENTAS BANCARIAS
     // =========================================================
     function cargarTarjetasDeAlmacenamiento() {
@@ -6587,14 +6654,23 @@
       const elKpiTotal = document.getElementById('kpi-tarjetas-total-saldo');
       if (elKpiTotal) elKpiTotal.textContent = formatoCLP(totalEnTarjetas);
 
-      const elKpiNegocio = document.getElementById('kpi-tarjetas-negocio-saldo');
+      const elKpiConteo = document.getElementById('kpi-tarjetas-conteo');
+      if (elKpiConteo) elKpiConteo.textContent = `${tarjetasUsuario.length} cuentas activas`;
+
+      const elKpiNegocio = document.getElementById('kpi-tarjetas-saldo-negocio') || document.getElementById('kpi-tarjetas-negocio-saldo');
       if (elKpiNegocio) elKpiNegocio.textContent = formatoCLP(totalEnNegocio);
 
-      const elKpiInv = document.getElementById('kpi-tarjetas-inversion-saldo');
+      const elKpiInv = document.getElementById('kpi-tarjetas-saldo-inversion') || document.getElementById('kpi-tarjetas-inversion-saldo');
       if (elKpiInv) elKpiInv.textContent = formatoCLP(totalEnInversion);
 
-      const elKpiInteres = document.getElementById('kpi-tarjetas-interes-proyectado');
-      if (elKpiInteres) elKpiInteres.textContent = formatoCLP(interesAnualTotalProyectado);
+      const elKpiInteres = document.getElementById('kpi-tarjetas-interes-anual') || document.getElementById('kpi-tarjetas-interes-proyectado');
+      if (elKpiInteres) elKpiInteres.textContent = `+${formatoCLP(interesAnualTotalProyectado)}/año`;
+
+      const elKpiTasa = document.getElementById('kpi-tarjetas-tasa-prom');
+      if (elKpiTasa) {
+        const tasaProm = totalEnInversion > 0 ? ((interesAnualTotalProyectado / totalEnInversion) * 100).toFixed(1) : '0.0';
+        elKpiTasa.textContent = `Tasa prom: ${tasaProm}% anual`;
+      }
 
       // Renderizar Galería de Tarjetas
       renderizarGaleriaTarjetas();
@@ -6788,14 +6864,22 @@
       const tarjetasNegocio = tarjetasUsuario.filter(t => t.tipo === 'negocio');
       const tarjetaNegocio = tarjetasNegocio[0] || null;
 
+      const elBadgeNombre = document.getElementById('badge-tarjeta-negocio-nombre');
+      const elSaldoDisp = document.getElementById('widget-negocio-saldo-disponible');
+      const elTarjetaDetalle = document.getElementById('widget-negocio-tarjeta-detalle');
+      const elInyecciones = document.getElementById('widget-negocio-total-inyecciones') || document.getElementById('widget-negocio-inyecciones-total');
+      const elMargen = document.getElementById('widget-negocio-margen-entregados');
+      const elNumEntregados = document.getElementById('widget-negocio-num-entregados') || document.getElementById('widget-negocio-pedidos-entregados-count');
+      const elRetiros = document.getElementById('widget-negocio-total-retiros') || document.getElementById('widget-negocio-retiros-total');
+
       if (!tarjetaNegocio) {
-        document.getElementById('widget-negocio-tarjeta-nombre').textContent = 'Sin Tarjeta de Negocio Asignada';
-        document.getElementById('widget-negocio-tarjeta-banco').textContent = 'Configura una tarjeta como "Negocio" en Finanzas Personales';
-        document.getElementById('widget-negocio-saldo-disponible').textContent = '$0';
-        document.getElementById('widget-negocio-inyecciones-total').textContent = '$0';
-        document.getElementById('widget-negocio-margen-entregados').textContent = '$0';
-        document.getElementById('widget-negocio-pedidos-entregados-count').textContent = '0 pedidos';
-        document.getElementById('widget-negocio-retiros-total').textContent = '$0';
+        if (elBadgeNombre) elBadgeNombre.textContent = 'Sin Tarjeta';
+        if (elSaldoDisp) elSaldoDisp.textContent = '$0';
+        if (elTarjetaDetalle) elTarjetaDetalle.textContent = 'Configura una tarjeta como Negocio';
+        if (elInyecciones) elInyecciones.textContent = '+$0';
+        if (elMargen) elMargen.textContent = '+$0';
+        if (elNumEntregados) elNumEntregados.textContent = '0 pedidos entregados';
+        if (elRetiros) elRetiros.textContent = '-$0';
         return;
       }
 
@@ -6809,57 +6893,81 @@
         }
       });
 
-      document.getElementById('widget-negocio-tarjeta-nombre').textContent = tarjetaNegocio.nombre;
-      document.getElementById('widget-negocio-tarjeta-banco').textContent = `${tarjetaNegocio.banco} •••• ${tarjetaNegocio.digitos || '0000'} (${tarjetaNegocio.formato || 'Cuenta'})`;
-      document.getElementById('widget-negocio-saldo-disponible').textContent = formatoCLP(info.saldoFinal);
-      document.getElementById('widget-negocio-inyecciones-total').textContent = `+${formatoCLP(info.traspasosEntrantes)}`;
-      document.getElementById('widget-negocio-margen-entregados').textContent = `+${formatoCLP(info.margenEntregados)}`;
-      document.getElementById('widget-negocio-pedidos-entregados-count').textContent = `${info.pedidosEntregadosCount} pedido(s) entregados`;
-      document.getElementById('widget-negocio-retiros-total').textContent = `-${formatoCLP(totalRetirosNegocio)}`;
+      if (elBadgeNombre) elBadgeNombre.textContent = tarjetaNegocio.nombre;
+      if (elSaldoDisp) elSaldoDisp.textContent = formatoCLP(info.saldoFinal);
+      if (elTarjetaDetalle) elTarjetaDetalle.textContent = `${tarjetaNegocio.banco} •••• ${tarjetaNegocio.digitos || '0000'} (${tarjetaNegocio.formato || 'Cuenta'})`;
+      if (elInyecciones) elInyecciones.textContent = `+${formatoCLP(info.traspasosEntrantes)}`;
+      if (elMargen) elMargen.textContent = `+${formatoCLP(info.margenEntregados)}`;
+      if (elNumEntregados) elNumEntregados.textContent = `${info.pedidosEntregadosCount} pedidos entregados`;
+      if (elRetiros) elRetiros.textContent = `-${formatoCLP(totalRetirosNegocio)}`;
     }
 
     // ==========================================
     // MODAL DE CREAR / EDITAR TARJETA
     // ==========================================
     function abrirModalNuevaTarjeta() {
-      document.getElementById('tarjeta-form-id').value = '';
-      document.getElementById('modal-tarjeta-titulo').textContent = 'Añadir Nueva Tarjeta / Cuenta';
-      document.getElementById('tarjeta-input-nombre').value = '';
-      document.getElementById('tarjeta-input-banco').value = 'Banco Santander';
-      document.getElementById('tarjeta-input-formato').value = 'Cuenta Corriente';
-      document.getElementById('tarjeta-input-digitos').value = '';
-      document.getElementById('tarjeta-input-tipo').value = 'personal';
-      document.getElementById('tarjeta-input-saldo-inicial').value = '0';
-      document.getElementById('tarjeta-input-interes').value = '0';
-      document.getElementById('tarjeta-input-color').value = '';
+      const elId = document.getElementById('tarjeta-id') || document.getElementById('tarjeta-form-id');
+      const elTitulo = document.getElementById('modal-tarjeta-titulo');
+      const elNombre = document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre');
+      const elBanco = document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco');
+      const elFormato = document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato');
+      const elDigitos = document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos');
+      const elTipo = document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo');
+      const elSaldo = document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial');
+      const elInteres = document.getElementById('tarjeta-tasa-interes') || document.getElementById('tarjeta-input-interes');
+      const elColor = document.getElementById('tarjeta-input-color');
+
+      if (elId) elId.value = '';
+      if (elTitulo) elTitulo.textContent = 'Añadir Nueva Tarjeta / Cuenta';
+      if (elNombre) elNombre.value = '';
+      if (elBanco) elBanco.value = 'Banco Santander';
+      if (elFormato) elFormato.value = 'Cuenta Corriente';
+      if (elDigitos) elDigitos.value = '';
+      if (elTipo) elTipo.value = 'principal';
+      if (elSaldo) elSaldo.value = '0';
+      if (elInteres) elInteres.value = '0';
+      if (elColor) elColor.value = '';
 
       cambiarBancoModalTarjeta('Banco Santander');
-      cambiarTipoTarjetaModal('personal');
+      cambiarTipoTarjetaModal('principal');
       actualizarPreviewTarjetaModal();
 
-      document.getElementById('modal-tarjeta').classList.remove('hidden');
+      const modal = document.getElementById('modal-tarjeta');
+      if (modal) modal.classList.remove('hidden');
     }
 
     function abrirModalEditarTarjeta(id) {
       const tar = tarjetasUsuario.find(t => t.id == id);
       if (!tar) return;
 
-      document.getElementById('tarjeta-form-id').value = tar.id;
-      document.getElementById('modal-tarjeta-titulo').textContent = 'Editar Tarjeta / Cuenta';
-      document.getElementById('tarjeta-input-nombre').value = tar.nombre || '';
-      document.getElementById('tarjeta-input-banco').value = tar.banco || 'Banco Santander';
-      document.getElementById('tarjeta-input-formato').value = tar.formato || 'Cuenta Corriente';
-      document.getElementById('tarjeta-input-digitos').value = tar.digitos || '';
-      document.getElementById('tarjeta-input-tipo').value = tar.tipo || 'personal';
-      document.getElementById('tarjeta-input-saldo-inicial').value = Number(tar.saldo_inicial || 0);
-      document.getElementById('tarjeta-input-interes').value = Number(tar.tasa_anual_interes || 0);
-      document.getElementById('tarjeta-input-color').value = tar.color_personalizado || '';
+      const elId = document.getElementById('tarjeta-id') || document.getElementById('tarjeta-form-id');
+      const elTitulo = document.getElementById('modal-tarjeta-titulo');
+      const elNombre = document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre');
+      const elBanco = document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco');
+      const elFormato = document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato');
+      const elDigitos = document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos');
+      const elTipo = document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo');
+      const elSaldo = document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial');
+      const elInteres = document.getElementById('tarjeta-tasa-interes') || document.getElementById('tarjeta-input-interes');
+      const elColor = document.getElementById('tarjeta-input-color');
+
+      if (elId) elId.value = tar.id;
+      if (elTitulo) elTitulo.textContent = 'Editar Tarjeta / Cuenta';
+      if (elNombre) elNombre.value = tar.nombre || '';
+      if (elBanco) elBanco.value = tar.banco || 'Banco Santander';
+      if (elFormato) elFormato.value = tar.formato || 'Cuenta Corriente';
+      if (elDigitos) elDigitos.value = tar.digitos || '';
+      if (elTipo) elTipo.value = tar.tipo || 'principal';
+      if (elSaldo) elSaldo.value = Number(tar.saldo_inicial || 0);
+      if (elInteres) elInteres.value = Number(tar.tasa_anual_interes || 0);
+      if (elColor) elColor.value = tar.color_personalizado || '';
 
       cambiarBancoModalTarjeta(tar.banco || 'Banco Santander');
-      cambiarTipoTarjetaModal(tar.tipo || 'personal');
+      cambiarTipoTarjetaModal(tar.tipo || 'principal');
       actualizarPreviewTarjetaModal();
 
-      document.getElementById('modal-tarjeta').classList.remove('hidden');
+      const modal = document.getElementById('modal-tarjeta');
+      if (modal) modal.classList.remove('hidden');
     }
 
     function cerrarModalTarjeta() {
@@ -6872,73 +6980,73 @@
       const previewCard = document.getElementById('tarjeta-preview-card');
       const inputColor = document.getElementById('tarjeta-input-color');
 
-      if (!inputColor.value) {
-        previewCard.className = `rounded-2xl bg-gradient-to-br ${preset.gradiente} p-4 text-white shadow-lg border border-white/20 flex flex-col justify-between min-h-[160px]`;
+      if (previewCard && (!inputColor || !inputColor.value)) {
+        previewCard.className = `w-full max-w-sm mx-auto h-44 rounded-2xl p-4 text-white shadow-xl flex flex-col justify-between relative overflow-hidden transition-all duration-300 bg-gradient-to-r ${preset.gradiente} border border-white/10`;
       }
       actualizarPreviewTarjetaModal();
     }
 
     function cambiarTipoTarjetaModal(tipo) {
-      const contenedorInteres = document.getElementById('tarjeta-contenedor-interes');
-      const contenedorNegocio = document.getElementById('tarjeta-contenedor-info-negocio');
-
-      if (tipo === 'inversion') {
-        if (contenedorInteres) contenedorInteres.classList.remove('hidden');
-        if (contenedorNegocio) contenedorNegocio.classList.add('hidden');
-      } else if (tipo === 'negocio') {
-        if (contenedorInteres) contenedorInteres.classList.add('hidden');
-        if (contenedorNegocio) contenedorNegocio.classList.remove('hidden');
-      } else {
-        if (contenedorInteres) contenedorInteres.classList.add('hidden');
-        if (contenedorNegocio) contenedorNegocio.classList.add('hidden');
+      const campoInteres = document.getElementById('campo-tasa-interes-tarjeta') || document.getElementById('tarjeta-contenedor-interes');
+      if (campoInteres) {
+        if (tipo === 'inversion') {
+          campoInteres.classList.remove('opacity-40');
+        } else {
+          campoInteres.classList.add('opacity-40');
+        }
       }
       actualizarPreviewTarjetaModal();
     }
 
     function actualizarPreviewTarjetaModal() {
-      const nombre = document.getElementById('tarjeta-input-nombre')?.value || 'Nombre de la Tarjeta';
-      const banco = document.getElementById('tarjeta-input-banco')?.value || 'Banco Emisor';
-      const digitos = document.getElementById('tarjeta-input-digitos')?.value || '4589';
-      const tipo = document.getElementById('tarjeta-input-tipo')?.value || 'personal';
-      const saldo = Number(document.getElementById('tarjeta-input-saldo-inicial')?.value || 0);
+      const nombre = (document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre'))?.value || 'Mi Cuenta';
+      const banco = (document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco'))?.value || 'Banco Santander';
+      const formato = (document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato'))?.value || 'Cuenta Corriente';
+      const digitos = (document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos'))?.value || '4589';
+      const tipo = (document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo'))?.value || 'principal';
+      const saldo = Number((document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial'))?.value || 0);
       const colorCustom = document.getElementById('tarjeta-input-color')?.value;
       const preset = PRESETS_BANCOS[banco] || PRESETS_BANCOS['Otro'];
 
-      const prevBanco = document.getElementById('tarjeta-preview-banco');
-      const prevNombre = document.getElementById('tarjeta-preview-nombre');
-      const prevDigitos = document.getElementById('tarjeta-preview-digitos');
-      const prevTipo = document.getElementById('tarjeta-preview-tipo');
-      const prevSaldo = document.getElementById('tarjeta-preview-saldo');
+      const prevBanco = document.getElementById('preview-banco-nombre') || document.getElementById('tarjeta-preview-banco');
+      const prevFormato = document.getElementById('preview-formato-tarjeta');
+      const prevNombre = document.getElementById('preview-nombre-titular') || document.getElementById('tarjeta-preview-nombre');
+      const prevDigitos = document.getElementById('preview-digitos') || document.getElementById('tarjeta-preview-digitos');
+      const prevTipo = document.getElementById('preview-tipo-badge') || document.getElementById('tarjeta-preview-tipo');
+      const prevSaldo = document.getElementById('preview-saldo-monto') || document.getElementById('tarjeta-preview-saldo');
       const prevCard = document.getElementById('tarjeta-preview-card');
 
       if (prevBanco) prevBanco.textContent = banco.toUpperCase();
+      if (prevFormato) prevFormato.textContent = formato;
       if (prevNombre) prevNombre.textContent = nombre;
-      if (prevDigitos) prevDigitos.textContent = `•••• ${digitos.slice(-4) || '0000'}`;
+      if (prevDigitos) prevDigitos.textContent = digitos ? digitos.slice(-4) : '4589';
       if (prevSaldo) prevSaldo.textContent = formatoCLP(saldo);
 
-      let tipoLabel = 'Personal';
-      if (tipo === 'principal') tipoLabel = '👑 Principal';
-      if (tipo === 'negocio') tipoLabel = '💼 Negocio';
-      if (tipo === 'inversion') tipoLabel = '📈 Inversión';
+      let tipoLabel = 'Principal';
+      if (tipo === 'principal') tipoLabel = '⭐ Principal';
+      if (tipo === 'negocio') tipoLabel = '🏢 Negocio';
+      if (tipo === 'inversion') tipoLabel = '🚀 Inversión';
+      if (tipo === 'costos') tipoLabel = '💸 Costos';
+      if (tipo === 'ahorro') tipoLabel = '🛡️ Ahorro';
       if (prevTipo) prevTipo.textContent = tipoLabel;
 
       if (prevCard) {
         const gradiente = colorCustom ? `from-[${colorCustom}] to-slate-950` : preset.gradiente;
-        prevCard.className = `rounded-2xl bg-gradient-to-br ${gradiente} p-4 text-white shadow-lg border border-white/20 flex flex-col justify-between min-h-[160px]`;
+        prevCard.className = `w-full max-w-sm mx-auto h-44 rounded-2xl p-4 text-white shadow-xl flex flex-col justify-between relative overflow-hidden transition-all duration-300 bg-gradient-to-r ${gradiente} border border-white/10`;
       }
     }
 
-    document.getElementById('form-tarjeta')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const idInput = document.getElementById('tarjeta-form-id').value;
-      const nombre = document.getElementById('tarjeta-input-nombre').value.trim();
-      const banco = document.getElementById('tarjeta-input-banco').value;
-      const formato = document.getElementById('tarjeta-input-formato').value;
-      const digitos = document.getElementById('tarjeta-input-digitos').value.trim();
-      const tipo = document.getElementById('tarjeta-input-tipo').value;
-      const saldoInicial = Number(document.getElementById('tarjeta-input-saldo-inicial').value || 0);
-      const tasa = Number(document.getElementById('tarjeta-input-interes').value || 0);
-      const colorCustom = document.getElementById('tarjeta-input-color').value.trim();
+    function guardarTarjeta(e) {
+      if (e) e.preventDefault();
+      const idInput = (document.getElementById('tarjeta-id') || document.getElementById('tarjeta-form-id'))?.value;
+      const nombre = (document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre'))?.value?.trim() || '';
+      const banco = (document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco'))?.value || 'Banco Santander';
+      const formato = (document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato'))?.value || 'Cuenta Corriente';
+      const digitos = (document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos'))?.value?.trim() || '';
+      const tipo = (document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo'))?.value || 'principal';
+      const saldoInicial = Number((document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial'))?.value || 0);
+      const tasa = Number((document.getElementById('tarjeta-tasa-interes') || document.getElementById('tarjeta-input-interes'))?.value || 0);
+      const colorCustom = document.getElementById('tarjeta-input-color')?.value?.trim() || '';
 
       if (!nombre) {
         mostrarToast('Ingresa un nombre para la tarjeta o cuenta.', 'warning');
@@ -6979,7 +7087,10 @@
       guardarTarjetasEnAlmacenamiento();
       cerrarModalTarjeta();
       procesarModuloTarjetas();
-    });
+    }
+    window.guardarTarjeta = guardarTarjeta;
+
+    document.getElementById('form-tarjeta')?.addEventListener('submit', guardarTarjeta);
 
     async function eliminarTarjeta(id) {
       const tar = tarjetasUsuario.find(t => t.id == id);
@@ -7005,12 +7116,12 @@
     function abrirModalTraspaso(origenId = null, destinoId = null, tipoSugerido = null) {
       poblarSelectsModalTraspaso();
 
-      const selOri = document.getElementById('traspaso-cuenta-origen');
-      const selDes = document.getElementById('traspaso-cuenta-destino');
-      const selTipo = document.getElementById('traspaso-tipo-operacion');
-      const inpFecha = document.getElementById('traspaso-input-fecha');
-      const inpMonto = document.getElementById('traspaso-input-monto');
-      const inpGlosa = document.getElementById('traspaso-input-glosa');
+      const selOri = document.getElementById('traspaso-origen') || document.getElementById('traspaso-cuenta-origen');
+      const selDes = document.getElementById('traspaso-destino') || document.getElementById('traspaso-cuenta-destino');
+      const selClasif = document.getElementById('traspaso-clasificacion') || document.getElementById('traspaso-tipo-operacion');
+      const inpFecha = document.getElementById('traspaso-fecha') || document.getElementById('traspaso-input-fecha');
+      const inpMonto = document.getElementById('traspaso-monto') || document.getElementById('traspaso-input-monto');
+      const inpGlosa = document.getElementById('traspaso-glosa') || document.getElementById('traspaso-input-glosa');
 
       if (inpFecha) inpFecha.value = hoyFechaStr;
       if (inpMonto) inpMonto.value = '';
@@ -7018,10 +7129,11 @@
 
       if (origenId && selOri) selOri.value = origenId;
       if (destinoId && selDes) selDes.value = destinoId;
-      if (tipoSugerido && selTipo) selTipo.value = tipoSugerido;
+      if (tipoSugerido && selClasif) selClasif.value = tipoSugerido;
 
       alCambiarCuentasTraspaso();
-      document.getElementById('modal-traspaso-tarjeta').classList.remove('hidden');
+      const m = document.getElementById('modal-traspaso-tarjeta');
+      if (m) m.classList.remove('hidden');
     }
 
     function abrirModalTraspasoNegocioInyeccion() {
@@ -7029,8 +7141,8 @@
       const tPrinc = tarjetasUsuario.find(t => t.tipo === 'principal') || tarjetasUsuario[0];
       const tNeg = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[1] || tarjetasUsuario[0];
 
-      abrirModalTraspaso(tPrinc?.id, tNeg?.id, 'inyeccion_negocio');
-      const glosa = document.getElementById('traspaso-input-glosa');
+      abrirModalTraspaso(tPrinc?.id, tNeg?.id, 'principal_a_negocio');
+      const glosa = document.getElementById('traspaso-glosa') || document.getElementById('traspaso-input-glosa');
       if (glosa) glosa.value = 'Inyección de capital de trabajo a la cuenta del negocio';
     }
 
@@ -7039,8 +7151,8 @@
       const tNeg = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
       const tPrinc = tarjetasUsuario.find(t => t.tipo === 'principal') || tarjetasUsuario[1] || tarjetasUsuario[0];
 
-      abrirModalTraspaso(tNeg?.id, tPrinc?.id, 'retiro_negocio');
-      const glosa = document.getElementById('traspaso-input-glosa');
+      abrirModalTraspaso(tNeg?.id, tPrinc?.id, 'negocio_a_principal');
+      const glosa = document.getElementById('traspaso-glosa') || document.getElementById('traspaso-input-glosa');
       if (glosa) glosa.value = 'Retiro de utilidades del negocio a la cuenta principal';
     }
 
@@ -7050,35 +7162,53 @@
     }
 
     function alCambiarCuentasTraspaso() {
-      const oriId = document.getElementById('traspaso-cuenta-origen')?.value;
-      const desId = document.getElementById('traspaso-cuenta-destino')?.value;
-      const selTipo = document.getElementById('traspaso-tipo-operacion');
+      const oriId = (document.getElementById('traspaso-origen') || document.getElementById('traspaso-cuenta-origen'))?.value;
+      const desId = (document.getElementById('traspaso-destino') || document.getElementById('traspaso-cuenta-destino'))?.value;
+      const selClasif = document.getElementById('traspaso-clasificacion') || document.getElementById('traspaso-tipo-operacion');
 
       const tOri = tarjetasUsuario.find(t => t.id == oriId);
       const tDes = tarjetasUsuario.find(t => t.id == desId);
 
       // Sugerir tipo de operación inteligente según combinación
-      if (tOri && tDes && selTipo) {
-        if (tDes.tipo === 'negocio' && (tOri.tipo === 'principal' || tOri.tipo === 'inversion' || tOri.tipo === 'personal')) {
-          selTipo.value = 'inyeccion_negocio';
-        } else if (tOri.tipo === 'negocio' && (tDes.tipo === 'principal' || tDes.tipo === 'personal')) {
-          selTipo.value = 'retiro_negocio';
+      if (tOri && tDes && selClasif) {
+        if (tDes.tipo === 'negocio' && (tOri.tipo === 'principal' || tOri.tipo === 'costos')) {
+          selClasif.value = 'principal_a_negocio';
+        } else if (tDes.tipo === 'negocio' && tOri.tipo === 'inversion') {
+          selClasif.value = 'inversion_a_negocio';
+        } else if (tOri.tipo === 'negocio' && (tDes.tipo === 'principal' || tDes.tipo === 'costos')) {
+          selClasif.value = 'negocio_a_principal';
+        } else if (tOri.tipo === 'negocio' && tDes.tipo === 'inversion') {
+          selClasif.value = 'negocio_a_inversion';
         } else if (tDes.tipo === 'inversion') {
-          selTipo.value = 'aporte_inversion';
-        } else if (tOri.tipo === 'inversion') {
-          selTipo.value = 'retiro_inversion';
+          selClasif.value = 'principal_a_inversion';
         } else {
-          selTipo.value = 'traspaso_interno';
+          selClasif.value = 'traspaso_general';
         }
+      }
+
+      const txtOri = document.getElementById('preview-traspaso-origen-txt');
+      const saldoOri = document.getElementById('preview-traspaso-origen-saldo');
+      const txtDes = document.getElementById('preview-traspaso-destino-txt');
+      const saldoDes = document.getElementById('preview-traspaso-destino-saldo');
+
+      if (tOri) {
+        const infoOri = calcularSaldosTarjeta(tOri.id);
+        if (txtOri) txtOri.textContent = tOri.nombre;
+        if (saldoOri) saldoOri.textContent = `Disp: ${formatoCLP(infoOri.saldoFinal)}`;
+      }
+      if (tDes) {
+        const infoDes = calcularSaldosTarjeta(tDes.id);
+        if (txtDes) txtDes.textContent = tDes.nombre;
+        if (saldoDes) saldoDes.textContent = `Disp: ${formatoCLP(infoDes.saldoFinal)}`;
       }
 
       alCambiarMontoTraspaso();
     }
 
     function alCambiarMontoTraspaso() {
-      const oriId = document.getElementById('traspaso-cuenta-origen')?.value;
-      const desId = document.getElementById('traspaso-cuenta-destino')?.value;
-      const monto = Number(document.getElementById('traspaso-input-monto')?.value || 0);
+      const oriId = (document.getElementById('traspaso-origen') || document.getElementById('traspaso-cuenta-origen'))?.value;
+      const desId = (document.getElementById('traspaso-destino') || document.getElementById('traspaso-cuenta-destino'))?.value;
+      const monto = Number((document.getElementById('traspaso-monto') || document.getElementById('traspaso-input-monto'))?.value || 0);
 
       const infoOri = calcularSaldosTarjeta(oriId);
       const infoDes = calcularSaldosTarjeta(desId);
@@ -7086,27 +7216,27 @@
       const nuevoSaldoOri = infoOri.saldoFinal - monto;
       const nuevoSaldoDes = infoDes.saldoFinal + monto;
 
-      const elOri = document.getElementById('traspaso-preview-saldo-origen');
-      const elDes = document.getElementById('traspaso-preview-saldo-destino');
+      const elOri = document.getElementById('preview-traspaso-origen-saldo') || document.getElementById('traspaso-preview-saldo-origen');
+      const elDes = document.getElementById('preview-traspaso-destino-saldo') || document.getElementById('traspaso-preview-saldo-destino');
 
-      if (elOri) {
+      if (elOri && oriId) {
         elOri.textContent = `${formatoCLP(infoOri.saldoFinal)} ➔ ${formatoCLP(nuevoSaldoOri)}`;
-        elOri.className = `font-mono font-bold ${nuevoSaldoOri < 0 ? 'text-rose-400' : 'text-slate-300'}`;
+        elOri.className = `text-[10px] font-mono font-bold ${nuevoSaldoOri < 0 ? 'text-rose-400' : 'text-slate-300'}`;
       }
-      if (elDes) {
+      if (elDes && desId) {
         elDes.textContent = `${formatoCLP(infoDes.saldoFinal)} ➔ ${formatoCLP(nuevoSaldoDes)}`;
-        elDes.className = 'font-mono font-bold text-emerald-400';
+        elDes.className = 'text-[10px] font-mono font-bold text-emerald-400';
       }
     }
 
-    document.getElementById('form-traspaso-tarjeta')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const fecha = document.getElementById('traspaso-input-fecha').value || hoyFechaStr;
-      const oriId = document.getElementById('traspaso-cuenta-origen').value;
-      const desId = document.getElementById('traspaso-cuenta-destino').value;
-      const tipoOperacion = document.getElementById('traspaso-tipo-operacion').value;
-      const monto = Number(document.getElementById('traspaso-input-monto').value || 0);
-      const glosa = document.getElementById('traspaso-input-glosa').value.trim();
+    function guardarTraspaso(e) {
+      if (e) e.preventDefault();
+      const fecha = (document.getElementById('traspaso-fecha') || document.getElementById('traspaso-input-fecha'))?.value || hoyFechaStr;
+      const oriId = (document.getElementById('traspaso-origen') || document.getElementById('traspaso-cuenta-origen'))?.value;
+      const desId = (document.getElementById('traspaso-destino') || document.getElementById('traspaso-cuenta-destino'))?.value;
+      const tipoOperacion = (document.getElementById('traspaso-clasificacion') || document.getElementById('traspaso-tipo-operacion'))?.value || 'traspaso_general';
+      const monto = Number((document.getElementById('traspaso-monto') || document.getElementById('traspaso-input-monto'))?.value || 0);
+      const glosa = (document.getElementById('traspaso-glosa') || document.getElementById('traspaso-input-glosa'))?.value?.trim() || '';
 
       if (!oriId || !desId) {
         mostrarToast('Selecciona ambas cuentas para el traspaso.', 'warning');
@@ -7144,7 +7274,11 @@
       mostrarToast(`¡Traspaso de ${formatoCLP(monto)} registrado con éxito!`, 'success');
       cerrarModalTraspaso();
       procesarModuloTarjetas();
-    });
+    }
+    window.guardarTraspaso = guardarTraspaso;
+
+    document.getElementById('form-traspaso')?.addEventListener('submit', guardarTraspaso);
+    document.getElementById('form-traspaso-tarjeta')?.addEventListener('submit', guardarTraspaso);
 
     async function eliminarTraspaso(id) {
       const tr = traspasosTarjetas.find(t => t.id == id);
@@ -7241,6 +7375,7 @@
     window.toggleDesplegableHonorarios = toggleDesplegableHonorarios;
     window.toggleDesplegableKpisPersonal = toggleDesplegableKpisPersonal;
     window.toggleDesplegableKpisTarjetas = toggleDesplegableKpisTarjetas;
+    window.toggleDesplegableInversion = toggleDesplegableInversion;
 
     // Inicialización general
     inicializarAuth();
