@@ -269,6 +269,10 @@
                 <span class="flex items-center gap-1 text-sky-300"><span class="w-2 h-2 rounded-full bg-sky-400"></span>Recibido</span>
                 <span class="flex items-center gap-1 text-amber-300"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Notificado</span>
                 <span class="flex items-center gap-1 text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Confirmado</span>
+                <span class="flex items-center gap-1 text-indigo-300"><span class="w-2 h-2 rounded-full bg-indigo-400"></span>Despachado</span>
+                <span class="flex items-center gap-1 text-teal-300"><span class="w-2 h-2 rounded-full bg-teal-400"></span>Entregado</span>
+                <span class="flex items-center gap-1 text-orange-300"><span class="w-2 h-2 rounded-full bg-orange-400"></span>Incidencia</span>
+                <span class="flex items-center gap-1 text-pink-300"><span class="w-2 h-2 rounded-full bg-pink-400"></span>Devuelto</span>
                 <span class="flex items-center gap-1 text-purple-300"><span class="w-2 h-2 rounded-full bg-purple-400"></span>Sin resp.</span>
                 <span class="flex items-center gap-1 text-rose-300"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Cancelado</span>
               </div>
@@ -283,9 +287,9 @@
                 <h3 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
                   <span>🎯</span> Embudo de Conversión de Pedidos
                 </h3>
-                <p class="text-[11px] text-slate-400">Efectividad del funnel desde recepción hasta confirmación</p>
+                <p class="text-[11px] text-slate-400">Efectividad del funnel de estados operativos</p>
               </div>
-              <span id="tasa-efectividad-general" class="text-xs font-bold font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-lg border border-emerald-800/60">0% Éxito</span>
+              <span id="tasa-efectividad-general" class="text-xs font-bold font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-lg border border-emerald-800/60">0% Concretados</span>
             </div>
 
             <div id="contenedor-embudo-estados" class="space-y-2 py-2">
@@ -293,8 +297,8 @@
             </div>
 
             <div class="pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-              <span>Efectividad Confirmados: <strong id="funnel-confirmados-pct" class="text-emerald-400 font-mono">0%</strong></span>
-              <span>Rechazo / Cancelados: <strong id="funnel-cancelados-pct" class="text-rose-400 font-mono">0%</strong></span>
+              <span>Ventas Concretadas: <strong id="funnel-confirmados-pct" class="text-emerald-400 font-mono">0%</strong></span>
+              <span>Cancelados / Devueltos: <strong id="funnel-cancelados-pct" class="text-rose-400 font-mono">0%</strong></span>
             </div>
           </div>
 
@@ -451,7 +455,7 @@
           </button>
 
           <div id="contenedor-form-pedido-manual" class="hidden p-4 pt-2 border-t border-slate-800/80 bg-slate-900/60">
-            <form id="form-venta" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs">
+            <form id="form-venta" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5 text-xs">
               <div>
                 <label class="text-slate-400">Fecha</label>
                 <input type="date" id="v-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
@@ -466,9 +470,17 @@
                   <option value="Recibido" selected>📥 Recibido</option>
                   <option value="Notificado">🔔 Notificado</option>
                   <option value="Confirmado">✅ Confirmado</option>
+                  <option value="Despachado">🚚 Despachado</option>
+                  <option value="Entregado">📦 Entregado</option>
+                  <option value="Incidencia">⚠️ Incidencia</option>
+                  <option value="Devuelto">🔄 Devuelto</option>
                   <option value="Sin respuesta">⏳ Sin respuesta</option>
                   <option value="Cancelado">❌ Cancelado</option>
                 </select>
+              </div>
+              <div>
+                <label class="text-slate-400">N° OT / Tracking</label>
+                <input type="text" id="v-ot" placeholder="Ej: 987654321" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-indigo-300 font-mono mt-1">
               </div>
               <div>
                 <label class="text-slate-400">Venta Total ($)</label>
@@ -482,7 +494,7 @@
                 <label class="text-slate-400">Flete / Envío ($)</label>
                 <input type="number" id="v-costo-envio" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
               </div>
-              <div class="col-span-2 md:col-span-2 lg:col-span-5">
+              <div class="col-span-2 md:col-span-2 lg:col-span-6">
                 <label class="text-slate-400">Comisión Dropi ($)</label>
                 <input type="number" id="v-comision-dropi" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
               </div>
@@ -504,12 +516,16 @@
               <button onclick="filtrarPedidosPorEstado('Recibido')" id="f-ped-Recibido" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-sky-300 hover:text-white cursor-pointer">📥 Recibido</button>
               <button onclick="filtrarPedidosPorEstado('Notificado')" id="f-ped-Notificado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-amber-300 hover:text-white cursor-pointer">🔔 Notificado</button>
               <button onclick="filtrarPedidosPorEstado('Confirmado')" id="f-ped-Confirmado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-emerald-300 hover:text-white cursor-pointer">✅ Confirmado</button>
-              <button onclick="filtrarPedidosPorEstado('Sin respuesta')" id="f-ped-Sin-respuesta" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-purple-300 hover:text-white cursor-pointer">⏳ Sin respuesta</button>
+              <button onclick="filtrarPedidosPorEstado('Despachado')" id="f-ped-Despachado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-indigo-300 hover:text-white cursor-pointer">🚚 Despachado</button>
+              <button onclick="filtrarPedidosPorEstado('Entregado')" id="f-ped-Entregado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-teal-300 hover:text-white cursor-pointer">📦 Entregado</button>
+              <button onclick="filtrarPedidosPorEstado('Incidencia')" id="f-ped-Incidencia" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-orange-300 hover:text-white cursor-pointer">⚠️ Incidencia</button>
+              <button onclick="filtrarPedidosPorEstado('Devuelto')" id="f-ped-Devuelto" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-pink-300 hover:text-white cursor-pointer">🔄 Devuelto</button>
+              <button onclick="filtrarPedidosPorEstado('Sin respuesta')" id="f-ped-Sin-respuesta" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-purple-300 hover:text-white cursor-pointer">⏳ Sin resp.</button>
               <button onclick="filtrarPedidosPorEstado('Cancelado')" id="f-ped-Cancelado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-rose-300 hover:text-white cursor-pointer">❌ Cancelado</button>
             </div>
 
             <div class="flex items-center gap-2 w-full md:w-auto">
-              <input type="text" id="buscador-pedidos" placeholder="🔍 Buscar ID, cliente o producto..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 w-full md:w-64" oninput="renderizarTablaPedidos()">
+              <input type="text" id="buscador-pedidos" placeholder="🔍 Buscar ID, cliente, producto o N° OT..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 w-full md:w-64" oninput="renderizarTablaPedidos()">
             </div>
           </div>
 
@@ -522,6 +538,7 @@
                   </th>
                   <th class="p-3">Fecha</th>
                   <th class="p-3">Pedido / Cliente / Producto</th>
+                  <th class="p-3">N° OT / Tracking</th>
                   <th class="p-3 text-center">Estado</th>
                   <th class="p-3 text-right">Venta ($)</th>
                   <th class="p-3 text-right">Costos Dropi ($)</th>
@@ -530,7 +547,7 @@
                 </tr>
               </thead>
               <tbody id="tabla-ventas" class="divide-y divide-slate-800 bg-slate-900/40">
-                <tr><td colspan="8" class="p-6 text-center text-slate-500">Cargando pedidos...</td></tr>
+                <tr><td colspan="9" class="p-6 text-center text-slate-500">Cargando pedidos...</td></tr>
               </tbody>
             </table>
           </div>
@@ -1089,7 +1106,7 @@
       </div>
       <form id="form-editar-pedido" class="space-y-3 text-xs">
         <input type="hidden" id="edit-p-id">
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div>
             <label class="text-slate-400">Fecha</label>
             <input type="date" id="edit-p-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
@@ -1100,9 +1117,17 @@
               <option value="Recibido">📥 Recibido</option>
               <option value="Notificado">🔔 Notificado</option>
               <option value="Confirmado">✅ Confirmado</option>
+              <option value="Despachado">🚚 Despachado</option>
+              <option value="Entregado">📦 Entregado</option>
+              <option value="Incidencia">⚠️ Incidencia</option>
+              <option value="Devuelto">🔄 Devuelto</option>
               <option value="Sin respuesta">⏳ Sin respuesta</option>
               <option value="Cancelado">❌ Cancelado</option>
             </select>
+          </div>
+          <div>
+            <label class="text-slate-400">N° OT / Tracking</label>
+            <input type="text" id="edit-p-ot" placeholder="Ej: 987654321" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-indigo-300 font-mono mt-1">
           </div>
         </div>
         <div>
@@ -2003,7 +2028,8 @@
 
         datosDrop.ventas = (resVentas?.data || []).map(v => ({
           ...v,
-          estado: v.estado || obtenerEstadoPedido(v.id, 'Recibido')
+          estado: v.estado || obtenerEstadoPedido(v.id, 'Recibido'),
+          numero_ot: v.numero_ot || obtenerOtPedido(v.id, '')
         }));
         datosDrop.ads = resAds?.data || [];
         datosDrop.costos = resCostos?.data || [];
@@ -2018,6 +2044,13 @@
       procesarModuloPersonal();
       procesarModuloInversiones();
       construirListaConsolidada();
+    }
+
+    const ESTADOS_CONCRETADOS = ['confirmado', 'despachado', 'entregado'];
+
+    function esPedidoConcretado(estado) {
+      if (!estado) return false;
+      return ESTADOS_CONCRETADOS.includes(estado.trim().toLowerCase());
     }
 
     function obtenerEstadoPedido(id, fallback = 'Recibido') {
@@ -2035,6 +2068,54 @@
         map[id] = estado;
         localStorage.setItem('pedidos_estados_map', JSON.stringify(map));
       } catch (e) {}
+    }
+
+    function obtenerOtPedido(id, fallback = '') {
+      try {
+        const map = JSON.parse(localStorage.getItem('pedidos_ot_map') || '{}');
+        if (id && map[id] !== undefined) return map[id];
+      } catch (e) {}
+      return fallback;
+    }
+
+    function guardarOtPedidoLocal(id, ot) {
+      if (!id) return;
+      try {
+        const map = JSON.parse(localStorage.getItem('pedidos_ot_map') || '{}');
+        map[id] = ot ? ot.trim() : '';
+        localStorage.setItem('pedidos_ot_map', JSON.stringify(map));
+      } catch (e) {}
+    }
+
+    function copiarOtPortapapeles(ot) {
+      if (!ot) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ot).then(() => {
+          mostrarToast(`📋 OT #${ot} copiada al portapapeles`, 'info');
+        }).catch(() => {
+          mostrarToast(`OT: ${ot}`, 'info');
+        });
+      } else {
+        mostrarToast(`OT: ${ot}`, 'info');
+      }
+    }
+
+    async function asignarOtRapido(id, valorActual = '') {
+      const v = datosDrop.ventas.find(x => x.id == id);
+      const otActual = valorActual || (v ? v.numero_ot : '') || '';
+      const nuevaOt = prompt('Ingresa el número de OT / Tracking de seguimiento (Dropi / Courier):', otActual);
+      if (nuevaOt === null) return; // Cancelado por el usuario
+      
+      const otLimpia = nuevaOt.trim();
+      guardarOtPedidoLocal(id, otLimpia);
+      if (v) v.numero_ot = otLimpia;
+      
+      try {
+        await db.from('ventas').update({ numero_ot: otLimpia }).eq('id', id);
+      } catch (ignored) {}
+      
+      mostrarToast(otLimpia ? `OT #${otLimpia} asignada con éxito` : 'OT actualizada', 'success');
+      renderizarTablaPedidos();
     }
 
     let filtroPedidoEstado = 'todos';
@@ -2062,6 +2143,14 @@
           return 'bg-amber-950/90 text-amber-300 border-amber-800/80';
         case 'Confirmado':
           return 'bg-emerald-950/90 text-emerald-300 border-emerald-800/80';
+        case 'Despachado':
+          return 'bg-indigo-950/90 text-indigo-300 border-indigo-800/80';
+        case 'Entregado':
+          return 'bg-teal-950/90 text-teal-300 border-teal-800/80';
+        case 'Incidencia':
+          return 'bg-orange-950/90 text-orange-300 border-orange-800/80';
+        case 'Devuelto':
+          return 'bg-pink-950/90 text-pink-300 border-pink-800/80';
         case 'Sin respuesta':
           return 'bg-purple-950/90 text-purple-300 border-purple-800/80';
         case 'Cancelado':
@@ -2079,6 +2168,7 @@
         const matchBusqueda = !query || 
           (v.cliente_detalle && v.cliente_detalle.toLowerCase().includes(query)) ||
           (v.fecha && v.fecha.toLowerCase().includes(query)) ||
+          (v.numero_ot && v.numero_ot.toLowerCase().includes(query)) ||
           (estado && estado.toLowerCase().includes(query));
         return matchEstado && matchBusqueda;
       });
@@ -2129,7 +2219,7 @@
         const mensaje = datosDrop.ventas.length === 0 
           ? 'Sin pedidos registrados en este período.'
           : 'No se encontraron pedidos con los filtros aplicados.';
-        cuerpoVentas.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">${mensaje}</td></tr>`;
+        cuerpoVentas.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">${mensaje}</td></tr>`;
         actualizarEstadoCheckAllPedidos();
         return;
       }
@@ -2139,6 +2229,33 @@
         const ingreso = Number(v.ingreso_total || 0);
         const margen = ingreso - costoDropi;
         const estado = v.estado || 'Recibido';
+        const ot = v.numero_ot || obtenerOtPedido(v.id, '');
+        const esConcretado = esPedidoConcretado(estado);
+
+        let otHTML = '';
+        if (ot) {
+          otHTML = `
+            <div class="flex items-center gap-1">
+              <span class="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 whitespace-nowrap" title="Número de OT">
+                🚚 ${ot}
+              </span>
+              <button onclick="copiarOtPortapapeles('${ot}')" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition cursor-pointer" title="Copiar OT">📋</button>
+              <button onclick="asignarOtRapido(${v.id}, '${ot}')" class="text-slate-400 hover:text-sky-300 p-1 rounded hover:bg-slate-800 transition cursor-pointer" title="Editar OT">✏️</button>
+            </div>
+          `;
+        } else if (['confirmado', 'despachado', 'entregado'].includes(estado.toLowerCase())) {
+          otHTML = `
+            <button onclick="asignarOtRapido(${v.id}, '')" class="text-[11px] font-medium px-2 py-1 rounded-lg bg-indigo-950/50 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-800/60 hover:text-white transition flex items-center gap-1 cursor-pointer">
+              <span>➕ Asignar OT</span>
+            </button>
+          `;
+        } else {
+          otHTML = `
+            <button onclick="asignarOtRapido(${v.id}, '')" class="text-[11px] text-slate-500 hover:text-slate-300 transition cursor-pointer" title="Asignar OT de seguimiento">
+              + OT
+            </button>
+          `;
+        }
 
         return `
           <tr class="hover:bg-slate-800/40 transition ${v.seleccionado ? 'bg-sky-950/20' : ''}">
@@ -2149,18 +2266,25 @@
             <td class="p-3 font-medium text-slate-200">
               <div class="line-clamp-2">${v.cliente_detalle}</div>
             </td>
+            <td class="p-3 whitespace-nowrap">
+              ${otHTML}
+            </td>
             <td class="p-3 text-center">
               <select onchange="cambiarEstadoPedidoRapido(${v.id}, this.value)" class="text-xs font-semibold px-2 py-1 rounded-lg border focus:outline-none cursor-pointer transition ${obtenerEstiloSelectPedido(estado)}">
                 <option value="Recibido" class="bg-slate-900 text-sky-300" ${estado === 'Recibido' ? 'selected' : ''}>📥 Recibido</option>
                 <option value="Notificado" class="bg-slate-900 text-amber-300" ${estado === 'Notificado' ? 'selected' : ''}>🔔 Notificado</option>
                 <option value="Confirmado" class="bg-slate-900 text-emerald-300" ${estado === 'Confirmado' ? 'selected' : ''}>✅ Confirmado</option>
+                <option value="Despachado" class="bg-slate-900 text-indigo-300" ${estado === 'Despachado' ? 'selected' : ''}>🚚 Despachado</option>
+                <option value="Entregado" class="bg-slate-900 text-teal-300" ${estado === 'Entregado' ? 'selected' : ''}>📦 Entregado</option>
+                <option value="Incidencia" class="bg-slate-900 text-orange-300" ${estado === 'Incidencia' ? 'selected' : ''}>⚠️ Incidencia</option>
+                <option value="Devuelto" class="bg-slate-900 text-pink-300" ${estado === 'Devuelto' ? 'selected' : ''}>🔄 Devuelto</option>
                 <option value="Sin respuesta" class="bg-slate-900 text-purple-300" ${estado === 'Sin respuesta' ? 'selected' : ''}>⏳ Sin respuesta</option>
                 <option value="Cancelado" class="bg-slate-900 text-rose-300" ${estado === 'Cancelado' ? 'selected' : ''}>❌ Cancelado</option>
               </select>
             </td>
-            <td class="p-3 text-right font-medium text-emerald-400 whitespace-nowrap">${formatoCLP(ingreso)}</td>
+            <td class="p-3 text-right font-medium whitespace-nowrap ${esConcretado ? 'text-emerald-400' : 'text-slate-500 line-through opacity-70'}">${formatoCLP(ingreso)}</td>
             <td class="p-3 text-right text-rose-300 whitespace-nowrap">-${formatoCLP(costoDropi)}</td>
-            <td class="p-3 text-right font-semibold whitespace-nowrap ${margen >= 0 ? 'text-sky-400' : 'text-rose-500'}">${formatoCLP(margen)}</td>
+            <td class="p-3 text-right font-semibold whitespace-nowrap ${margen >= 0 ? (esConcretado ? 'text-sky-400' : 'text-slate-400') : 'text-rose-500'}">${formatoCLP(margen)}</td>
             <td class="p-3 text-center whitespace-nowrap">
               <div class="flex items-center justify-center gap-1.5">
                 <button onclick="abrirModalEditarPedido(${v.id})" class="p-1.5 px-2 rounded-lg bg-sky-950 text-sky-300 border border-sky-800/60 hover:bg-sky-900 hover:text-white transition text-xs font-medium cursor-pointer" title="Editar Pedido">
@@ -2179,17 +2303,22 @@
     }
 
     function procesarModuloDropshipping() {
-      let totalVentas = 0;
-      let totalCostosDropi = 0;
-      let totalCostoProd = 0;
-      let totalCostoEnvio = 0;
-      let totalComisionDropi = 0;
+      let totalVentasConcretadas = 0;
+      let totalCostosDropiConcretados = 0;
+      let totalCostoProdConcretados = 0;
+      let totalCostoEnvioConcretados = 0;
+      let totalComisionDropiConcretados = 0;
+      let totalPedidosConcretados = 0;
 
-      // Conteo de estados
+      // Conteo completo de los 9 estados
       const conteoEstados = {
         'Recibido': 0,
         'Notificado': 0,
         'Confirmado': 0,
+        'Despachado': 0,
+        'Entregado': 0,
+        'Incidencia': 0,
+        'Devuelto': 0,
         'Sin respuesta': 0,
         'Cancelado': 0
       };
@@ -2204,12 +2333,6 @@
         const costoDropi = cProd + cEnv + cCom;
         const ingreso = Number(v.ingreso_total || 0);
 
-        totalVentas += ingreso;
-        totalCostosDropi += costoDropi;
-        totalCostoProd += cProd;
-        totalCostoEnvio += cEnv;
-        totalComisionDropi += cCom;
-
         // Estado
         const est = v.estado || 'Recibido';
         if (conteoEstados[est] !== undefined) {
@@ -2218,15 +2341,25 @@
           conteoEstados['Recibido']++;
         }
 
-        // Agrupación de top productos
-        const prodKey = (v.cliente_detalle && v.cliente_detalle.trim()) ? v.cliente_detalle.trim() : 'Pedido Estándar';
-        if (!productosMap[prodKey]) {
-          productosMap[prodKey] = { nombre: prodKey, cantidad: 0, ventas: 0, costo: 0, margen: 0 };
+        // Las ventas brutas y costos efectivos sólo se suman si el pedido está en estado Concretado (Confirmado, Despachado, Entregado)
+        if (esPedidoConcretado(est)) {
+          totalVentasConcretadas += ingreso;
+          totalCostosDropiConcretados += costoDropi;
+          totalCostoProdConcretados += cProd;
+          totalCostoEnvioConcretados += cEnv;
+          totalComisionDropiConcretados += cCom;
+          totalPedidosConcretados++;
+
+          // Agrupación de top productos para pedidos concretados
+          const prodKey = (v.cliente_detalle && v.cliente_detalle.trim()) ? v.cliente_detalle.trim() : 'Pedido Estándar';
+          if (!productosMap[prodKey]) {
+            productosMap[prodKey] = { nombre: prodKey, cantidad: 0, ventas: 0, costo: 0, margen: 0 };
+          }
+          productosMap[prodKey].cantidad++;
+          productosMap[prodKey].ventas += ingreso;
+          productosMap[prodKey].costo += costoDropi;
+          productosMap[prodKey].margen += (ingreso - costoDropi);
         }
-        productosMap[prodKey].cantidad++;
-        productosMap[prodKey].ventas += ingreso;
-        productosMap[prodKey].costo += costoDropi;
-        productosMap[prodKey].margen += (ingreso - costoDropi);
       });
 
       renderizarTablaPedidos();
@@ -2258,28 +2391,31 @@
         </tr>
       `).join('');
 
-      const totalPedidos = datosDrop.ventas.length;
+      const totalPedidosTotales = datosDrop.ventas.length;
+      const totalVentas = totalVentasConcretadas;
+      const totalCostosDropi = totalCostosDropiConcretados;
+
       const margenContrib = totalVentas - totalCostosDropi;
       const utilidadNeta = margenContrib - totalAds - totalFijosMes;
       const roas = totalAds > 0 ? (totalVentas / totalAds).toFixed(2) : '0.0';
-      const cpa = totalPedidos > 0 ? (totalAds / totalPedidos) : 0;
+      const cpa = totalPedidosConcretados > 0 ? (totalAds / totalPedidosConcretados) : (totalPedidosTotales > 0 ? (totalAds / totalPedidosTotales) : 0);
       const margenNetoPct = totalVentas > 0 ? ((utilidadNeta / totalVentas) * 100).toFixed(1) : '0.0';
       const margenBrutoPct = totalVentas > 0 ? ((margenContrib / totalVentas) * 100).toFixed(1) : '0.0';
 
-      // Métricas Unit Economics
-      const ticketProm = totalPedidos > 0 ? (totalVentas / totalPedidos) : 0;
-      const costoUnitDropi = totalPedidos > 0 ? (totalCostosDropi / totalPedidos) : 0;
-      const margenUnitProm = totalPedidos > 0 ? (margenContrib / totalPedidos) : 0;
-      const netoUnitProm = totalPedidos > 0 ? (utilidadNeta / totalPedidos) : 0;
+      // Métricas Unit Economics basadas en ventas concretadas
+      const ticketProm = totalPedidosConcretados > 0 ? (totalVentas / totalPedidosConcretados) : 0;
+      const margenUnitProm = totalPedidosConcretados > 0 ? (margenContrib / totalPedidosConcretados) : 0;
+      const netoUnitProm = totalPedidosConcretados > 0 ? (utilidadNeta / totalPedidosConcretados) : 0;
 
-      // Días activos y Ventas diarias promedio
-      const diasVentasSet = new Set(datosDrop.ventas.map(v => v.fecha));
+      // Días activos y Ventas diarias promedio de pedidos concretados
+      const ventasConcretadasArr = datosDrop.ventas.filter(v => esPedidoConcretado(v.estado));
+      const diasVentasSet = new Set(ventasConcretadasArr.map(v => v.fecha));
       const diasActivos = diasVentasSet.size > 0 ? diasVentasSet.size : 1;
       const ventasPorDiaProm = totalVentas / diasActivos;
 
       // Actualizar Barra Superior de KPIs
       document.getElementById('kpi-ventas').textContent = formatoCLP(totalVentas);
-      document.getElementById('kpi-num-ventas').textContent = `${totalPedidos} pedidos`;
+      document.getElementById('kpi-num-ventas').textContent = `${totalPedidosConcretados} concretados (${totalPedidosTotales} tot)`;
       document.getElementById('kpi-ventas-dia').textContent = `Día: ${formatoCLP(ventasPorDiaProm)}`;
 
       document.getElementById('kpi-ticket-prom').textContent = formatoCLP(ticketProm);
@@ -2339,11 +2475,11 @@
       document.getElementById('diag-pedidos-equilibrio').textContent = `${pedidosEquilibrio} pedidos`;
       document.getElementById('kpi-break-even-mini').textContent = `Eq: ${formatoCLP(ventaEquilibrio)}`;
 
-      const cantConfirmados = conteoEstados['Confirmado'] || 0;
-      const tasaConfirmacion = totalPedidos > 0 ? ((cantConfirmados / totalPedidos) * 100).toFixed(1) : 0;
+      const cantConcretadosTotal = totalPedidosConcretados;
+      const tasaConcrecion = totalPedidosTotales > 0 ? ((cantConcretadosTotal / totalPedidosTotales) * 100).toFixed(1) : 0;
       const elBadgeConf = document.getElementById('diagnostico-efectividad-badge');
-      elBadgeConf.textContent = `${tasaConfirmacion}% Confirmados`;
-      elBadgeConf.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${Number(tasaConfirmacion) >= 70 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (Number(tasaConfirmacion) >= 40 ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-rose-950 text-rose-400 border border-rose-800')}`;
+      elBadgeConf.textContent = `${tasaConcrecion}% Concretados`;
+      elBadgeConf.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${Number(tasaConcrecion) >= 60 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (Number(tasaConcrecion) >= 35 ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-rose-950 text-rose-400 border border-rose-800')}`;
 
       // Texto de diagnóstico
       const elDiagTexto = document.getElementById('diagnostico-viabilidad-texto');
@@ -2352,9 +2488,9 @@
         elDiagTexto.textContent = `Operación sobre el punto de equilibrio (+${formatoCLP(superavit)}). El negocio cubre costos fijos y publicidad holgadamente.`;
       } else if (ventaEquilibrio > 0) {
         const deficit = ventaEquilibrio - totalVentas;
-        elDiagTexto.textContent = `Faltan ${formatoCLP(deficit)} (${Math.max(0, pedidosEquilibrio - totalPedidos)} pedidos) para alcanzar el punto de equilibrio este mes.`;
+        elDiagTexto.textContent = `Faltan ${formatoCLP(deficit)} (${Math.max(0, pedidosEquilibrio - totalPedidosConcretados)} pedidos) para alcanzar el punto de equilibrio este mes.`;
       } else {
-        elDiagTexto.textContent = 'Registra tus costos fijos y ventas para calibrar el punto de equilibrio.';
+        elDiagTexto.textContent = 'Registra tus costos fijos y pedidos concretados para calibrar el punto de equilibrio.';
       }
 
       // -------------------------------------------------------------
@@ -2380,12 +2516,12 @@
         else scoreRoas = 0;
       }
 
-      const scoreConf = Math.min(20, Math.max(0, Math.round((Number(tasaConfirmacion) / 100) * 20)));
+      const scoreConf = Math.min(20, Math.max(0, Math.round((Number(tasaConcrecion) / 100) * 20)));
       const ratioFijos = totalVentas > 0 ? (totalFijosMes / totalVentas) : 0;
       const scoreFijos = ratioFijos < 0.12 ? 15 : (ratioFijos < 0.25 ? 10 : 4);
 
       let viabilidadScore = Math.min(100, Math.max(0, Math.round(scoreNeto + scoreRoas + scoreConf + scoreFijos)));
-      if (totalPedidos === 0) viabilidadScore = 0;
+      if (totalPedidosTotales === 0) viabilidadScore = 0;
 
       const elViabScore = document.getElementById('kpi-viabilidad-score');
       const elViabBadge = document.getElementById('kpi-viabilidad-badge');
@@ -2406,7 +2542,7 @@
       } else {
         elViabScore.className = 'text-lg md:text-xl font-bold text-rose-400';
         elViabBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-rose-950 text-rose-400 border border-rose-800';
-        elViabBadge.textContent = totalPedidos === 0 ? 'Sin datos' : 'Crítico';
+        elViabBadge.textContent = totalPedidosTotales === 0 ? 'Sin datos' : 'Crítico';
       }
 
       // Etiquetas adicionales
@@ -2417,27 +2553,31 @@
       // -------------------------------------------------------------
       // 4. EMBUDO DE CONVERSIÓN DE PEDIDOS
       // -------------------------------------------------------------
-      const cantCancelados = conteoEstados['Cancelado'] || 0;
-      const tasaCancelacion = totalPedidos > 0 ? ((cantCancelados / totalPedidos) * 100).toFixed(1) : 0;
-      document.getElementById('tasa-efectividad-general').textContent = `${tasaConfirmacion}% Éxito`;
-      document.getElementById('funnel-confirmados-pct').textContent = `${tasaConfirmacion}% (${cantConfirmados} ped)`;
-      document.getElementById('funnel-cancelados-pct').textContent = `${tasaCancelacion}% (${cantCancelados} ped)`;
+      const cantCanceladosODevueltos = (conteoEstados['Cancelado'] || 0) + (conteoEstados['Devuelto'] || 0);
+      const tasaRechazo = totalPedidosTotales > 0 ? ((cantCanceladosODevueltos / totalPedidosTotales) * 100).toFixed(1) : 0;
+      document.getElementById('tasa-efectividad-general').textContent = `${tasaConcrecion}% Concretados`;
+      document.getElementById('funnel-confirmados-pct').textContent = `${tasaConcrecion}% (${cantConcretadosTotal} ped)`;
+      document.getElementById('funnel-cancelados-pct').textContent = `${tasaRechazo}% (${cantCanceladosODevueltos} ped)`;
 
       const configEstados = [
-        { nombre: 'Recibido', color: 'bg-sky-400', textColor: 'text-sky-300' },
-        { nombre: 'Notificado', color: 'bg-amber-400', textColor: 'text-amber-300' },
-        { nombre: 'Confirmado', color: 'bg-emerald-400', textColor: 'text-emerald-300' },
-        { nombre: 'Sin respuesta', color: 'bg-purple-400', textColor: 'text-purple-300' },
-        { nombre: 'Cancelado', color: 'bg-rose-400', textColor: 'text-rose-300' }
+        { nombre: 'Recibido', color: 'bg-sky-400', textColor: 'text-sky-300', label: '📥 Recibido' },
+        { nombre: 'Notificado', color: 'bg-amber-400', textColor: 'text-amber-300', label: '🔔 Notificado' },
+        { nombre: 'Confirmado', color: 'bg-emerald-400', textColor: 'text-emerald-300', label: '✅ Confirmado' },
+        { nombre: 'Despachado', color: 'bg-indigo-400', textColor: 'text-indigo-300', label: '🚚 Despachado' },
+        { nombre: 'Entregado', color: 'bg-teal-400', textColor: 'text-teal-300', label: '📦 Entregado' },
+        { nombre: 'Incidencia', color: 'bg-orange-400', textColor: 'text-orange-300', label: '⚠️ Incidencia' },
+        { nombre: 'Devuelto', color: 'bg-pink-400', textColor: 'text-pink-300', label: '🔄 Devuelto' },
+        { nombre: 'Sin respuesta', color: 'bg-purple-400', textColor: 'text-purple-300', label: '⏳ Sin resp.' },
+        { nombre: 'Cancelado', color: 'bg-rose-400', textColor: 'text-rose-300', label: '❌ Cancelado' }
       ];
 
       document.getElementById('contenedor-embudo-estados').innerHTML = configEstados.map(cfg => {
         const cant = conteoEstados[cfg.nombre] || 0;
-        const pct = totalPedidos > 0 ? ((cant / totalPedidos) * 100).toFixed(1) : 0;
+        const pct = totalPedidosTotales > 0 ? ((cant / totalPedidosTotales) * 100).toFixed(1) : 0;
         return `
           <div>
             <div class="flex justify-between text-xs mb-1">
-              <span class="font-medium text-slate-300">${cfg.nombre}</span>
+              <span class="font-medium text-slate-300">${cfg.label}</span>
               <span class="font-mono ${cfg.textColor} font-semibold">${cant} (${pct}%)</span>
             </div>
             <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/80">
@@ -2448,12 +2588,12 @@
       }).join('');
 
       // -------------------------------------------------------------
-      // 5. TOP PRODUCTOS / PEDIDOS RENTABLES
+      // 5. TOP PRODUCTOS / PEDIDOS RENTABLES (CONCRETADOS)
       // -------------------------------------------------------------
       const listaTop = Object.values(productosMap).sort((a, b) => b.margen - a.margen).slice(0, 5);
       const tablaTop = document.getElementById('tabla-top-productos');
       if (listaTop.length === 0) {
-        tablaTop.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500">Sin datos de pedidos en este período.</td></tr>';
+        tablaTop.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500">Sin pedidos concretados en este período.</td></tr>';
         document.getElementById('top-total-generado').textContent = '$0 margen';
       } else {
         tablaTop.innerHTML = listaTop.map((item, idx) => {
@@ -2471,8 +2611,8 @@
             </tr>
           `;
         }).join('');
-        const sumaMargenTop = listaTop.reduce((acc, i) => acc + i.margen, 0);
-        document.getElementById('top-total-generado').textContent = `${formatoCLP(sumaMargenTop)} margen Top 5`;
+        const sumaTopMargen = listaTop.reduce((acc, x) => acc + x.margen, 0);
+        document.getElementById('top-total-generado').textContent = `${formatoCLP(sumaTopMargen)} margen`;
       }
 
       // Actualizar Simulador
@@ -3449,6 +3589,7 @@
       const fecha = document.getElementById('v-fecha').value;
       const detalle = document.getElementById('v-detalle').value.trim();
       const estado = document.getElementById('v-estado')?.value || 'Recibido';
+      const ot = document.getElementById('v-ot')?.value?.trim() || '';
       const ingreso = Number(document.getElementById('v-ingreso').value);
       const costoProd = Number(document.getElementById('v-costo-prod').value);
       const costoEnvio = Number(document.getElementById('v-costo-envio').value || 0);
@@ -3474,10 +3615,13 @@
 
         if (insertRes.data && insertRes.data[0] && insertRes.data[0].id) {
           guardarEstadoPedidoLocal(insertRes.data[0].id, estado);
+          if (ot) guardarOtPedidoLocal(insertRes.data[0].id, ot);
         }
         
         mostrarToast('¡Pedido guardado con éxito!', 'success');
         document.getElementById('v-detalle').value = '';
+        const elOt = document.getElementById('v-ot');
+        if (elOt) elOt.value = '';
         document.getElementById('v-ingreso').value = '';
         document.getElementById('v-costo-prod').value = '';
         document.getElementById('v-costo-envio').value = '';
@@ -3684,15 +3828,17 @@
       if (!canvasEvo || !canvasDist) return;
 
       // -------------------------------------------------------------
-      // 1. GRÁFICO DE TENDENCIA DIARIA: VENTAS, COSTOS & UTILIDAD
+      // 1. GRÁFICO DE TENDENCIA DIARIA: VENTAS, COSTOS & UTILIDAD (PEDIDOS CONCRETADOS)
       // -------------------------------------------------------------
       const diasMap = {};
       datosDrop.ventas.forEach(v => {
         const dia = v.fecha;
         if (!diasMap[dia]) diasMap[dia] = { ventas: 0, costos: 0, ads: 0 };
-        const costoDirecto = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
-        diasMap[dia].ventas += Number(v.ingreso_total || 0);
-        diasMap[dia].costos += costoDirecto;
+        if (esPedidoConcretado(v.estado)) {
+          const costoDirecto = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
+          diasMap[dia].ventas += Number(v.ingreso_total || 0);
+          diasMap[dia].costos += costoDirecto;
+        }
       });
 
       // Distribuir gasto de Ads por fecha si coincide
@@ -3715,7 +3861,7 @@
           labels: labels.length > 0 ? labels.map(d => d.slice(5)) : ['Sin datos'],
           datasets: [
             {
-              label: 'Ventas ($)',
+              label: 'Ventas Concretadas ($)',
               data: labels.map(d => diasMap[d].ventas),
               borderColor: '#34d399',
               backgroundColor: 'rgba(52, 211, 153, 0.12)',
@@ -3774,9 +3920,10 @@
       // -------------------------------------------------------------
       // 2. GRÁFICO DE DESGLOSE SEGMENTADO DE CADA COSTO (DONA)
       // -------------------------------------------------------------
-      let totalCostoProd = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_producto || 0), 0);
-      let totalCostoEnvio = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_envio || 0), 0);
-      let totalComisionDropi = datosDrop.ventas.reduce((acc, v) => acc + Number(v.comision_dropi || 0), 0);
+      const ventasConcretadas = datosDrop.ventas.filter(v => esPedidoConcretado(v.estado));
+      let totalCostoProd = ventasConcretadas.reduce((acc, v) => acc + Number(v.costo_producto || 0), 0);
+      let totalCostoEnvio = ventasConcretadas.reduce((acc, v) => acc + Number(v.costo_envio || 0), 0);
+      let totalComisionDropi = ventasConcretadas.reduce((acc, v) => acc + Number(v.comision_dropi || 0), 0);
       let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
       let totalFijosMes = datosDrop.costos.reduce((acc, c) => acc + Number(c.monto || 0) / (c.frecuencia_dias === 90 ? 3 : (c.frecuencia_dias === 365 ? 12 : 1)), 0);
 
@@ -3833,26 +3980,28 @@
       }).join('');
 
       // -------------------------------------------------------------
-      // 3. GRÁFICO DE ESTADOS DE PEDIDOS POR FECHA (STACKED BARS)
+      // 3. GRÁFICO DE ESTADOS DE PEDIDOS POR FECHA (STACKED BARS CON 9 ESTADOS)
       // -------------------------------------------------------------
       if (canvasEstados) {
+        const estadosTodos = ['Recibido', 'Notificado', 'Confirmado', 'Despachado', 'Entregado', 'Incidencia', 'Devuelto', 'Sin respuesta', 'Cancelado'];
         const diasEstadosMap = {};
         datosDrop.ventas.forEach(v => {
           const dia = v.fecha || 'Sin fecha';
           if (!diasEstadosMap[dia]) {
-            diasEstadosMap[dia] = {
-              'Recibido': 0,
-              'Notificado': 0,
-              'Confirmado': 0,
-              'Sin respuesta': 0,
-              'Cancelado': 0
-            };
+            diasEstadosMap[dia] = {};
+            estadosTodos.forEach(e => { diasEstadosMap[dia][e] = 0; });
           }
-          const est = v.estado || 'Recibido';
+          const est = (v.estado || 'Recibido').trim();
           if (diasEstadosMap[dia][est] !== undefined) {
             diasEstadosMap[dia][est]++;
           } else {
-            diasEstadosMap[dia]['Recibido']++;
+            // Emparejar por similitud si mayúsculas/minúsculas difieren
+            const coincidencia = estadosTodos.find(e => e.toLowerCase() === est.toLowerCase());
+            if (coincidencia) {
+              diasEstadosMap[dia][coincidencia]++;
+            } else {
+              diasEstadosMap[dia]['Recibido']++;
+            }
           }
         });
 
@@ -3860,53 +4009,44 @@
         const ctxEstados = canvasEstados.getContext('2d');
         if (chartPedidosEstados) chartPedidosEstados.destroy();
 
+        const colorMapEstados = {
+          'Recibido': '#38bdf8',
+          'Notificado': '#fbbf24',
+          'Confirmado': '#34d399',
+          'Despachado': '#818cf8',
+          'Entregado': '#2dd4bf',
+          'Incidencia': '#fb923c',
+          'Devuelto': '#f472b6',
+          'Sin respuesta': '#c084fc',
+          'Cancelado': '#f87171'
+        };
+
         chartPedidosEstados = new Chart(ctxEstados, {
           type: 'bar',
           data: {
             labels: diasLabels.length > 0 ? diasLabels.map(d => d.slice(5)) : ['Sin datos'],
-            datasets: [
-              {
-                label: 'Recibido',
-                data: diasLabels.map(d => diasEstadosMap[d]['Recibido']),
-                backgroundColor: '#38bdf8',
-                stack: 'pedidos',
-                borderRadius: 2
-              },
-              {
-                label: 'Notificado',
-                data: diasLabels.map(d => diasEstadosMap[d]['Notificado']),
-                backgroundColor: '#fbbf24',
-                stack: 'pedidos',
-                borderRadius: 2
-              },
-              {
-                label: 'Confirmado',
-                data: diasLabels.map(d => diasEstadosMap[d]['Confirmado']),
-                backgroundColor: '#34d399',
-                stack: 'pedidos',
-                borderRadius: 2
-              },
-              {
-                label: 'Sin respuesta',
-                data: diasLabels.map(d => diasEstadosMap[d]['Sin respuesta']),
-                backgroundColor: '#c084fc',
-                stack: 'pedidos',
-                borderRadius: 2
-              },
-              {
-                label: 'Cancelado',
-                data: diasLabels.map(d => diasEstadosMap[d]['Cancelado']),
-                backgroundColor: '#f87171',
-                stack: 'pedidos',
-                borderRadius: 2
-              }
-            ]
+            datasets: estadosTodos.map(est => ({
+              label: est,
+              data: diasLabels.map(d => diasEstadosMap[d][est] || 0),
+              backgroundColor: colorMapEstados[est],
+              stack: 'pedidos',
+              borderRadius: 2
+            }))
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { display: false },
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  color: '#94a3b8',
+                  boxWidth: 10,
+                  font: { size: 9 },
+                  padding: 8
+                }
+              },
               tooltip: {
                 callbacks: {
                   label: function(context) {
@@ -4180,6 +4320,8 @@
       if (elFecha) elFecha.value = p.fecha || hoyFechaStr;
       const elEstado = document.getElementById('edit-p-estado');
       if (elEstado) elEstado.value = p.estado || 'Recibido';
+      const elOt = document.getElementById('edit-p-ot');
+      if (elOt) elOt.value = p.numero_ot || obtenerOtPedido(p.id, '');
       const elDetalle = document.getElementById('edit-p-detalle');
       if (elDetalle) elDetalle.value = p.cliente_detalle || '';
       const elIngreso = document.getElementById('edit-p-ingreso');
@@ -4205,6 +4347,7 @@
       const id = document.getElementById('edit-p-id')?.value;
       const fecha = document.getElementById('edit-p-fecha')?.value;
       const estado = document.getElementById('edit-p-estado')?.value;
+      const ot = document.getElementById('edit-p-ot')?.value?.trim() || '';
       const detalle = document.getElementById('edit-p-detalle')?.value?.trim() || '';
       const ingreso = Number(document.getElementById('edit-p-ingreso')?.value || 0);
       const costoProd = Number(document.getElementById('edit-p-costo-prod')?.value || 0);
@@ -4214,6 +4357,7 @@
       if (!id) return;
 
       guardarEstadoPedidoLocal(id, estado);
+      guardarOtPedidoLocal(id, ot);
 
       const payload = {
         fecha: fecha,
