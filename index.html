@@ -3231,20 +3231,23 @@
       if (!val) return hoyFechaStr;
       if (val instanceof Date) {
         if (isNaN(val.getTime())) return hoyFechaStr;
-        const y = val.getFullYear();
-        const m = String(val.getMonth() + 1).padStart(2, '0');
-        const d = String(val.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
+        try {
+          return val.toISOString().slice(0, 10);
+        } catch (e) {
+          const y = val.getFullYear();
+          const m = String(val.getMonth() + 1).padStart(2, '0');
+          const d = String(val.getDate()).padStart(2, '0');
+          return `${y}-${m}-${d}`;
+        }
       }
       if (typeof val === 'number') {
         if (val > 20000 && val < 60000) {
           // Código serial de fecha Excel
           const jsDate = new Date(Math.round((val - 25569) * 86400 * 1000));
           if (!isNaN(jsDate.getTime())) {
-            const y = jsDate.getUTCFullYear();
-            const m = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
-            const d = String(jsDate.getUTCDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+            try {
+              return jsDate.toISOString().slice(0, 10);
+            } catch (e) {}
           }
         }
       }
@@ -3257,27 +3260,37 @@
         if (num > 20000 && num < 60000) {
           const jsDate = new Date(Math.round((num - 25569) * 86400 * 1000));
           if (!isNaN(jsDate.getTime())) {
-            const y = jsDate.getUTCFullYear();
-            const m = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
-            const d = String(jsDate.getUTCDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+            try {
+              return jsDate.toISOString().slice(0, 10);
+            } catch (e) {}
           }
         }
       }
 
+      // Si viene con ISO Timestamp con 'T' (ej: "2026-08-17T00:39:49Z" o "2026-08-17T02:25:07.000-04:00")
       if (s.includes('T')) {
-        const p = s.split('T')[0];
-        if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return p;
+        const p = s.split('T')[0].trim();
+        const matchISO = p.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+        if (matchISO) {
+          return `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
+        }
       }
-      const justDate = s.split(/\s+/)[0];
-      const matchYMD = justDate.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+
+      // Si viene con espacio separando fecha y hora (ej: "2026-08-17 00:39:49" o "17/08/2026 14:30")
+      const justDate = s.split(/\s+/)[0].trim();
+
+      // Formato YYYY-MM-DD o YYYY/MM/DD
+      const matchYMD = justDate.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
       if (matchYMD) {
         return `${matchYMD[1]}-${matchYMD[2].padStart(2, '0')}-${matchYMD[3].padStart(2, '0')}`;
       }
-      const matchDMY = justDate.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+
+      // Formato DD-MM-YYYY o DD/MM/YYYY
+      const matchDMY = justDate.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
       if (matchDMY) {
         return `${matchDMY[3]}-${matchDMY[2].padStart(2, '0')}-${matchDMY[1].padStart(2, '0')}`;
       }
+
       const matchGeneral = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
       if (matchGeneral) {
         let year = matchGeneral[3];
@@ -3321,6 +3334,8 @@
         ('tipo_de_medio_de_pago' in cleanRow) ||
         ('tipo_de_operacion' in cleanRow) ||
         ('canal_de_venta' in cleanRow) ||
+        ('fecha_de_pago' in cleanRow) ||
+        ('fecha_pago' in cleanRow) ||
         ('plataforma_de_cobro' in cleanRow);
 
       let fechaRaw = null;
@@ -3345,20 +3360,48 @@
 
         montoNum = parsearMontoUniversal(rawMonto);
 
-        // Fecha: preferir settlement_date o transaction_date o money_release_date
+        // Fecha: preferir settlement_date, fecha_de_pago, transaction_date, etc.
         fechaRaw = cleanRow['settlement_date'] ??
+          cleanRow['fecha_de_pago'] ??
+          cleanRow['fecha_pago'] ??
+          cleanRow['payment_date'] ??
           cleanRow['fecha_de_liberacion_del_dinero'] ??
           cleanRow['fecha_de_liberacion_del_cobro'] ??
+          cleanRow['fecha_de_liberacion'] ??
           cleanRow['fecha_de_acreditacion'] ??
+          cleanRow['fecha_acreditacion'] ??
           cleanRow['fecha_de_aprobacion'] ??
+          cleanRow['fecha_aprobacion'] ??
           cleanRow['transaction_date'] ??
           cleanRow['fecha_de_origen'] ??
           cleanRow['fecha_de_operacion'] ??
+          cleanRow['fecha_operacion'] ??
           cleanRow['fecha_de_creacion'] ??
+          cleanRow['fecha_creacion'] ??
           cleanRow['fecha_de_cobro'] ??
+          cleanRow['fecha_cobro'] ??
           cleanRow['money_release_date'] ??
+          cleanRow['fecha_de_transaccion'] ??
+          cleanRow['fecha_transaccion'] ??
+          cleanRow['fecha_de_movimiento'] ??
+          cleanRow['fecha_movimiento'] ??
+          cleanRow['fecha_valor'] ??
+          cleanRow['fecha_contable'] ??
           cleanRow['fecha'] ??
           cleanRow['date'];
+
+        // Si no se encontró por nombres directos, buscar cualquier clave con fecha
+        if (!fechaRaw) {
+          for (let k in cleanRow) {
+            const val = cleanRow[k];
+            if (val !== null && val !== undefined && val !== '') {
+              if (k.includes('fecha') || k.includes('date') || k.includes('fec') || k.includes('pago') || k.includes('time') || k.includes('periodo')) {
+                fechaRaw = val;
+                break;
+              }
+            }
+          }
+        }
 
         // Construir detalle descriptivo
         const srcId = String(cleanRow['source_id'] ?? cleanRow['id_de_operacion_en_mercado_pago'] ?? cleanRow['id_de_la_operacion'] ?? cleanRow['id_de_operacion'] ?? cleanRow['id_operacion'] ?? '').trim();
@@ -3417,7 +3460,7 @@
             continue;
           }
 
-          if (!fechaRaw && (k.includes('fecha') || k.includes('date') || k.includes('fec') || k.includes('periodo'))) {
+          if (!fechaRaw && (k.includes('fecha') || k.includes('date') || k.includes('fec') || k.includes('periodo') || k.includes('pago'))) {
             fechaRaw = val;
           }
 
@@ -3447,6 +3490,21 @@
 
         if (!desc) desc = 'Movimiento Bancario';
         destinoSugerido = (montoNum !== null && montoNum < 0) ? 'gasto' : 'ingreso';
+      }
+
+      // Si fechaRaw sigue siendo nula, buscar en las celdas del objeto original cualquier valor de fecha
+      if (!fechaRaw) {
+        for (let k in row) {
+          const val = row[k];
+          if (val instanceof Date) {
+            fechaRaw = val;
+            break;
+          }
+          if (typeof val === 'string' && /^\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(val.trim())) {
+            fechaRaw = val;
+            break;
+          }
+        }
       }
 
       if (montoNum === null || isNaN(montoNum) || montoNum === 0) {
@@ -3571,7 +3629,8 @@
         'id_de_la_operacion', 'id_de_operacion', 'id_operacion', 'monto_neto', 'valor_de_la_compra',
         'tipo_de_operacion', 'fecha', 'date', 'monto', 'amount', 'cargo', 'abono', 'debito', 'credito',
         'egreso', 'ingreso', 'detalle', 'descripcion', 'glosa', 'concepto', 'operacion', 'valor',
-        'importe', 'neto', 'total', 'saldo', 'cliente', 'referencia', 'motivo', 'comercio', 'beneficiario'
+        'importe', 'neto', 'total', 'saldo', 'cliente', 'referencia', 'motivo', 'comercio', 'beneficiario',
+        'fecha_de_pago', 'pago', 'payment'
       ];
 
       for (let r = 0; r < Math.min(matrix.length, 25); r++) {
