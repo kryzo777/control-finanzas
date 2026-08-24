@@ -1972,6 +1972,29 @@
       }
     }
 
+    // Helper de reintento automático para operaciones con Supabase / PostgREST (cuando el schema cache está en calentamiento o reinicio)
+    async function ejecutarConReintentos(fnConsulta, maxIntentos = 4, esperaBase = 800) {
+      let ultimoResultado = null;
+      for (let intento = 1; intento <= maxIntentos; intento++) {
+        try {
+          const resultado = await fnConsulta();
+          ultimoResultado = resultado;
+          if (resultado && resultado.error) {
+            const msg = (resultado.error.message || '').toLowerCase();
+            if (msg.includes('schema cache') || msg.includes('failed to fetch') || msg.includes('retrying') || msg.includes('503') || msg.includes('502')) {
+              await new Promise(r => setTimeout(r, esperaBase * intento));
+              continue;
+            }
+          }
+          return resultado;
+        } catch (err) {
+          ultimoResultado = { data: null, error: err };
+          await new Promise(r => setTimeout(r, esperaBase * intento));
+        }
+      }
+      return ultimoResultado || { data: null, error: new Error('Error al conectar con la base de datos tras reintentos.') };
+    }
+
     // ==========================================
     // CARGAR DATOS CON FILTRO FLEXIBLE
     // ==========================================
@@ -2018,12 +2041,12 @@
 
       try {
         const [resVentas, resAds, resCostos, resHon, resGastosPers, resInv] = await Promise.all([
-          qVentas,
-          qAds,
-          db.from('costos_recurrentes').select('*').eq('activo', true),
-          qHon,
-          qGastos,
-          qInv
+          ejecutarConReintentos(() => qVentas),
+          ejecutarConReintentos(() => qAds),
+          ejecutarConReintentos(() => db.from('costos_recurrentes').select('*').eq('activo', true)),
+          ejecutarConReintentos(() => qHon),
+          ejecutarConReintentos(() => qGastos),
+          ejecutarConReintentos(() => qInv)
         ]);
 
         datosDrop.ventas = (resVentas?.data || []).map(v => ({
@@ -4486,9 +4509,24 @@
         comision_dropi: f.comision_dropi
       }));
 
-      const { error } = await db.from('ventas').insert(filasParaDB);
-      if (error) {
-        mostrarToast('Error al importar pedidos: ' + error.message, 'error');
+      // Inserción por lotes con reintentos para no sobrecargar PostgREST
+      const BATCH_SIZE = 50;
+      let errorOcurrido = null;
+      let pedidosInsertados = 0;
+
+      for (let i = 0; i < filasParaDB.length; i += BATCH_SIZE) {
+        const batch = filasParaDB.slice(i, i + BATCH_SIZE);
+        const { error } = await ejecutarConReintentos(() => db.from('ventas').insert(batch), 4, 1000);
+        if (error) {
+          errorOcurrido = error;
+          break;
+        }
+        pedidosInsertados += batch.length;
+        btn.textContent = `Guardando (${pedidosInsertados}/${filasParaDB.length})...`;
+      }
+
+      if (errorOcurrido) {
+        mostrarToast('Error al importar pedidos: ' + errorOcurrido.message, 'error');
         btn.disabled = false;
         btn.textContent = 'Confirmar y Cargar a Supabase';
       } else {
