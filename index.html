@@ -425,12 +425,23 @@
               <span id="btn-toggle-form-pedido-texto">Registrar Pedido Manual</span>
             </button>
             <button onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-sky-600/20 cursor-pointer">
-              <span>📁 Cargar Archivo de Pedidos (CSV / Excel)</span>
+              <span>📁 Cargar Archivo (CSV / Excel)</span>
             </button>
             <button id="btn-eliminar-pedidos-marcados" onclick="eliminarPedidosSeleccionados()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 cursor-pointer">
               <span>🗑️ Eliminar Marcados</span>
             </button>
           </div>
+        </div>
+
+        <!-- Zona Drag & Drop para Cargar Archivos de Pedidos al Instante -->
+        <div id="dropzone-pedidos-tab" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-900/60 hover:bg-slate-800/40 p-4 rounded-2xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group shadow-inner" onclick="document.getElementById('input-pedidos-directo-tab').click()">
+          <div class="flex items-center gap-2 text-sky-400 group-hover:scale-105 transition-transform">
+            <span class="text-2xl">📥</span>
+            <span class="text-xs font-bold text-slate-100">Arrastra y suelta tu archivo de pedidos aquí</span>
+            <span class="text-[10px] text-sky-300 bg-sky-950/80 px-2 py-0.5 rounded-full border border-sky-800/60 font-mono font-semibold">.CSV / .XLSX / .XLS</span>
+          </div>
+          <p class="text-[11px] text-slate-400">O haz clic para seleccionarlo — Compatible con exportaciones masivas de Shopify, Dropi y Excel</p>
+          <input type="file" id="input-pedidos-directo-tab" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoPedidosDirecto(event)">
         </div>
 
         <!-- Formulario Manual para Registrar Pedido (Desplegable / Acordeón) -->
@@ -700,6 +711,16 @@
                 <span>🗑️ Eliminar Marcados</span>
               </button>
             </div>
+          </div>
+
+          <!-- Zona Drag & Drop para Cartola en la Pestaña -->
+          <div id="dropzone-cartola-tab" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/50 hover:bg-slate-800/40 p-4 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1 group shadow-inner" onclick="document.getElementById('input-cartola-directa').click()">
+            <div class="flex items-center gap-2 text-sky-400 group-hover:scale-105 transition-transform">
+              <span class="text-2xl">📥</span>
+              <span class="text-xs font-bold text-slate-100">Arrastra tu cartola bancaria aquí</span>
+              <span class="text-[10px] text-sky-300 bg-sky-950/80 px-2 py-0.5 rounded-full border border-sky-800/60 font-mono font-semibold">.CSV / .XLSX / .XLS</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Compatible con Mercado Pago, Santander, Banco de Chile, Banco Estado, BCI, Falabella, Tenpo y más</p>
           </div>
 
           <!-- Controles de Búsqueda y Filtros Rápidos -->
@@ -1200,31 +1221,44 @@
     </div>
   </div>
 
-  <!-- MODAL CSV SHOPIFY -->
+  <!-- MODAL CSV / EXCEL PEDIDOS (SHOPIFY / DROPI) -->
   <div id="modal-csv" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <div><h2 class="text-lg font-bold text-white">Importar Pedidos Masivos (CSV Shopify)</h2></div>
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2"><span>📦</span> Importar Pedidos Masivos (CSV / Excel)</h2>
+          <p class="text-xs text-slate-400">Compatible con Shopify, Dropi y planillas estándar con detección automática de columnas</p>
+        </div>
         <button onclick="cerrarModalCSV()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
+
+      <!-- Dropzone dentro del Modal -->
+      <div id="dropzone-csv-modal" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/60 p-4 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1 group" onclick="document.getElementById('input-csv').click()">
+        <span class="text-2xl group-hover:scale-110 transition-transform">📁</span>
+        <span class="text-xs font-semibold text-sky-400">Arrastra tu archivo aquí (.csv, .xlsx o .xls) o haz clic para seleccionarlo</span>
+        <span class="text-[10px] text-slate-500">Detecta automáticamente columnas de pedidos, ventas, clientes y trackings</span>
+        <input type="file" id="input-csv" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoPedidosDirecto(event)">
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
-        <div class="md:col-span-4"><input type="file" id="input-csv" accept=".csv" class="w-full text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white cursor-pointer"></div>
         <div><label class="text-slate-400">Costo Producto ($)</label><input type="number" id="csv-def-prod" value="0" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-100 mt-1" oninput="aplicarValoresDefecto()"></div>
         <div><label class="text-slate-400">Costo Envío ($)</label><input type="number" id="csv-def-envio" value="0" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-100 mt-1" oninput="aplicarValoresDefecto()"></div>
         <div><label class="text-slate-400">Comisión Dropi ($)</label><input type="number" id="csv-def-dropi" value="0" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-100 mt-1" oninput="aplicarValoresDefecto()"></div>
-        <div class="flex items-end"><button type="button" onclick="aplicarValoresDefecto()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 py-1.5 rounded text-xs">Aplicar a todos</button></div>
+        <div class="flex items-end"><button type="button" onclick="aplicarValoresDefecto()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 py-1.5 rounded text-xs cursor-pointer">Aplicar a todos</button></div>
       </div>
       <div class="flex-1 overflow-y-auto border border-slate-800 rounded-xl bg-slate-950/60 min-h-[200px]">
         <table class="w-full text-left text-xs text-slate-300">
-          <thead class="bg-slate-800/90 sticky top-0 text-slate-400"><tr><th class="p-2">Fecha</th><th class="p-2">Pedido</th><th class="p-2 text-right">Venta</th><th class="p-2 text-right">Prod</th><th class="p-2 text-right">Envío</th><th class="p-2 text-right">Dropi</th></tr></thead>
-          <tbody id="csv-preview-body" class="divide-y divide-slate-800"></tbody>
+          <thead class="bg-slate-800/90 sticky top-0 text-slate-400"><tr><th class="p-2">Fecha</th><th class="p-2">Pedido / Detalle</th><th class="p-2 text-right">Venta</th><th class="p-2 text-right">Prod</th><th class="p-2 text-right">Envío</th><th class="p-2 text-right">Dropi</th></tr></thead>
+          <tbody id="csv-preview-body" class="divide-y divide-slate-800">
+            <tr><td colspan="6" class="p-6 text-center text-slate-500">Selecciona o arrastra un archivo para previsualizar los pedidos.</td></tr>
+          </tbody>
         </table>
       </div>
       <div class="flex justify-between items-center pt-2 border-t border-slate-800">
         <span id="csv-contador" class="text-xs text-slate-400">0 pedidos listos</span>
         <div class="space-x-2">
           <button onclick="cerrarModalCSV()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white">Cancelar</button>
-          <button id="btn-confirmar-csv" onclick="guardarCSVEnSupabase()" disabled class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white transition">Confirmar y Cargar</button>
+          <button id="btn-confirmar-csv" onclick="guardarCSVEnSupabase()" disabled class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white transition cursor-pointer">Confirmar y Cargar</button>
         </div>
       </div>
     </div>
@@ -3077,6 +3111,138 @@
     }
 
     // =========================================================
+    // UTILIDADES UNIVERSALES DE PARSEO DE ARCHIVOS Y MONTOS
+    // =========================================================
+    function parsearMontoUniversal(val) {
+      if (val === null || val === undefined || val === '') return null;
+      if (typeof val === 'number') return isNaN(val) ? null : val;
+      let s = String(val).trim();
+      if (!s) return null;
+      s = s.replace(/[$€£CLP\s]/gi, '').trim();
+      if (!s) return null;
+
+      // Decimal estándar con punto: -2500.00, 160000.00, 56.00
+      if (/^-?\d+\.\d{1,2}$/.test(s)) {
+        return parseFloat(s);
+      }
+      // Decimal estándar con coma: -2500,00, 56,00
+      if (/^-?\d+,\d{1,2}$/.test(s)) {
+        return parseFloat(s.replace(',', '.'));
+      }
+      // Formato chileno/europeo con puntos de miles y coma decimal: 1.000.000,50
+      if (s.includes('.') && s.includes(',')) {
+        s = s.replace(/\./g, '').replace(',', '.');
+        return parseFloat(s);
+      }
+      // Múltiples puntos (ej: 1.000.000 o -2.500.000)
+      if ((s.match(/\./g) || []).length > 1) {
+        s = s.replace(/\./g, '');
+        return parseFloat(s);
+      }
+      // Punto único seguido de 3 dígitos (ej: 25.000 o 100.000 o -2.500)
+      if (/^-?\d+\.\d{3}$/.test(s)) {
+        s = s.replace(/\./g, '');
+        return parseFloat(s);
+      }
+      // Coma única seguida de 3 dígitos (ej: 25,000 o 100,000)
+      if (/^-?\d+,\d{3}$/.test(s)) {
+        s = s.replace(/,/g, '');
+        return parseFloat(s);
+      }
+      s = s.replace(/\./g, '').replace(',', '.');
+      const res = parseFloat(s);
+      return isNaN(res) ? null : res;
+    }
+
+    function extraerFechaUniversal(val) {
+      if (!val) return hoyFechaStr;
+      if (val instanceof Date) {
+        return val.toISOString().slice(0, 10);
+      }
+      const s = String(val).trim();
+      if (s.includes('T')) {
+        const p = s.split('T')[0];
+        if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return p;
+      }
+      const matchYMD = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+      if (matchYMD) {
+        return `${matchYMD[1]}-${matchYMD[2].padStart(2, '0')}-${matchYMD[3].padStart(2, '0')}`;
+      }
+      const matchDMY = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (matchDMY) {
+        return `${matchDMY[3]}-${matchDMY[2].padStart(2, '0')}-${matchDMY[1].padStart(2, '0')}`;
+      }
+      return hoyFechaStr;
+    }
+
+    function construirDescripcionYDestino(row, montoNum) {
+      let desc = '';
+      let destinoSugerido = montoNum < 0 ? 'gasto' : 'ingreso';
+      let catSugerida = 'Otros';
+
+      const tieneMpFields = ('TRANSACTION_TYPE' in row) || ('PAYMENT_METHOD_TYPE' in row) || ('SETTLEMENT_DATE' in row) || ('SOURCE_ID' in row) || ('BUSINESS_UNIT' in row);
+      
+      if (tieneMpFields) {
+        const parts = [];
+        const bu = (row['BUSINESS_UNIT'] || row['business_unit'] || '').trim();
+        const tt = (row['TRANSACTION_TYPE'] || row['transaction_type'] || '').trim();
+        const pm = (row['PAYMENT_METHOD_TYPE'] || row['payment_method_type'] || '').trim();
+        const src = (row['SOURCE_ID'] || row['source_id'] || '').trim();
+
+        if (bu) parts.push(bu);
+        else parts.push('Mercado Pago');
+
+        if (tt) {
+          if (tt === 'SETTLEMENT') parts.push('Liquidación');
+          else if (tt === 'CASHBACK') parts.push('Reintegro Cashback');
+          else parts.push(tt);
+        }
+        if (pm) {
+          if (pm === 'bank_transfer') parts.push('(Transferencia Bancaria)');
+          else if (pm === 'available_money') parts.push('(Dinero en Cuenta)');
+          else parts.push(`(${pm})`);
+        }
+        if (src) parts.push(`#${src}`);
+
+        desc = parts.join(' ');
+      } else {
+        for (let key in row) {
+          const k = key.toLowerCase();
+          if (!desc && (k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('concepto') || k.includes('movimiento') || k.includes('comercio') || k.includes('tipo') || k.includes('beneficiario') || k.includes('motivo'))) {
+            const val = String(row[key] || '').trim();
+            if (val) desc = val;
+          }
+        }
+      }
+
+      if (!desc) desc = 'Movimiento Bancario';
+      const descLower = desc.toLowerCase();
+
+      if (montoNum < 0) {
+        destinoSugerido = 'gasto';
+        if (/lider|jumbo|tottus|unimarc|santa isabel|supermercado|almacen|pedidosya|rappi|uber eats|mcdonald|burger|starbucks|cafe|restauran|pizza|sushi|comida|panaderia/i.test(descLower)) {
+          catSugerida = 'Supermercado/Comida';
+        } else if (/enel|cge|aguas|essbio|vtr|wom|entel|movistar|claro|autopista|tag|costanera|vespucio|gasco|lipigas|abastible|luz|agua|gas|internet|servicios/i.test(descLower)) {
+          catSugerida = 'Servicios Básicos';
+        } else if (/uber|didi|cabify|copec|shell|petrobras|bencina|combustible|estacionamiento|peaje|metro|bip|auto|taller|mecanico|repuesto/i.test(descLower)) {
+          catSugerida = 'Transporte/Auto';
+        } else if (/netflix|spotify|prime|disney|hbo|max|apple|google|youtube|steam|playstation|cine|cinehoyts|cinemark|gym|smartfit|farmacia|cruz verde|ahumada|salcobrand|dr simi|ocio/i.test(descLower)) {
+          catSugerida = 'Ocio/Personal';
+        } else if (/arriendo|gasto comun|ggcc|condominio|inmobiliaria|vivienda|departamento/i.test(descLower)) {
+          catSugerida = 'Vivienda/Arriendo';
+        }
+      } else {
+        if (/fintual|racional|trii|buda|binance|crypto|larrain vial|banchile|santander corredores|inversion|deposito a plazo/i.test(descLower)) {
+          destinoSugerido = 'inversion';
+        } else {
+          destinoSugerido = 'ingreso';
+        }
+      }
+
+      return { desc, destinoSugerido, catSugerida };
+    }
+
+    // =========================================================
     // MODAL DE CARGA DE NUEVAS CARTOLAS (XLSX / CSV)
     // =========================================================
     function abrirModalSubirCartola() {
@@ -3091,32 +3257,37 @@
     }
 
     function procesarArchivoCartolaDirecto(event) {
-      const file = event.target.files[0];
+      const file = event.target.files && event.target.files[0];
       if (file) procesarArchivoCartolaGenerico(file);
     }
 
     async function procesarArchivoCartolaGenerico(file) {
       const fileName = file.name.toLowerCase();
-      const reader = new FileReader();
 
+      if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        parsearComoBinarioCartola(file);
+        return;
+      }
+
+      const reader = new FileReader();
       reader.onload = function(e) {
         const textContent = e.target.result;
-        if (textContent.includes(',') || textContent.includes(';') || textContent.includes('\t') || fileName.endsWith('.csv')) {
-          Papa.parse(textContent, {
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-              if (results.data && results.data.length > 0) {
-                analizarDatosParaModalCartola(results.data);
-                return;
-              }
+        Papa.parse(textContent, {
+          header: true,
+          skipEmptyLines: true,
+          dynamicTyping: false,
+          delimitersToGuess: [';', ',', '\t', '|'],
+          complete: function(results) {
+            if (results.data && results.data.length > 0) {
+              analizarDatosParaModalCartola(results.data);
+            } else {
               parsearComoBinarioCartola(file);
-            },
-            error: function() { parsearComoBinarioCartola(file); }
-          });
-        } else {
-          parsearComoBinarioCartola(file);
-        }
+            }
+          },
+          error: function() {
+            parsearComoBinarioCartola(file);
+          }
+        });
       };
       reader.readAsText(file);
     }
@@ -3127,9 +3298,13 @@
         const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
-        analizarDatosParaModalCartola(jsonData);
+        if (jsonData && jsonData.length > 0) {
+          analizarDatosParaModalCartola(jsonData);
+        } else {
+          mostrarToast("No se encontraron filas con datos en la hoja de cálculo.", "warning");
+        }
       } catch (err) {
-        alert("Error al leer el archivo: " + err.message);
+        mostrarToast("Error al leer el archivo: " + err.message, "error");
       }
     }
 
@@ -3139,63 +3314,70 @@
       let totalIngresos = 0;
 
       data.forEach((row, idx) => {
-        let fecha = null, desc = 'Movimiento', cargo = null;
+        let fechaRaw = null;
+        let cargoRaw = null;
+        let abonoRaw = null;
+        let montoGeneralRaw = null;
 
         for (let key in row) {
-          const k = key.toLowerCase();
-          if (!fecha && (k.includes('fecha') || k.includes('date'))) fecha = row[key];
-          if (k.includes('tipo') || k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('concepto')) desc = row[key];
-          if (cargo === null && (k.includes('importe') || k.includes('cargo') || k.includes('monto') || k.includes('debito') || k.includes('egreso') || k.includes('valor') || k.includes('abono'))) {
-            cargo = row[key];
+          const k = key.toLowerCase().trim();
+          const val = row[key];
+          if (val === null || val === undefined || val === '') continue;
+
+          if (!fechaRaw && (k.includes('fecha') || k.includes('date') || k.includes('fec') || k.includes('time') || k.includes('periodo'))) {
+            fechaRaw = val;
+          }
+
+          if (k.includes('cargo') || k.includes('debito') || k.includes('egreso') || k.includes('debit') || k.includes('withdrawal')) {
+            cargoRaw = val;
+          } else if (k.includes('abono') || k.includes('credito') || k.includes('ingreso') || k.includes('credit') || k.includes('deposit')) {
+            abonoRaw = val;
+          } else if (k.includes('amount') || k.includes('monto') || k.includes('importe') || k.includes('valor') || k.includes('total') || k.includes('saldo') || k.includes('neto')) {
+            montoGeneralRaw = val;
           }
         }
 
-        if (cargo !== null && cargo !== undefined && cargo !== '') {
-          let montoNum = 0;
-          if (typeof cargo === 'number') montoNum = cargo;
-          else montoNum = parseFloat(String(cargo).replace(/\./g, '').replace(',', '.')) || 0;
+        let montoNum = null;
 
-          if (montoNum !== 0) {
-            let fechaStr = hoyFechaStr;
-            if (fecha) {
-              if (typeof fecha === 'string' && fecha.includes('T')) fechaStr = fecha.split('T')[0];
-              else if (typeof fecha === 'string') {
-                const matchF = fecha.match(/(\d{1,4})[\/\-](\d{1,2})[\/\-](\d{1,4})/);
-                if (matchF) {
-                  if (matchF[1].length === 4) fechaStr = `${matchF[1]}-${matchF[2].padStart(2, '0')}-${matchF[3].padStart(2, '0')}`;
-                  else fechaStr = `${matchF[3]}-${matchF[2].padStart(2, '0')}-${matchF[1].padStart(2, '0')}`;
-                }
-              }
-            }
+        const cargoParsed = parsearMontoUniversal(cargoRaw);
+        const abonoParsed = parsearMontoUniversal(abonoRaw);
 
-            const descStr = String(desc || 'Movimiento').toLowerCase();
-            const esGasto = montoNum < 0 || descStr.includes('pago') || descStr.includes('retiro');
-            const montoFinal = Math.abs(montoNum);
+        if (cargoParsed !== null && cargoParsed !== 0) {
+          montoNum = -Math.abs(cargoParsed);
+        } else if (abonoParsed !== null && abonoParsed !== 0) {
+          montoNum = Math.abs(abonoParsed);
+        } else if (montoGeneralRaw !== null) {
+          montoNum = parsearMontoUniversal(montoGeneralRaw);
+        }
 
-            let destino = esGasto ? 'gasto' : 'ingreso';
+        if (montoNum !== null && montoNum !== 0) {
+          const fechaStr = extraerFechaUniversal(fechaRaw);
+          const { desc, destinoSugerido, catSugerida } = construirDescripcionYDestino(row, montoNum);
+          const montoFinal = Math.abs(montoNum);
+          const esGasto = montoNum < 0;
 
-            if (esGasto) totalGastos += montoFinal;
-            else totalIngresos += montoFinal;
+          if (destinoSugerido === 'gasto') totalGastos += montoFinal;
+          else totalIngresos += montoFinal;
 
-            bufferModalCartola.push({
-              idTemporal: idx,
-              fecha: fechaStr,
-              descripcion: String(desc || 'Movimiento').trim(),
-              monto: montoFinal,
-              esGasto: esGasto,
-              destinoFinanciero: destino,
-              categoria: 'Otros',
-              seleccionado: true
-            });
-          }
+          bufferModalCartola.push({
+            idTemporal: idx,
+            fecha: fechaStr,
+            descripcion: desc,
+            monto: montoFinal,
+            esGasto: esGasto,
+            destinoFinanciero: destinoSugerido,
+            categoria: catSugerida,
+            seleccionado: true
+          });
         }
       });
 
       if (bufferModalCartola.length === 0) {
-        alert("No se detectaron movimientos válidos en el archivo.");
+        mostrarToast("No se detectaron movimientos válidos en el archivo.", "warning");
         return;
       }
 
+      abrirModalSubirCartola();
       document.getElementById('resumen-cartola-modal').classList.remove('hidden');
       document.getElementById('rm-gastos').textContent = formatoCLP(totalGastos);
       document.getElementById('rm-ingresos').textContent = formatoCLP(totalIngresos);
@@ -3212,8 +3394,8 @@
           <td class="p-2.5 text-center">
             <input type="checkbox" ${m.seleccionado ? 'checked' : ''} onchange="toggleItemBufferModal(${m.idTemporal}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0">
           </td>
-          <td class="p-2.5 text-slate-400 font-mono">${m.fecha}</td>
-          <td class="p-2.5 font-medium text-slate-200">${m.descripcion}</td>
+          <td class="p-2.5 text-slate-400 font-mono text-xs">${m.fecha}</td>
+          <td class="p-2.5 font-medium text-slate-200 text-xs">${m.descripcion}</td>
           <td class="p-2.5">
             <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
               <option value="gasto" ${m.destinoFinanciero==='gasto'?'selected':''}>💸 Gasto</option>
@@ -3223,15 +3405,15 @@
           </td>
           <td class="p-2.5">
             <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200" onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).categoria = this.value">
-              <option value="Otros">Otros</option>
-              <option value="Supermercado/Comida">Supermercado & Comida</option>
-              <option value="Servicios Básicos">Servicios Básicos</option>
-              <option value="Transporte/Auto">Transporte / Auto</option>
-              <option value="Ocio/Personal">Ocio / Personal</option>
-              <option value="Vivienda/Arriendo">Vivienda / Arriendo</option>
+              <option value="Otros" ${m.categoria==='Otros'?'selected':''}>Otros</option>
+              <option value="Supermercado/Comida" ${m.categoria==='Supermercado/Comida'?'selected':''}>Supermercado & Comida</option>
+              <option value="Servicios Básicos" ${m.categoria==='Servicios Básicos'?'selected':''}>Servicios Básicos</option>
+              <option value="Transporte/Auto" ${m.categoria==='Transporte/Auto'?'selected':''}>Transporte / Auto</option>
+              <option value="Ocio/Personal" ${m.categoria==='Ocio/Personal'?'selected':''}>Ocio / Personal</option>
+              <option value="Vivienda/Arriendo" ${m.categoria==='Vivienda/Arriendo'?'selected':''}>Vivienda / Arriendo</option>
             </select>
           </td>
-          <td class="p-2.5 text-right font-semibold ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}">
+          <td class="p-2.5 text-right font-semibold text-xs ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}">
             ${m.destinoFinanciero==='gasto' ? '-' : '+'}${formatoCLP(m.monto)}
           </td>
         </tr>
@@ -3295,17 +3477,17 @@
       let errores = [];
 
       if (gastosParaInsertar.length > 0) {
-        const { error: errG } = await db.from('gastos_personales').insert(gastosParaInsertar);
+        const { error: errG } = await ejecutarConReintentos(() => db.from('gastos_personales').insert(gastosParaInsertar), 4, 1000);
         if (errG) errores.push('Gastos: ' + errG.message);
       }
 
       if (ingresosParaInsertar.length > 0) {
-        const { error: errI } = await db.from('honorarios').insert(ingresosParaInsertar);
+        const { error: errI } = await ejecutarConReintentos(() => db.from('honorarios').insert(ingresosParaInsertar), 4, 1000);
         if (errI) errores.push('Ingresos: ' + errI.message);
       }
 
       if (inversionesParaInsertar.length > 0) {
-        const { error: errInv } = await db.from('inversiones').insert(inversionesParaInsertar);
+        const { error: errInv } = await ejecutarConReintentos(() => db.from('inversiones').insert(inversionesParaInsertar), 4, 1000);
         if (errInv) errores.push('Inversiones: ' + errInv.message);
       }
 
@@ -3313,37 +3495,94 @@
       btn.textContent = '⚡ Confirmar e Insertar en la Base de Datos';
 
       if (errores.length > 0) {
-        alert("Error al insertar:\n" + errores.join('\n'));
+        mostrarToast("Aviso al insertar movimientos:\n" + errores.join('\n'), 'warning');
       } else {
-        alert(`¡Éxito! Se insertaron ${seleccionados.length} movimientos en la base de datos.`);
+        mostrarToast(`¡Éxito! Se insertaron ${seleccionados.length} movimientos en la base de datos.`, 'success');
         cerrarModalSubirCartola();
-        cargarTodo();
+        await cargarTodo();
       }
     }
 
     // ==========================================
-    // LECTOR DE BOLETAS PDF SII
+    // LECTOR DE BOLETAS PDF SII & CONFIGURACIÓN DRAG & DROP
     // ==========================================
     function setupDragAndDrop() {
       const dzPdf = document.getElementById('dropzone-pdf');
       const dzCartolaModal = document.getElementById('dropzone-cartola-full');
+      const dzCartolaTab = document.getElementById('dropzone-cartola-tab');
+      const tabAuditoria = document.getElementById('tab-pers-auditoria_cartola');
+      const dzPedidosTab = document.getElementById('dropzone-pedidos-tab');
+      const dzCsvModal = document.getElementById('dropzone-csv-modal');
+      const tabPedidos = document.getElementById('tab-drop-pedidos');
 
-      if (dzPdf) {
-        ['dragenter', 'dragover'].forEach(n => { dzPdf.addEventListener(n, (e) => { e.preventDefault(); dzPdf.classList.add('border-emerald-400', 'bg-emerald-950/20'); }); });
-        ['dragleave', 'drop'].forEach(n => { dzPdf.addEventListener(n, (e) => { e.preventDefault(); dzPdf.classList.remove('border-emerald-400', 'bg-emerald-950/20'); }); });
-        dzPdf.addEventListener('drop', (e) => {
-          const file = e.dataTransfer.files[0];
-          if (file && file.name.toLowerCase().endsWith('.pdf')) procesarArchivoPDF(file);
-          else alert('Por favor arrastra un archivo PDF válido.');
+      function bindDropZone(el, onFile, activeClasses = ['border-sky-400', 'bg-sky-950/30', 'scale-[1.01]']) {
+        if (!el) return;
+        ['dragenter', 'dragover'].forEach(n => {
+          el.addEventListener(n, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            el.classList.add(...activeClasses);
+          });
+        });
+        ['dragleave', 'drop'].forEach(n => {
+          el.addEventListener(n, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            el.classList.remove(...activeClasses);
+          });
+        });
+        el.addEventListener('drop', (e) => {
+          const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+          if (file) onFile(file);
         });
       }
 
+      if (dzPdf) {
+        bindDropZone(dzPdf, (file) => {
+          if (file.name.toLowerCase().endsWith('.pdf')) procesarArchivoPDF(file);
+          else mostrarToast('Por favor arrastra un archivo PDF válido.', 'warning');
+        }, ['border-emerald-400', 'bg-emerald-950/20']);
+      }
+
       if (dzCartolaModal) {
-        ['dragenter', 'dragover'].forEach(n => { dzCartolaModal.addEventListener(n, (e) => { e.preventDefault(); dzCartolaModal.classList.add('border-sky-400', 'bg-sky-950/20'); }); });
-        ['dragleave', 'drop'].forEach(n => { dzCartolaModal.addEventListener(n, (e) => { e.preventDefault(); dzCartolaModal.classList.remove('border-sky-400', 'bg-sky-950/20'); }); });
-        dzCartolaModal.addEventListener('drop', (e) => {
-          const file = e.dataTransfer.files[0];
+        bindDropZone(dzCartolaModal, (file) => {
+          procesarArchivoCartolaGenerico(file);
+        });
+      }
+
+      if (dzCartolaTab) {
+        bindDropZone(dzCartolaTab, (file) => {
+          procesarArchivoCartolaGenerico(file);
+        });
+      }
+
+      if (tabAuditoria) {
+        tabAuditoria.addEventListener('dragover', (e) => e.preventDefault());
+        tabAuditoria.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
           if (file) procesarArchivoCartolaGenerico(file);
+        });
+      }
+
+      if (dzPedidosTab) {
+        bindDropZone(dzPedidosTab, (file) => {
+          procesarArchivoPedidosGenerico(file);
+        });
+      }
+
+      if (dzCsvModal) {
+        bindDropZone(dzCsvModal, (file) => {
+          procesarArchivoPedidosGenerico(file);
+        });
+      }
+
+      if (tabPedidos) {
+        tabPedidos.addEventListener('dragover', (e) => e.preventDefault());
+        tabPedidos.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+          if (file) procesarArchivoPedidosGenerico(file);
         });
       }
     }
@@ -4405,7 +4644,9 @@
       }
     });
 
-    // Modal CSV Shopify
+    // =========================================================
+    // MODAL Y PROCESADOR DE PEDIDOS (CSV / EXCEL / SHOPIFY / DROPI)
+    // =========================================================
     function abrirModalCSV() {
       const m = document.getElementById('modal-csv');
       if (m) m.classList.remove('hidden');
@@ -4415,50 +4656,166 @@
       if (m) m.classList.add('hidden');
     }
 
-    document.getElementById('input-csv').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    function procesarArchivoPedidosDirecto(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) procesarArchivoPedidosGenerico(file);
+    }
+
+    async function procesarArchivoPedidosGenerico(file) {
+      const fileName = file.name.toLowerCase();
+      
+      if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
+          if (jsonData && jsonData.length > 0) {
+            abrirModalCSV();
+            procesarFilasCSV(jsonData);
+          } else {
+            mostrarToast("El archivo Excel no contiene filas con datos.", "warning");
+          }
+        } catch (err) {
+          mostrarToast("Error al leer archivo Excel: " + err.message, "error");
+        }
+        return;
+      }
+
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        complete: function(results) { procesarFilasCSV(results.data); }
+        dynamicTyping: false,
+        delimitersToGuess: [',', ';', '\t', '|'],
+        complete: function(results) {
+          if (results.data && results.data.length > 0) {
+            abrirModalCSV();
+            procesarFilasCSV(results.data);
+          } else {
+            mostrarToast("No se detectaron registros de pedidos válidos en el archivo.", "warning");
+          }
+        },
+        error: function(err) {
+          mostrarToast("Error al procesar archivo CSV: " + err.message, "error");
+        }
       });
-    });
+    }
 
     function procesarFilasCSV(data) {
       filasParaImportar = [];
-      const prodDef = Number(document.getElementById('csv-def-prod').value || 0);
-      const envioDef = Number(document.getElementById('csv-def-envio').value || 0);
-      const dropiDef = Number(document.getElementById('csv-def-dropi').value || 0);
+      const prodDef = Number(document.getElementById('csv-def-prod')?.value || 0);
+      const envioDef = Number(document.getElementById('csv-def-envio')?.value || 0);
+      const dropiDef = Number(document.getElementById('csv-def-dropi')?.value || 0);
 
       data.forEach(row => {
-        if (row['Name'] && row['Total'] !== undefined && row['Total'] !== '') {
-          let fecha = hoyFechaStr;
-          if (row['Created at']) fecha = row['Created at'].slice(0, 10);
+        let orderName = '';
+        let cliente = '';
+        let producto = '';
+        let fecha = hoyFechaStr;
+        let totalVenta = 0;
+        let costoProd = prodDef;
+        let costoEnvio = envioDef;
+        let comisionDropi = dropiDef;
+        let trackingOt = '';
+        let estadoInicial = 'Recibido';
 
-          const cliente = row['Shipping Name'] || row['Billing Name'] || 'Cliente';
-          const producto = row['Lineitem name'] ? `(${row['Lineitem quantity'] || 1}x ${row['Lineitem name'].slice(0, 20)}...)` : '';
-          const detalle = `${row['Name']} - ${cliente} ${producto}`.trim();
-          const totalVenta = Number(row['Total']) || 0;
+        // 1. Detectar Identificador del Pedido (Shopify o Dropi o Estándar)
+        if (row['Name'] || row['name'] || row['Order'] || row['order'] || row['Order ID'] || row['ID Pedido'] || row['Pedido']) {
+          orderName = String(row['Name'] || row['name'] || row['Order'] || row['order'] || row['Order ID'] || row['ID Pedido'] || row['Pedido'] || '').trim();
+        }
+        if (!orderName) {
+          for (let k in row) {
+            const kl = k.toLowerCase();
+            if (kl.includes('pedido') || kl.includes('orden') || kl.includes('numero') || kl.includes('num_guia') || kl.includes('id_pedido')) {
+              if (row[k]) { orderName = String(row[k]).trim(); break; }
+            }
+          }
+        }
+
+        // 2. Detectar Cliente
+        cliente = String(row['Shipping Name'] || row['Billing Name'] || row['Cliente'] || row['cliente'] || row['Customer'] || row['Nombre'] || row['Destinatario'] || '').trim();
+
+        // 3. Detectar Producto
+        if (row['Lineitem name']) {
+          const qty = row['Lineitem quantity'] || 1;
+          producto = `(${qty}x ${String(row['Lineitem name']).slice(0, 30)})`;
+        } else if (row['Producto'] || row['producto'] || row['Item'] || row['item'] || row['Descripcion']) {
+          producto = `(${String(row['Producto'] || row['producto'] || row['Item'] || row['item'] || row['Descripcion']).slice(0, 30)})`;
+        }
+
+        // 4. Detectar Fecha
+        const rawDate = row['Created at'] || row['created_at'] || row['Fecha'] || row['fecha'] || row['Date'] || row['date'] || row['Fecha Creacion'];
+        if (rawDate) fecha = extraerFechaUniversal(rawDate);
+
+        // 5. Detectar Venta / Total
+        for (let k in row) {
+          const kl = k.toLowerCase();
+          if (kl.includes('total') || kl.includes('venta') || kl.includes('subtotal') || kl.includes('precio') || kl.includes('monto') || kl.includes('importe') || kl.includes('recaudo')) {
+            const parsedM = parsearMontoUniversal(row[k]);
+            if (parsedM !== null && parsedM > 0) {
+              totalVenta = parsedM;
+              break;
+            }
+          }
+        }
+
+        // 6. Detectar Costos específicos si vienen en el archivo
+        for (let k in row) {
+          const kl = k.toLowerCase();
+          if (kl.includes('costo') && (kl.includes('prod') || kl.includes('proveedor') || kl.includes('articulo') || kl.includes('mercaderia'))) {
+            const p = parsearMontoUniversal(row[k]);
+            if (p !== null && p > 0) costoProd = p;
+          }
+          if (kl.includes('flete') || (kl.includes('costo') && kl.includes('envio')) || kl.includes('shipping_cost')) {
+            const p = parsearMontoUniversal(row[k]);
+            if (p !== null && p > 0) costoEnvio = p;
+          }
+          if (kl.includes('comision') || kl.includes('dropi') || kl.includes('comision_dropi')) {
+            const p = parsearMontoUniversal(row[k]);
+            if (p !== null && p > 0) comisionDropi = p;
+          }
+          if (kl.includes('ot') || kl.includes('tracking') || kl.includes('guia') || kl.includes('guía') || kl.includes('numero_guia') || kl.includes('tracking_number')) {
+            const val = String(row[k] || '').trim();
+            if (val) trackingOt = val;
+          }
+          if (kl.includes('estado') || kl.includes('status')) {
+            const val = String(row[k] || '').trim().toLowerCase();
+            if (val) {
+              if (val.includes('entreg')) estadoInicial = 'Entregado';
+              else if (val.includes('despach') || val.includes('enviad') || val.includes('transito') || val.includes('shipped')) estadoInicial = 'Despachado';
+              else if (val.includes('confirm') || val.includes('paid')) estadoInicial = 'Confirmado';
+              else if (val.includes('notific')) estadoInicial = 'Notificado';
+              else if (val.includes('cancel') || val.includes('void')) estadoInicial = 'Cancelado';
+              else if (val.includes('devuel') || val.includes('retorno')) estadoInicial = 'Devuelto';
+              else if (val.includes('incid') || val.includes('problema') || val.includes('novedad')) estadoInicial = 'Incidencia';
+              else if (val.includes('sin resp') || val.includes('pendiente')) estadoInicial = 'Sin respuesta';
+            }
+          }
+        }
+
+        if (orderName || cliente || totalVenta > 0) {
+          const detalle = [orderName, cliente, producto].filter(Boolean).join(' - ').trim() || 'Pedido Importado';
 
           filasParaImportar.push({
             fecha: fecha,
             cliente_detalle: detalle,
-            estado: 'Recibido',
+            estado: estadoInicial,
+            numero_ot: trackingOt,
             ingreso_total: totalVenta,
-            costo_producto: prodDef,
-            costo_envio: envioDef,
-            comision_dropi: dropiDef
+            costo_producto: costoProd,
+            costo_envio: costoEnvio,
+            comision_dropi: comisionDropi
           });
         }
       });
+
       renderizarPreviewCSV();
     }
 
     function aplicarValoresDefecto() {
-      const prodDef = Number(document.getElementById('csv-def-prod').value || 0);
-      const envioDef = Number(document.getElementById('csv-def-envio').value || 0);
-      const dropiDef = Number(document.getElementById('csv-def-dropi').value || 0);
+      const prodDef = Number(document.getElementById('csv-def-prod')?.value || 0);
+      const envioDef = Number(document.getElementById('csv-def-envio')?.value || 0);
+      const dropiDef = Number(document.getElementById('csv-def-dropi')?.value || 0);
 
       filasParaImportar.forEach(item => {
         item.costo_producto = prodDef;
@@ -4473,24 +4830,29 @@
       const btn = document.getElementById('btn-confirmar-csv');
       const contador = document.getElementById('csv-contador');
 
+      if (!tbody || !btn || !contador) return;
+
       if (filasParaImportar.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No se detectaron pedidos válidos.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No se detectaron pedidos válidos en el archivo.</td></tr>';
         btn.disabled = true;
         contador.textContent = '0 pedidos listos';
         return;
       }
 
-      contador.textContent = `${filasParaImportar.length} pedidos listos`;
+      contador.textContent = `${filasParaImportar.length} pedidos listos para importar`;
       btn.disabled = false;
 
       tbody.innerHTML = filasParaImportar.map((f, i) => `
         <tr class="hover:bg-slate-900/60">
           <td class="p-2 text-slate-400 font-mono text-[11px]">${f.fecha}</td>
-          <td class="p-2 font-medium text-slate-200 truncate max-w-xs">${f.cliente_detalle}</td>
-          <td class="p-2 text-right text-emerald-400 font-semibold">${formatoCLP(f.ingreso_total)}</td>
-          <td class="p-2 text-right"><input type="number" value="${f.costo_producto}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].costo_producto = Number(this.value)"></td>
-          <td class="p-2 text-right"><input type="number" value="${f.costo_envio}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].costo_envio = Number(this.value)"></td>
-          <td class="p-2 text-right"><input type="number" value="${f.comision_dropi}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].comision_dropi = Number(this.value)"></td>
+          <td class="p-2 font-medium text-slate-200 truncate max-w-xs text-xs" title="${f.cliente_detalle}">
+            <div>${f.cliente_detalle}</div>
+            ${f.numero_ot ? `<div class="text-[10px] text-sky-400 font-mono">OT: ${f.numero_ot}</div>` : ''}
+          </td>
+          <td class="p-2 text-right text-emerald-400 font-semibold text-xs">${formatoCLP(f.ingreso_total)}</td>
+          <td class="p-2 text-right"><input type="number" value="${f.costo_producto}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200 text-xs" onchange="filasParaImportar[${i}].costo_producto = Number(this.value)"></td>
+          <td class="p-2 text-right"><input type="number" value="${f.costo_envio}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200 text-xs" onchange="filasParaImportar[${i}].costo_envio = Number(this.value)"></td>
+          <td class="p-2 text-right"><input type="number" value="${f.comision_dropi}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200 text-xs" onchange="filasParaImportar[${i}].comision_dropi = Number(this.value)"></td>
         </tr>
       `).join('');
     }
@@ -4509,18 +4871,31 @@
         comision_dropi: f.comision_dropi
       }));
 
-      // Inserción por lotes con reintentos para no sobrecargar PostgREST
       const BATCH_SIZE = 50;
       let errorOcurrido = null;
       let pedidosInsertados = 0;
 
       for (let i = 0; i < filasParaDB.length; i += BATCH_SIZE) {
         const batch = filasParaDB.slice(i, i + BATCH_SIZE);
-        const { error } = await ejecutarConReintentos(() => db.from('ventas').insert(batch), 4, 1000);
-        if (error) {
-          errorOcurrido = error;
+        const originalSlice = filasParaImportar.slice(i, i + BATCH_SIZE);
+
+        const res = await ejecutarConReintentos(() => db.from('ventas').insert(batch).select('id'), 4, 1000);
+        if (res && res.error) {
+          errorOcurrido = res.error;
           break;
         }
+
+        // Si se insertaron y devolvieron IDs, guardar OT y estado inicial
+        if (res && res.data && Array.isArray(res.data)) {
+          res.data.forEach((item, idx) => {
+            const orig = originalSlice[idx];
+            if (orig && item.id) {
+              if (orig.numero_ot) guardarOtPedidoLocal(item.id, orig.numero_ot);
+              if (orig.estado && orig.estado !== 'Recibido') guardarEstadoPedidoLocal(item.id, orig.estado);
+            }
+          });
+        }
+
         pedidosInsertados += batch.length;
         btn.textContent = `Guardando (${pedidosInsertados}/${filasParaDB.length})...`;
       }
@@ -4555,6 +4930,7 @@
     window.renderizarPlanillaConsolidada = renderizarPlanillaConsolidada;
     window.abrirModalSubirCartola = abrirModalSubirCartola;
     window.cerrarModalSubirCartola = cerrarModalSubirCartola;
+    window.procesarArchivoCartolaDirecto = procesarArchivoCartolaDirecto;
     window.guardarMovimientosModalEnSupabase = guardarMovimientosModalEnSupabase;
     window.alternarEstadoHonorario = alternarEstadoHonorario;
     window.abrirModalEditarHonorario = abrirModalEditarHonorario;
@@ -4581,6 +4957,8 @@
     window.renderizarTablaPedidos = renderizarTablaPedidos;
     window.abrirModalCSV = abrirModalCSV;
     window.cerrarModalCSV = cerrarModalCSV;
+    window.procesarArchivoPedidosDirecto = procesarArchivoPedidosDirecto;
+    window.procesarArchivoPedidosGenerico = procesarArchivoPedidosGenerico;
     window.aplicarValoresDefecto = aplicarValoresDefecto;
     window.guardarCSVEnSupabase = guardarCSVEnSupabase;
 
