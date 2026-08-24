@@ -39,10 +39,6 @@
           </button>
         </div>
 
-        <button id="btn-import-csv" onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
-          <span>📁</span> Importar CSV
-        </button>
-
         <div class="flex items-center bg-slate-800 rounded-xl px-2.5 py-1 border border-slate-700 gap-1.5 text-xs">
           <select id="filtro-tipo" class="bg-transparent text-slate-300 focus:outline-none cursor-pointer" onchange="cambiarModoFiltro()">
             <option value="semana">Esta Semana</option>
@@ -51,6 +47,25 @@
             <option value="todo">Historial Completo</option>
           </select>
           <input type="month" id="filtro-mes" class="bg-transparent text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
+        </div>
+
+        <!-- BOTÓN LOGIN / PERFIL USUARIO -->
+        <button id="btn-auth-header-login" onclick="abrirModalAuth('login')" class="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold rounded-xl text-xs shadow-md shadow-sky-600/20 transition cursor-pointer">
+          <span>🔑</span>
+          <span class="hidden sm:inline">Iniciar Sesión</span>
+        </button>
+
+        <div id="usuario-perfil-header" class="hidden flex items-center gap-2 bg-slate-950 p-1 pr-2 rounded-xl border border-slate-800">
+          <div id="usuario-avatar" class="w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold flex items-center justify-center overflow-hidden border border-indigo-400/40 shrink-0">
+            U
+          </div>
+          <div class="hidden sm:flex flex-col text-left">
+            <span id="usuario-nombre" class="text-[11px] font-semibold text-slate-200 leading-tight max-w-[120px] truncate">Usuario</span>
+            <span id="usuario-email" class="text-[9px] text-slate-400 leading-tight max-w-[120px] truncate">usuario@email.com</span>
+          </div>
+          <button onclick="confirmarCerrarSesion()" title="Cerrar Sesión" class="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-lg transition cursor-pointer text-xs">
+            <span>🚪</span>
+          </button>
         </div>
 
         <button onclick="abrirModalConfig()" title="Configuración" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition">
@@ -78,69 +93,445 @@
         </button>
       </nav>
 
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Ventas Brutas</span>
-          <p id="kpi-ventas" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
-          <span id="kpi-num-ventas" class="text-[11px] text-slate-500">0 pedidos</span>
-        </div>
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Costos Dropi</span>
-          <p id="kpi-dropi" class="text-xl font-bold text-amber-400 mt-1">$0</p>
-          <span id="kpi-margen-bruto" class="text-[11px] text-slate-400">Margen: $0</span>
-        </div>
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Meta Ads</span>
-          <p id="kpi-ads" class="text-xl font-bold text-indigo-400 mt-1">$0</p>
-          <span id="kpi-roas" class="text-[11px] text-indigo-300 font-medium">ROAS: 0.0x</span>
-        </div>
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Costos Fijos</span>
-          <p id="kpi-fijos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
-          <span id="kpi-fijos-sub" class="text-[11px] text-slate-500">Prorrateados</span>
-        </div>
-        <div class="col-span-2 md:col-span-1 bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">Utilidad Neta</span>
-          <p id="kpi-utilidad" class="text-xl font-bold text-sky-400 mt-1">$0</p>
-          <span id="kpi-margen-neto" class="text-[11px] font-medium text-slate-300">Margen: 0%</span>
-        </div>
-      </div>
-
+      <!-- Pestaña Principal de Dashboard de Negocio -->
       <div id="tab-drop-dashboard" class="tab-drop-content space-y-5">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div class="lg:col-span-8 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-sm font-bold uppercase text-slate-300 mb-4">📈 Tendencia: Ventas vs Costos Variables</h3>
+
+        <!-- Métricas Clave de Negocio (Unit Economics & Viabilidad) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 text-[11px] font-semibold uppercase">Ventas Brutas</span>
+              <span class="text-emerald-400 text-xs">💰</span>
+            </div>
+            <p id="kpi-ventas" class="text-lg md:text-xl font-bold text-emerald-400 mt-1">$0</p>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-0.5">
+              <span id="kpi-num-ventas">0 pedidos</span>
+              <span id="kpi-ventas-dia" class="text-slate-500 font-mono">Día: $0</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 text-[11px] font-semibold uppercase">Ticket Prom. (AOV)</span>
+              <span class="text-teal-400 text-xs">🏷️</span>
+            </div>
+            <p id="kpi-ticket-prom" class="text-lg md:text-xl font-bold text-teal-400 mt-1">$0</p>
+            <div class="text-[11px] text-slate-400 mt-0.5 truncate">
+              Margen: <span id="kpi-margen-unit-prom" class="text-teal-300 font-medium">$0/u</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 text-[11px] font-semibold uppercase">Costos Dropi</span>
+              <span class="text-amber-400 text-xs">📦</span>
+            </div>
+            <p id="kpi-dropi" class="text-lg md:text-xl font-bold text-amber-400 mt-1">$0</p>
+            <div class="text-[11px] text-slate-400 mt-0.5 truncate">
+              <span id="kpi-margen-bruto">Margen: $0</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 text-[11px] font-semibold uppercase">Meta Ads</span>
+              <span class="text-indigo-400 text-xs">📢</span>
+            </div>
+            <p id="kpi-ads" class="text-lg md:text-xl font-bold text-indigo-400 mt-1">$0</p>
+            <div class="flex items-center justify-between text-[11px] text-indigo-300 mt-0.5 font-medium">
+              <span id="kpi-roas">ROAS: 0.0x</span>
+              <span id="kpi-cpa" class="text-slate-400 font-mono">CPA: $0</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 text-[11px] font-semibold uppercase">Utilidad Neta</span>
+              <span class="text-sky-400 text-xs">💎</span>
+            </div>
+            <p id="kpi-utilidad" class="text-lg md:text-xl font-bold text-sky-400 mt-1">$0</p>
+            <div class="flex items-center justify-between text-[11px] text-slate-300 mt-0.5 font-medium">
+              <span id="kpi-margen-neto">0% Neto</span>
+              <span id="kpi-neto-pedido" class="text-slate-400 font-mono">$0/ped</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 text-[11px] font-semibold uppercase">Viabilidad Negocio</span>
+              <span class="text-emerald-400 text-xs">⚡</span>
+            </div>
+            <div id="kpi-viabilidad-container" class="flex items-center gap-1.5 mt-1">
+              <p id="kpi-viabilidad-score" class="text-lg md:text-xl font-bold text-emerald-400">0/100</p>
+              <span id="kpi-viabilidad-badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Analizando</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5 truncate">
+              <span id="kpi-break-even-mini">Eq: $0</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Panel de Alertas Inteligentes & Diagnóstico Ejecutivo -->
+        <div id="seccion-alertas-negocio" class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          
+          <!-- Alerta de Pedidos Estancados / Sin Respuesta (>24h) -->
+          <div id="card-alerta-sin-respuesta" class="md:col-span-6 bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between transition">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⏳</span>
+                <div>
+                  <h4 class="text-xs font-bold text-slate-200">Alertas de Atención: Pedidos Sin Respuesta</h4>
+                  <p id="alerta-sin-respuesta-desc" class="text-[11px] text-slate-400 mt-0.5">Analizando pedidos pendientes con más de 1 día de antigüedad...</p>
+                </div>
+              </div>
+              <span id="alerta-sin-respuesta-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap">0 pedidos</span>
+            </div>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/80">
+              <span id="alerta-sin-respuesta-monto" class="text-xs font-semibold text-purple-300 font-mono">Total en riesgo: $0</span>
+              <button onclick="irAPedidosSinRespuesta()" class="bg-purple-950 hover:bg-purple-900 text-purple-300 border border-purple-800/70 hover:text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1">
+                <span>🔍 Filtrar Pedidos Pendientes</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Diagnóstico de Viabilidad & Punto de Equilibrio (Break-Even) -->
+          <div class="md:col-span-6 bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⚖️</span>
+                <div>
+                  <h4 class="text-xs font-bold text-slate-200">Punto de Equilibrio & Viabilidad Operativa</h4>
+                  <p id="diagnostico-viabilidad-texto" class="text-[11px] text-slate-400 mt-0.5">Calculando volumen necesario para cubrir publicidad y fijos...</p>
+                </div>
+              </div>
+              <span id="diagnostico-efectividad-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">0% Confirmación</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-3 mt-3 border-t border-slate-800/80 text-xs">
+              <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">Venta Mínima de Equilibrio</span>
+                <p id="diag-venta-equilibrio" class="text-sm font-bold text-amber-400 font-mono mt-0.5">$0</p>
+              </div>
+              <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">Pedidos Mínimos (Break-Even)</span>
+                <p id="diag-pedidos-equilibrio" class="text-sm font-bold text-sky-400 font-mono mt-0.5">0 pedidos</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Fila 1: Tendencia Temporal & Desglose Segmentado de Cada Costo -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div class="lg:col-span-7 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+              <div>
+                <h3 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
+                  <span>📈</span> Tendencia Diaria: Ventas, Costos Totales & Utilidad
+                </h3>
+                <p class="text-[11px] text-slate-400">Evolución de ingresos brutos frente al costo total directo (Dropi + Ads)</p>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-[11px] text-slate-400">Ventas/Día:</span>
+                <strong id="tag-ventas-dia-prom" class="text-emerald-400 font-mono">$0</strong>
+              </div>
+            </div>
             <div class="h-64 relative w-full"><canvas id="chart-evolucion"></canvas></div>
           </div>
-          <div class="lg:col-span-4 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
-            <h3 class="text-sm font-bold uppercase text-slate-300 mb-3">🍩 Distribución de Costos</h3>
-            <div class="h-56 relative flex items-center justify-center w-full"><canvas id="chart-distribucion"></canvas></div>
-            <div id="distribucion-leyenda" class="text-xs text-slate-400 grid grid-cols-3 text-center pt-3 border-t border-slate-800/80 gap-1"></div>
+
+          <div class="lg:col-span-5 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-2">
+              <div>
+                <h3 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
+                  <span>🍩</span> Desglose Segmentado de Cada Costo
+                </h3>
+                <p class="text-[11px] text-slate-400">Distribución de cada partida sobre el 100% de los costos</p>
+              </div>
+              <span id="badge-total-costos-sum" class="text-xs font-bold font-mono text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded-lg border border-rose-800/60">$0</span>
+            </div>
+            <div class="h-48 relative flex items-center justify-center w-full"><canvas id="chart-distribucion"></canvas></div>
+            <div id="distribucion-leyenda" class="text-[11px] text-slate-300 grid grid-cols-2 gap-1.5 pt-3 border-t border-slate-800/80 mt-2"></div>
           </div>
         </div>
+
+        <!-- Fila 2: Gráfico de Estados de Pedidos por Fecha & Embudo de Conversión -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          
+          <!-- Gráfico de Estados por Fecha (Stacked Bars) -->
+          <div class="lg:col-span-7 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+              <div>
+                <h3 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
+                  <span>📊</span> Estados de Pedidos por Fecha
+                </h3>
+                <p class="text-[11px] text-slate-400">Cantidad diaria de pedidos clasificados por su estado operativo actual</p>
+              </div>
+              <div class="flex flex-wrap gap-2 text-[10px]">
+                <span class="flex items-center gap-1 text-sky-300"><span class="w-2 h-2 rounded-full bg-sky-400"></span>Recibido</span>
+                <span class="flex items-center gap-1 text-amber-300"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Notificado</span>
+                <span class="flex items-center gap-1 text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Confirmado</span>
+                <span class="flex items-center gap-1 text-purple-300"><span class="w-2 h-2 rounded-full bg-purple-400"></span>Sin resp.</span>
+                <span class="flex items-center gap-1 text-rose-300"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Cancelado</span>
+              </div>
+            </div>
+            <div class="h-60 relative w-full"><canvas id="chart-pedidos-estados"></canvas></div>
+          </div>
+
+          <!-- Embudo de Conversión & Eficacia de Operación -->
+          <div class="lg:col-span-5 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-2">
+              <div>
+                <h3 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
+                  <span>🎯</span> Embudo de Conversión de Pedidos
+                </h3>
+                <p class="text-[11px] text-slate-400">Efectividad del funnel desde recepción hasta confirmación</p>
+              </div>
+              <span id="tasa-efectividad-general" class="text-xs font-bold font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-lg border border-emerald-800/60">0% Éxito</span>
+            </div>
+
+            <div id="contenedor-embudo-estados" class="space-y-2 py-2">
+              <!-- Renderizado dinámico de barras de estado -->
+            </div>
+
+            <div class="pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+              <span>Efectividad Confirmados: <strong id="funnel-confirmados-pct" class="text-emerald-400 font-mono">0%</strong></span>
+              <span>Rechazo / Cancelados: <strong id="funnel-cancelados-pct" class="text-rose-400 font-mono">0%</strong></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Fila 3: Top Productos/Pedidos Rentables & Simulador de Escalamiento -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          
+          <!-- Top Productos / Pedidos Más Rentables -->
+          <div class="lg:col-span-6 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <h3 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
+                    <span>🏆</span> Top Ítems & Pedidos Más Rentables
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Productos con mayor margen de contribución generado</p>
+                </div>
+                <span class="text-[10px] text-slate-500 font-medium">Top 5</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="text-[10px] uppercase text-slate-400 border-b border-slate-800">
+                      <th class="pb-2 font-semibold">Producto / Detalle</th>
+                      <th class="pb-2 text-center font-semibold">Ventas</th>
+                      <th class="pb-2 text-right font-semibold">Facturación</th>
+                      <th class="pb-2 text-right font-semibold">Margen Bruto</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-top-productos" class="divide-y divide-slate-800/60">
+                    <tr><td colspan="4" class="py-4 text-center text-slate-500">Sin datos de ventas en este período.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex justify-between items-center mt-2">
+              <span>Focaliza tus campañas en los ítems con margen > 40%</span>
+              <span id="top-total-generado" class="font-mono text-emerald-400 font-semibold">$0 margen</span>
+            </div>
+          </div>
+
+          <!-- Simulador Interactivo de Escalamiento y Crecimiento -->
+          <div class="lg:col-span-6 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <div>
+                  <h3 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
+                    <span>🚀</span> Simulador de Crecimiento & Escalamiento
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Proyecta cómo variará tu Utilidad Neta si aumentas la pauta publicitaria o el ticket promedio</p>
+                </div>
+                <span class="text-[10px] font-bold text-sky-400 bg-sky-950/80 border border-sky-800/60 px-2 py-0.5 rounded-full">Simulador</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
+                <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                  <div class="flex justify-between text-xs mb-1">
+                    <label class="text-slate-400 font-medium">Escalar Meta Ads:</label>
+                    <span id="sim-ads-pct" class="text-indigo-400 font-bold font-mono">+0%</span>
+                  </div>
+                  <input type="range" id="sim-slider-ads" min="-50" max="200" step="10" value="0" oninput="actualizarSimuladorEscalamiento()" class="w-full accent-indigo-500 cursor-pointer">
+                  <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>-50%</span>
+                    <span>Actual</span>
+                    <span>+200%</span>
+                  </div>
+                </div>
+
+                <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                  <div class="flex justify-between text-xs mb-1">
+                    <label class="text-slate-400 font-medium">Mejora Ticket Promedio:</label>
+                    <span id="sim-ticket-pct" class="text-teal-400 font-bold font-mono">+0%</span>
+                  </div>
+                  <input type="range" id="sim-slider-ticket" min="0" max="50" step="5" value="0" oninput="actualizarSimuladorEscalamiento()" class="w-full accent-teal-500 cursor-pointer">
+                  <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>0% (Actual)</span>
+                    <span>+25%</span>
+                    <span>+50%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Resultados Proyectados -->
+              <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800/80">
+                  <span class="text-[10px] text-slate-400 block uppercase">Nuevas Ventas Est.</span>
+                  <strong id="sim-res-ventas" class="text-emerald-400 font-mono text-sm block mt-0.5">$0</strong>
+                </div>
+                <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800/80">
+                  <span class="text-[10px] text-slate-400 block uppercase">Pauta Publicitaria</span>
+                  <strong id="sim-res-ads" class="text-indigo-400 font-mono text-sm block mt-0.5">$0</strong>
+                </div>
+                <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800/80">
+                  <span class="text-[10px] text-slate-400 block uppercase">Nueva Utilidad Neta</span>
+                  <strong id="sim-res-utilidad" class="text-sky-400 font-mono text-sm block mt-0.5">$0</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2.5 mt-2 border-t border-slate-800/80 text-[11px] flex items-center justify-between text-slate-400">
+              <span id="sim-res-consejo">Mueve los controles para ver el impacto financiero proyectado</span>
+              <span id="sim-res-ganancia-extra" class="font-mono text-sky-300 font-bold">+$0 extra</span>
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
       <div id="tab-drop-pedidos" class="tab-drop-content hidden space-y-4">
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <h2 class="text-sm font-semibold uppercase text-slate-300 mb-3">➕ Registrar Nuevo Pedido</h2>
-          <form id="form-venta" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
-            <div><label class="text-slate-400">Fecha</label><input type="date" id="v-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
-            <div class="col-span-2 md:col-span-3"><label class="text-slate-400">Detalle / ID Pedido / Cliente</label><input type="text" id="v-detalle" placeholder="Ej: #1024 - Cecilia Navarrete" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
-            <div><label class="text-slate-400">Total Cobrado ($)</label><input type="number" id="v-ingreso" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1"></div>
-            <div><label class="text-slate-400">Costo Proveedor ($)</label><input type="number" id="v-costo-prod" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
-            <div><label class="text-slate-400">Flete / Envío ($)</label><input type="number" id="v-costo-envio" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
-            <div><label class="text-slate-400">Comisión Dropi ($)</label><input type="number" id="v-comision-dropi" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1"></div>
-            <button type="submit" class="col-span-2 md:col-span-4 bg-emerald-600 hover:bg-emerald-500 font-medium py-2.5 rounded-xl text-white transition text-xs mt-1">Guardar Pedido</button>
-          </form>
+        <!-- Barra Superior de Acciones de Pedidos -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900 p-4 rounded-2xl border border-slate-800 gap-3">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>📦</span> Gestión de Pedidos & Dropshipping
+            </h2>
+            <p class="text-xs text-slate-400">Control de estados, costos unitarios de Dropi y márgenes reales</p>
+          </div>
+          
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="toggleFormularioPedidoManual()" id="btn-toggle-form-pedido-top" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer">
+              <span id="btn-toggle-form-pedido-icono">➕</span>
+              <span id="btn-toggle-form-pedido-texto">Registrar Pedido Manual</span>
+            </button>
+            <button onclick="abrirModalCSV()" class="bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-sky-600/20 cursor-pointer">
+              <span>📁 Cargar Archivo de Pedidos (CSV / Excel)</span>
+            </button>
+            <button id="btn-eliminar-pedidos-marcados" onclick="eliminarPedidosSeleccionados()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 cursor-pointer">
+              <span>🗑️ Eliminar Marcados</span>
+            </button>
+          </div>
         </div>
-        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-          <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Listado de Pedidos</h3></div>
-          <div class="overflow-x-auto max-h-[500px]">
+
+        <!-- Formulario Manual para Registrar Pedido (Desplegable / Acordeón) -->
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden transition">
+          <button type="button" onclick="toggleFormularioPedidoManual()" class="w-full flex justify-between items-center p-3.5 hover:bg-slate-800/40 transition cursor-pointer text-left">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-emerald-950/70 border border-emerald-800/60 flex items-center justify-center text-emerald-400 text-xs font-bold">
+                ➕
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-slate-200 flex items-center gap-2">
+                  <span>Registrar Pedido Manual</span>
+                  <span id="badge-toggle-form-pedido" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Plegado</span>
+                </h3>
+                <p class="text-[11px] text-slate-400">Despliega este módulo sólo si necesitas ingresar una venta unitaria manualmente</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-slate-400 hover:text-slate-200">
+              <span id="label-toggle-form-pedido" class="text-xs font-medium hidden sm:inline">Desplegar</span>
+              <span id="chevron-toggle-form-pedido" class="text-xs transition-transform duration-200">▼</span>
+            </div>
+          </button>
+
+          <div id="contenedor-form-pedido-manual" class="hidden p-4 pt-2 border-t border-slate-800/80 bg-slate-900/60">
+            <form id="form-venta" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs">
+              <div>
+                <label class="text-slate-400">Fecha</label>
+                <input type="date" id="v-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div class="col-span-2">
+                <label class="text-slate-400">ID Pedido / Cliente / Producto</label>
+                <input type="text" id="v-detalle" placeholder="Ej: #1024 - Cecilia Navarrete (Pack Luces)" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div>
+                <label class="text-slate-400">Estado Inicial</label>
+                <select id="v-estado" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <option value="Recibido" selected>📥 Recibido</option>
+                  <option value="Notificado">🔔 Notificado</option>
+                  <option value="Confirmado">✅ Confirmado</option>
+                  <option value="Sin respuesta">⏳ Sin respuesta</option>
+                  <option value="Cancelado">❌ Cancelado</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-slate-400">Venta Total ($)</label>
+                <input type="number" id="v-ingreso" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
+              </div>
+              <div>
+                <label class="text-slate-400">Costo Proveedor ($)</label>
+                <input type="number" id="v-costo-prod" min="0" placeholder="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div>
+                <label class="text-slate-400">Flete / Envío ($)</label>
+                <input type="number" id="v-costo-envio" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div class="col-span-2 md:col-span-2 lg:col-span-5">
+                <label class="text-slate-400">Comisión Dropi ($)</label>
+                <input type="number" id="v-comision-dropi" min="0" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              </div>
+              <div class="col-span-2 md:col-span-2 lg:col-span-2 flex items-end">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 font-medium py-2 rounded-xl text-white transition text-xs cursor-pointer shadow-lg shadow-emerald-600/20">
+                  Guardar Pedido
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Filtros y Listado de Pedidos -->
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden space-y-3 p-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div class="flex flex-wrap items-center gap-1.5 text-xs">
+              <span class="text-slate-400 font-medium mr-1">Filtrar Estado:</span>
+              <button onclick="filtrarPedidosPorEstado('todos')" id="f-ped-todos" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold cursor-pointer">Todos</button>
+              <button onclick="filtrarPedidosPorEstado('Recibido')" id="f-ped-Recibido" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-sky-300 hover:text-white cursor-pointer">📥 Recibido</button>
+              <button onclick="filtrarPedidosPorEstado('Notificado')" id="f-ped-Notificado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-amber-300 hover:text-white cursor-pointer">🔔 Notificado</button>
+              <button onclick="filtrarPedidosPorEstado('Confirmado')" id="f-ped-Confirmado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-emerald-300 hover:text-white cursor-pointer">✅ Confirmado</button>
+              <button onclick="filtrarPedidosPorEstado('Sin respuesta')" id="f-ped-Sin-respuesta" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-purple-300 hover:text-white cursor-pointer">⏳ Sin respuesta</button>
+              <button onclick="filtrarPedidosPorEstado('Cancelado')" id="f-ped-Cancelado" class="btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-rose-300 hover:text-white cursor-pointer">❌ Cancelado</button>
+            </div>
+
+            <div class="flex items-center gap-2 w-full md:w-auto">
+              <input type="text" id="buscador-pedidos" placeholder="🔍 Buscar ID, cliente o producto..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 w-full md:w-64" oninput="renderizarTablaPedidos()">
+            </div>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-800 rounded-xl max-h-[520px]">
             <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-                <tr><th class="p-3">Fecha</th><th class="p-3">Pedido</th><th class="p-3 text-right">Venta</th><th class="p-3 text-right">Costos Dropi</th><th class="p-3 text-right">Margen</th><th class="p-3 text-center">x</th></tr>
+              <thead class="bg-slate-950 sticky top-0 text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="p-3 w-10 text-center">
+                    <input type="checkbox" id="check-pedidos-all" onchange="toggleSeleccionarTodosPedidos(this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+                  </th>
+                  <th class="p-3">Fecha</th>
+                  <th class="p-3">Pedido / Cliente / Producto</th>
+                  <th class="p-3 text-center">Estado</th>
+                  <th class="p-3 text-right">Venta ($)</th>
+                  <th class="p-3 text-right">Costos Dropi ($)</th>
+                  <th class="p-3 text-right">Margen ($)</th>
+                  <th class="p-3 text-center">Acciones</th>
+                </tr>
               </thead>
-              <tbody id="tabla-ventas" class="divide-y divide-slate-800"></tbody>
+              <tbody id="tabla-ventas" class="divide-y divide-slate-800 bg-slate-900/40">
+                <tr><td colspan="8" class="p-6 text-center text-slate-500">Cargando pedidos...</td></tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -285,10 +676,10 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-              <button onclick="abrirModalSubirCartola()" class="bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-sky-600/20">
+              <button onclick="abrirModalSubirCartola()" class="bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-sky-600/20 cursor-pointer">
                 <span>➕ Cargar Nueva Cartola (XLSX/CSV)</span>
               </button>
-              <button onclick="eliminarMovimientosConsolidadosSeleccionados()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1">
+              <button id="btn-eliminar-marcados-cartola" onclick="eliminarMovimientosConsolidadosSeleccionados()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 cursor-pointer">
                 <span>🗑️ Eliminar Marcados</span>
               </button>
             </div>
@@ -689,6 +1080,61 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR PEDIDO / VENTA -->
+  <div id="modal-editar-pedido" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2"><span>✏️</span> Editar Pedido / Venta</h2>
+        <button onclick="cerrarModalEditarPedido()" class="text-slate-400 hover:text-white text-lg cursor-pointer">✕</button>
+      </div>
+      <form id="form-editar-pedido" class="space-y-3 text-xs">
+        <input type="hidden" id="edit-p-id">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-slate-400">Fecha</label>
+            <input type="date" id="edit-p-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Estado del Pedido</label>
+            <select id="edit-p-estado" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              <option value="Recibido">📥 Recibido</option>
+              <option value="Notificado">🔔 Notificado</option>
+              <option value="Confirmado">✅ Confirmado</option>
+              <option value="Sin respuesta">⏳ Sin respuesta</option>
+              <option value="Cancelado">❌ Cancelado</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-slate-400">Detalle / ID Pedido / Cliente</label>
+          <input type="text" id="edit-p-detalle" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div>
+            <label class="text-slate-400">Venta Total ($)</label>
+            <input type="number" id="edit-p-ingreso" min="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Costo Prov. ($)</label>
+            <input type="number" id="edit-p-costo-prod" min="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Flete ($)</label>
+            <input type="number" id="edit-p-costo-envio" min="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Dropi ($)</label>
+            <input type="number" id="edit-p-comision-dropi" min="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalEditarPedido()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl transition cursor-pointer shadow-lg shadow-sky-600/20">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL CONFIGURACIÓN -->
   <div id="modal-config" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4">
@@ -759,6 +1205,153 @@
     </div>
   </div>
 
+  <!-- MODAL DE AUTENTICACIÓN (LOGIN, REGISTRO & GOOGLE) -->
+  <div id="modal-auth" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[998] hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5 relative my-auto">
+      
+      <!-- Botón Cerrar Modal -->
+      <button onclick="cerrarModalAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 transition cursor-pointer" title="Cerrar">
+        <span class="text-sm font-bold">✕</span>
+      </button>
+
+      <!-- Encabezado Modal -->
+      <div class="text-center space-y-1.5 pt-1">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center mx-auto shadow-lg shadow-sky-600/30 text-xl border border-sky-400/30">
+          🔐
+        </div>
+        <h2 id="auth-modal-titulo" class="text-lg font-bold text-white tracking-tight">Acceso a la Suite Financiera</h2>
+        <p id="auth-modal-subtitulo" class="text-xs text-slate-400 max-w-xs mx-auto">Inicia sesión o regístrate para sincronizar tus métricas y finanzas en la nube.</p>
+      </div>
+
+      <!-- Selector de Modo: Iniciar Sesión / Registrarse -->
+      <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+        <button type="button" id="tab-auth-btn-login" onclick="cambiarModoAuth('login')" class="flex-1 py-2 rounded-lg bg-sky-600 text-white transition shadow-sm cursor-pointer">
+          Iniciar Sesión
+        </button>
+        <button type="button" id="tab-auth-btn-registro" onclick="cambiarModoAuth('registro')" class="flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+          Crear Cuenta
+        </button>
+      </div>
+
+      <!-- BOTÓN PRINCIPAL GOOGLE OAUTH -->
+      <div>
+        <button type="button" id="btn-google-auth" onclick="loginConGoogle()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 px-4 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-black/20 active:scale-[0.99] cursor-pointer">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span id="btn-google-auth-text">Continuar con Google</span>
+        </button>
+        <p class="text-[10px] text-slate-500 text-center mt-1.5">Acceso instantáneo y seguro sin recordar contraseñas</p>
+      </div>
+
+      <!-- Separador Visual -->
+      <div class="relative flex py-0.5 items-center">
+        <div class="flex-grow border-t border-slate-800"></div>
+        <span class="flex-shrink mx-3 text-slate-500 text-[11px] uppercase font-semibold">o con tu correo</span>
+        <div class="flex-grow border-t border-slate-800"></div>
+      </div>
+
+      <!-- Caja de Mensajes / Errores de Auth -->
+      <div id="auth-mensaje-box" class="hidden p-3 rounded-xl text-xs font-medium border flex items-start gap-2">
+        <span id="auth-mensaje-icono" class="text-sm">⚠️</span>
+        <span id="auth-mensaje-texto" class="flex-1 leading-relaxed"></span>
+      </div>
+
+      <!-- FORMULARIO 1: INICIAR SESIÓN -->
+      <form id="form-auth-login" onsubmit="loginConPassword(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Correo Electrónico</label>
+          <input type="email" id="auth-login-email" required placeholder="tu@correo.com" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
+          <div class="relative">
+            <input type="password" id="auth-login-pass" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-2.5 pr-9 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+            <button type="button" onclick="alternarVisibilidadPassword('auth-login-pass', 'icono-toggle-login-pass')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer p-1 text-xs">
+              <span id="icono-toggle-login-pass">👁️</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit-login" class="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl text-xs shadow-lg shadow-sky-600/20 transition active:scale-[0.99] cursor-pointer">
+          Iniciar Sesión
+        </button>
+
+        <p class="text-center text-xs text-slate-400 pt-1">
+          ¿No tienes una cuenta? <button type="button" onclick="cambiarModoAuth('registro')" class="text-sky-400 hover:text-sky-300 font-semibold underline cursor-pointer">Regístrate gratis</button>
+        </p>
+      </form>
+
+      <!-- FORMULARIO 2: CREAR CUENTA NUEVA -->
+      <form id="form-auth-registro" onsubmit="registrarUsuario(event)" class="space-y-3.5 hidden">
+        <div>
+          <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Nombre Completo / Usuario</label>
+          <input type="text" id="auth-reg-nombre" placeholder="Ej: Sebastián Toro" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Correo Electrónico</label>
+          <input type="email" id="auth-reg-email" required placeholder="tu@correo.com" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Contraseña (Mínimo 6 caracteres)</label>
+          <div class="relative">
+            <input type="password" id="auth-reg-pass" required minlength="6" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-2.5 pr-9 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+            <button type="button" onclick="alternarVisibilidadPassword('auth-reg-pass', 'icono-toggle-reg-pass')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer p-1 text-xs">
+              <span id="icono-toggle-reg-pass">👁️</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Confirmar Contraseña</label>
+          <div class="relative">
+            <input type="password" id="auth-reg-pass-conf" required minlength="6" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-2.5 pr-9 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+            <button type="button" onclick="alternarVisibilidadPassword('auth-reg-pass-conf', 'icono-toggle-reg-pass-conf')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer p-1 text-xs">
+              <span id="icono-toggle-reg-pass-conf">👁️</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit-reg" class="w-full py-2.5 px-4 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold rounded-xl text-xs shadow-lg shadow-sky-600/20 transition active:scale-[0.99] cursor-pointer">
+          Crear Cuenta
+        </button>
+
+        <p class="text-center text-xs text-slate-400 pt-1">
+          ¿Ya tienes una cuenta? <button type="button" onclick="cambiarModoAuth('login')" class="text-sky-400 hover:text-sky-300 font-semibold underline cursor-pointer">Inicia sesión aquí</button>
+        </p>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMACIÓN GENÉRICO IN-APP -->
+  <div id="modal-confirmacion-app" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999] hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center mx-auto text-2xl">
+        ⚠️
+      </div>
+      <h3 id="modal-confirm-titulo" class="text-base font-bold text-white">¿Confirmar Acción?</h3>
+      <p id="modal-confirm-mensaje" class="text-xs text-slate-300">¿Estás seguro de que deseas continuar con esta operación?</p>
+      <div class="flex items-center justify-center gap-3 pt-2">
+        <button id="btn-modal-confirm-cancelar" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer">
+          Cancelar
+        </button>
+        <button id="btn-modal-confirm-aceptar" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition shadow-lg shadow-rose-600/20 cursor-pointer">
+          Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[1000] flex flex-col gap-2 pointer-events-none"></div>
+
   <script>
     // ==========================================
     // CLIENTE SUPABASE & VARIABLES GLOBALES
@@ -779,8 +1372,300 @@
     // Buffer del modal para subir cartolas nuevas
     let bufferModalCartola = [];
 
+    // Usuario autenticado
+    let usuarioActual = null;
+
+    // ==========================================
+    // SISTEMA DE AUTENTICACIÓN (LOGIN, REGISTRO & GOOGLE)
+    // ==========================================
+    function abrirModalAuth(modo = 'login') {
+      const modal = document.getElementById('modal-auth');
+      if (!modal) return;
+      cambiarModoAuth(modo);
+      modal.classList.remove('hidden');
+    }
+
+    function cerrarModalAuth() {
+      const modal = document.getElementById('modal-auth');
+      if (modal) modal.classList.add('hidden');
+      ocultarMensajeAuth();
+    }
+
+    function cambiarModoAuth(modo) {
+      const btnLogin = document.getElementById('tab-auth-btn-login');
+      const btnReg = document.getElementById('tab-auth-btn-registro');
+      const formLogin = document.getElementById('form-auth-login');
+      const formReg = document.getElementById('form-auth-registro');
+      const tit = document.getElementById('auth-modal-titulo');
+      const sub = document.getElementById('auth-modal-subtitulo');
+      const googleBtnText = document.getElementById('btn-google-auth-text');
+      ocultarMensajeAuth();
+
+      if (modo === 'login') {
+        if (btnLogin) btnLogin.className = 'flex-1 py-2 rounded-lg bg-sky-600 text-white transition shadow-sm cursor-pointer';
+        if (btnReg) btnReg.className = 'flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition cursor-pointer';
+        if (formLogin) formLogin.classList.remove('hidden');
+        if (formReg) formReg.classList.add('hidden');
+        if (tit) tit.textContent = 'Iniciar Sesión en Suite Financiera';
+        if (sub) sub.textContent = 'Ingresa con tu cuenta de Google o correo para gestionar tus métricas.';
+        if (googleBtnText) googleBtnText.textContent = 'Continuar con Google';
+      } else {
+        if (btnReg) btnReg.className = 'flex-1 py-2 rounded-lg bg-gradient-to-r from-sky-600 to-indigo-600 text-white transition shadow-sm cursor-pointer';
+        if (btnLogin) btnLogin.className = 'flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition cursor-pointer';
+        if (formLogin) formLogin.classList.add('hidden');
+        if (formReg) formReg.classList.remove('hidden');
+        if (tit) tit.textContent = 'Crear Nueva Cuenta';
+        if (sub) sub.textContent = 'Regístrate con tu cuenta de Google o correo para acceder a la suite.';
+        if (googleBtnText) googleBtnText.textContent = 'Registrarse con Google';
+      }
+    }
+
+    function alternarVisibilidadPassword(inputId, iconoId) {
+      const input = document.getElementById(inputId);
+      const icono = document.getElementById(iconoId);
+      if (!input || !icono) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        icono.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        icono.textContent = '👁️';
+      }
+    }
+
+    function mostrarMensajeAuth(texto, tipo = 'error') {
+      const box = document.getElementById('auth-mensaje-box');
+      const icon = document.getElementById('auth-mensaje-icono');
+      const txt = document.getElementById('auth-mensaje-texto');
+      if (!box || !txt) return;
+
+      txt.textContent = texto;
+      if (tipo === 'success') {
+        box.className = 'p-3 rounded-xl text-xs font-medium border border-emerald-500/40 bg-emerald-950/80 text-emerald-200 flex items-start gap-2';
+        icon.textContent = '✅';
+      } else {
+        box.className = 'p-3 rounded-xl text-xs font-medium border border-rose-500/40 bg-rose-950/80 text-rose-200 flex items-start gap-2';
+        icon.textContent = '⚠️';
+      }
+      box.classList.remove('hidden');
+    }
+
+    function ocultarMensajeAuth() {
+      const box = document.getElementById('auth-mensaje-box');
+      if (box) box.classList.add('hidden');
+    }
+
+    async function loginConGoogle() {
+      const btn = document.getElementById('btn-google-auth');
+      const originalHtml = btn.innerHTML;
+      try {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="animate-spin text-sm">⏳</span> <span class="text-xs">Conectando con Google...</span>';
+        ocultarMensajeAuth();
+
+        const redirectUrl = window.location.origin + window.location.pathname;
+        const { data, error } = await db.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectUrl
+          }
+        });
+
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error Google OAuth:', err);
+        mostrarMensajeAuth('Error al conectar con Google: ' + (err.message || err), 'error');
+        mostrarToast('Error con Google: ' + (err.message || err), 'error');
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+
+    async function loginConPassword(e) {
+      if (e) e.preventDefault();
+      const email = (document.getElementById('auth-login-email').value || '').trim();
+      const pass = (document.getElementById('auth-login-pass').value || '');
+      const btn = document.getElementById('btn-submit-login');
+
+      if (!email || !pass) {
+        mostrarMensajeAuth('Por favor completa todos los campos requeridos.', 'error');
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = 'Iniciando sesión...';
+        ocultarMensajeAuth();
+
+        const { data, error } = await db.auth.signInWithPassword({
+          email: email,
+          password: pass
+        });
+
+        if (error) throw error;
+
+        mostrarToast('¡Inicio de sesión exitoso!', 'success');
+        cerrarModalAuth();
+      } catch (err) {
+        console.error('Error login:', err);
+        let mensajeAmigable = err.message;
+        if (err.message === 'Invalid login credentials' || err.message.includes('invalid_credentials')) {
+          mensajeAmigable = 'Correo o contraseña incorrectos. Por favor verifica tus datos.';
+        } else if (err.message.includes('Email not confirmed')) {
+          mensajeAmigable = 'Tu correo aún no ha sido confirmado. Por favor revisa tu bandeja de entrada.';
+        }
+        mostrarMensajeAuth(mensajeAmigable, 'error');
+        mostrarToast(mensajeAmigable, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Iniciar Sesión';
+      }
+    }
+
+    async function registrarUsuario(e) {
+      if (e) e.preventDefault();
+      const nombre = (document.getElementById('auth-reg-nombre').value || '').trim();
+      const email = (document.getElementById('auth-reg-email').value || '').trim();
+      const pass = (document.getElementById('auth-reg-pass').value || '');
+      const passConf = (document.getElementById('auth-reg-pass-conf').value || '');
+      const btn = document.getElementById('btn-submit-reg');
+
+      if (!email || !pass) {
+        mostrarMensajeAuth('Por favor ingresa un correo y contraseña.', 'error');
+        return;
+      }
+
+      if (pass.length < 6) {
+        mostrarMensajeAuth('La contraseña debe contener al menos 6 caracteres.', 'error');
+        return;
+      }
+
+      if (pass !== passConf) {
+        mostrarMensajeAuth('Las contraseñas ingresadas no coinciden.', 'error');
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = 'Creando cuenta...';
+        ocultarMensajeAuth();
+
+        const { data, error } = await db.auth.signUp({
+          email: email,
+          password: pass,
+          options: {
+            data: {
+              full_name: nombre || email.split('@')[0]
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        if (data.session) {
+          mostrarToast('¡Cuenta creada y sesión iniciada con éxito!', 'success');
+          cerrarModalAuth();
+        } else if (data.user) {
+          mostrarMensajeAuth('¡Registro completado! Si Supabase tiene confirmación activada, revisa tu correo electrónico para verificar tu cuenta.', 'success');
+          mostrarToast('¡Registro completado! Revisa tu correo.', 'success');
+        }
+      } catch (err) {
+        console.error('Error al registrar:', err);
+        mostrarMensajeAuth('Error en el registro: ' + err.message, 'error');
+        mostrarToast('Error al registrar: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Crear Cuenta';
+      }
+    }
+
+    async function confirmarCerrarSesion() {
+      const confirmado = await pedirConfirmacion({
+        titulo: '¿Cerrar Sesión?',
+        mensaje: '¿Estás seguro de que deseas salir de tu cuenta?',
+        btnTexto: 'Cerrar Sesión',
+        btnClase: 'bg-indigo-600 hover:bg-indigo-500 text-white'
+      });
+      if (!confirmado) return;
+
+      try {
+        await db.auth.signOut();
+        usuarioActual = null;
+        actualizarUIUsuario(null);
+        mostrarToast('Sesión cerrada correctamente.', 'info');
+      } catch (err) {
+        mostrarToast('Error al cerrar sesión: ' + err.message, 'error');
+      }
+    }
+
+    function actualizarUIUsuario(user) {
+      const btnLoginHeader = document.getElementById('btn-auth-header-login');
+      const perfilHeader = document.getElementById('usuario-perfil-header');
+      const avatarEl = document.getElementById('usuario-avatar');
+      const nombreEl = document.getElementById('usuario-nombre');
+      const emailEl = document.getElementById('usuario-email');
+
+      if (user) {
+        if (btnLoginHeader) btnLoginHeader.classList.add('hidden');
+        if (perfilHeader) perfilHeader.classList.remove('hidden');
+
+        const meta = user.user_metadata || {};
+        const nombre = meta.full_name || meta.name || (user.email ? user.email.split('@')[0] : 'Usuario');
+        const avatarUrl = meta.avatar_url || meta.picture;
+        const initial = (nombre || user.email || 'U').charAt(0).toUpperCase();
+
+        if (avatarEl) {
+          if (avatarUrl) {
+            avatarEl.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="w-full h-full object-cover">`;
+          } else {
+            avatarEl.innerHTML = initial;
+            avatarEl.className = 'w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold flex items-center justify-center overflow-hidden border border-indigo-400/40 shrink-0';
+          }
+        }
+
+        if (nombreEl) nombreEl.textContent = nombre;
+        if (emailEl) emailEl.textContent = user.email || '';
+      } else {
+        if (btnLoginHeader) btnLoginHeader.classList.remove('hidden');
+        if (perfilHeader) perfilHeader.classList.add('hidden');
+      }
+    }
+
+    async function inicializarAuth() {
+      try {
+        // Verificar sesión inicial
+        const { data: { session }, error } = await db.auth.getSession();
+        if (session && session.user) {
+          usuarioActual = session.user;
+          actualizarUIUsuario(usuarioActual);
+        } else {
+          usuarioActual = null;
+          actualizarUIUsuario(null);
+        }
+      } catch (err) {
+        console.warn('Error al verificar sesión Supabase:', err);
+      }
+
+      // Escuchar cambios de autenticación
+      db.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          usuarioActual = session.user;
+          actualizarUIUsuario(usuarioActual);
+          cerrarModalAuth();
+          const meta = usuarioActual.user_metadata || {};
+          const nombre = meta.full_name || meta.name || usuarioActual.email.split('@')[0];
+          mostrarToast(`¡Bienvenido/a, ${nombre}!`, 'success');
+          cargarTodo();
+        } else if (event === 'SIGNED_OUT') {
+          usuarioActual = null;
+          actualizarUIUsuario(null);
+        }
+      });
+    }
+
     let chartEvolucion = null;
     let chartDistribucion = null;
+    let chartPedidosEstados = null;
     let chartFlujoPersonal = null;
     let chartGastosCat = null;
     let chartInversiones = null;
@@ -800,13 +1685,92 @@
 
     const formatoCLP = (v) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
+    // ==========================================
+    // SISTEMA IN-APP DE NOTIFICACIONES Y DIÁLOGOS
+    // ==========================================
+    function mostrarToast(mensaje, tipo = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) {
+        console.log(`[Toast ${tipo}] ${mensaje}`);
+        return;
+      }
+      const toast = document.createElement('div');
+      const colores = {
+        success: 'bg-emerald-950/95 border-emerald-500/60 text-emerald-100',
+        error: 'bg-rose-950/95 border-rose-500/60 text-rose-100',
+        warning: 'bg-amber-950/95 border-amber-500/60 text-amber-100',
+        info: 'bg-slate-900/95 border-sky-500/60 text-sky-100'
+      };
+      const iconos = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md text-xs font-medium transition-all duration-300 transform translate-y-4 opacity-0 ${colores[tipo] || colores.info}`;
+      toast.innerHTML = `<span class="text-base">${iconos[tipo] || 'ℹ️'}</span><span class="leading-tight">${mensaje}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      });
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function pedirConfirmacion({ titulo = '¿Confirmar Acción?', mensaje = '¿Estás seguro?', btnTexto = 'Sí, Eliminar', btnClase = 'bg-rose-600 hover:bg-rose-500 text-white' }) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('modal-confirmacion-app');
+        const elTit = document.getElementById('modal-confirm-titulo');
+        const elMsg = document.getElementById('modal-confirm-mensaje');
+        const btnCancel = document.getElementById('btn-modal-confirm-cancelar');
+        const btnOk = document.getElementById('btn-modal-confirm-aceptar');
+
+        if (!modal || !btnCancel || !btnOk) {
+          resolve(true);
+          return;
+        }
+
+        elTit.textContent = titulo;
+        elMsg.textContent = mensaje;
+        btnOk.textContent = btnTexto;
+        btnOk.className = `px-4 py-2 rounded-xl text-xs font-semibold transition shadow-lg cursor-pointer ${btnClase}`;
+
+        modal.classList.remove('hidden');
+
+        const handleCancel = () => {
+          cleanup();
+          modal.classList.add('hidden');
+          resolve(false);
+        };
+
+        const handleOk = () => {
+          cleanup();
+          modal.classList.add('hidden');
+          resolve(true);
+        };
+
+        const cleanup = () => {
+          btnCancel.removeEventListener('click', handleCancel);
+          btnOk.removeEventListener('click', handleOk);
+        };
+
+        btnCancel.addEventListener('click', handleCancel, { once: true });
+        btnOk.addEventListener('click', handleOk, { once: true });
+      });
+    }
+
     function cambiarModoFiltro() {
-      const tipo = document.getElementById('filtro-tipo').value;
+      const tipoEl = document.getElementById('filtro-tipo');
+      const tipo = tipoEl ? tipoEl.value : 'mes';
       const inputMes = document.getElementById('filtro-mes');
-      if (tipo === 'mes') {
-        inputMes.classList.remove('hidden');
-      } else {
-        inputMes.classList.add('hidden');
+      if (inputMes) {
+        if (tipo === 'mes') {
+          inputMes.classList.remove('hidden');
+        } else {
+          inputMes.classList.add('hidden');
+        }
       }
       cargarTodo();
     }
@@ -821,16 +1785,32 @@
       const cfgRetSii = localStorage.getItem('cfg_ret_sii') || '15.25';
       const cfgTasaInv = localStorage.getItem('cfg_tasa_inv') || '8.0';
 
-      document.getElementById('app-logo-img').src = cfgLogo;
-      document.getElementById('label-ws-drop').textContent = cfgWsDrop;
-      document.getElementById('label-ws-pers').textContent = cfgWsPers;
-      document.getElementById('h-ret-tasa').value = cfgRetSii;
-      document.getElementById('inv-tasa').value = cfgTasaInv;
+      const logoImg = document.getElementById('app-logo-img');
+      if (logoImg) logoImg.src = cfgLogo;
 
-      document.getElementById('cfg-ws-drop').value = cfgWsDrop;
-      document.getElementById('cfg-ws-pers').value = cfgWsPers;
-      document.getElementById('cfg-ret-sii').value = cfgRetSii;
-      document.getElementById('cfg-tasa-inv').value = cfgTasaInv;
+      const lblWsDrop = document.getElementById('label-ws-drop');
+      if (lblWsDrop) lblWsDrop.textContent = cfgWsDrop;
+
+      const lblWsPers = document.getElementById('label-ws-pers');
+      if (lblWsPers) lblWsPers.textContent = cfgWsPers;
+
+      const hRetTasa = document.getElementById('h-ret-tasa');
+      if (hRetTasa) hRetTasa.value = cfgRetSii;
+
+      const invTasa = document.getElementById('inv-tasa');
+      if (invTasa) invTasa.value = cfgTasaInv;
+
+      const cfgWsDropInput = document.getElementById('cfg-ws-drop');
+      if (cfgWsDropInput) cfgWsDropInput.value = cfgWsDrop;
+
+      const cfgWsPersInput = document.getElementById('cfg-ws-pers');
+      if (cfgWsPersInput) cfgWsPersInput.value = cfgWsPers;
+
+      const cfgRetSiiInput = document.getElementById('cfg-ret-sii');
+      if (cfgRetSiiInput) cfgRetSiiInput.value = cfgRetSii;
+
+      const cfgTasaInvInput = document.getElementById('cfg-tasa-inv');
+      if (cfgTasaInvInput) cfgTasaInvInput.value = cfgTasaInv;
     }
 
     function cargarLogoLocal(event) {
@@ -840,15 +1820,22 @@
       reader.onload = function(e) {
         const base64Image = e.target.result;
         localStorage.setItem('cfg_logo_local', base64Image);
-        document.getElementById('app-logo-img').src = base64Image;
+        const logoImg = document.getElementById('app-logo-img');
+        if (logoImg) logoImg.src = base64Image;
       };
       reader.readAsDataURL(file);
     }
 
-    function abrirModalConfig() { document.getElementById('modal-config').classList.remove('hidden'); }
-    function cerrarModalConfig() { document.getElementById('modal-config').classList.add('hidden'); }
+    function abrirModalConfig() {
+      const m = document.getElementById('modal-config');
+      if (m) m.classList.remove('hidden');
+    }
+    function cerrarModalConfig() {
+      const m = document.getElementById('modal-config');
+      if (m) m.classList.add('hidden');
+    }
 
-    document.getElementById('form-config').addEventListener('submit', (e) => {
+    document.getElementById('form-config')?.addEventListener('submit', (e) => {
       e.preventDefault();
       localStorage.setItem('cfg_ws_drop', document.getElementById('cfg-ws-drop').value.trim());
       localStorage.setItem('cfg_ws_pers', document.getElementById('cfg-ws-pers').value.trim());
@@ -856,7 +1843,7 @@
       localStorage.setItem('cfg_tasa_inv', document.getElementById('cfg-tasa-inv').value);
       aplicarConfiguraciones();
       cerrarModalConfig();
-      alert('¡Configuración guardada!');
+      mostrarToast('¡Configuración guardada!', 'success');
     });
 
     // ==========================================
@@ -873,22 +1860,22 @@
       const sub = document.getElementById('header-subtitulo-principal');
 
       if (ws === 'dropshipping') {
-        btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition';
-        btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
-        wsDrop.classList.remove('hidden');
-        wsPers.classList.add('hidden');
-        btnCsv.classList.remove('hidden');
-        tit.textContent = localStorage.getItem('cfg_ws_drop') || 'Negocio';
-        sub.textContent = 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
+        if (btnDrop) btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition';
+        if (btnPers) btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+        if (wsDrop) wsDrop.classList.remove('hidden');
+        if (wsPers) wsPers.classList.add('hidden');
+        if (btnCsv) btnCsv.classList.remove('hidden');
+        if (tit) tit.textContent = localStorage.getItem('cfg_ws_drop') || 'Negocio';
+        if (sub) sub.textContent = 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
         setTimeout(renderizarGraficosDrop, 60);
       } else {
-        btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition';
-        btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
-        wsDrop.classList.add('hidden');
-        wsPers.classList.remove('hidden');
-        btnCsv.classList.add('hidden');
-        tit.textContent = localStorage.getItem('cfg_ws_pers') || 'Finanzas Personales';
-        sub.textContent = 'Boletas de Honorarios, Gastos Personales e Inversiones';
+        if (btnPers) btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition';
+        if (btnDrop) btnDrop.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+        if (wsDrop) wsDrop.classList.add('hidden');
+        if (wsPers) wsPers.classList.remove('hidden');
+        if (btnCsv) btnCsv.classList.add('hidden');
+        if (tit) tit.textContent = localStorage.getItem('cfg_ws_pers') || 'Finanzas Personales';
+        if (sub) sub.textContent = 'Boletas de Honorarios, Gastos Personales e Inversiones';
         setTimeout(renderizarGraficosPersonal, 60);
       }
     }
@@ -901,7 +1888,13 @@
       });
       const target = document.getElementById(`tab-drop-${tab}`);
       if (target) target.classList.remove('hidden');
-      const btn = document.getElementById(`tab-drop-${tab}-btn`);
+
+      let btnId = 'tab-drop-dash-btn';
+      if (tab === 'pedidos') btnId = 'tab-drop-ped-btn';
+      if (tab === 'ads') btnId = 'tab-drop-ads-btn';
+      if (tab === 'costos') btnId = 'tab-drop-cost-btn';
+
+      const btn = document.getElementById(btnId);
       if (btn) {
         btn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
         btn.classList.remove('border-transparent', 'text-slate-400');
@@ -942,15 +1935,15 @@
       const btnExtra = document.getElementById('subtab-extra-btn');
 
       if (tipo === 'boleta') {
-        secBoleta.classList.remove('hidden');
-        secExtra.classList.add('hidden');
-        btnBoleta.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition';
-        btnExtra.className = 'text-xs font-medium px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+        if (secBoleta) secBoleta.classList.remove('hidden');
+        if (secExtra) secExtra.classList.add('hidden');
+        if (btnBoleta) btnBoleta.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition';
+        if (btnExtra) btnExtra.className = 'text-xs font-medium px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
       } else {
-        secBoleta.classList.add('hidden');
-        secExtra.classList.remove('hidden');
-        btnExtra.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition';
-        btnBoleta.className = 'text-xs font-medium px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+        if (secBoleta) secBoleta.classList.add('hidden');
+        if (secExtra) secExtra.classList.remove('hidden');
+        if (btnExtra) btnExtra.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition';
+        if (btnBoleta) btnBoleta.className = 'text-xs font-medium px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
       }
     }
 
@@ -1008,7 +2001,10 @@
           qInv
         ]);
 
-        datosDrop.ventas = resVentas?.data || [];
+        datosDrop.ventas = (resVentas?.data || []).map(v => ({
+          ...v,
+          estado: v.estado || obtenerEstadoPedido(v.id, 'Recibido')
+        }));
         datosDrop.ads = resAds?.data || [];
         datosDrop.costos = resCostos?.data || [];
         datosPersonal.honorarios = resHon?.data || [];
@@ -1024,46 +2020,229 @@
       construirListaConsolidada();
     }
 
+    function obtenerEstadoPedido(id, fallback = 'Recibido') {
+      try {
+        const map = JSON.parse(localStorage.getItem('pedidos_estados_map') || '{}');
+        if (id && map[id]) return map[id];
+      } catch (e) {}
+      return fallback;
+    }
+
+    function guardarEstadoPedidoLocal(id, estado) {
+      if (!id) return;
+      try {
+        const map = JSON.parse(localStorage.getItem('pedidos_estados_map') || '{}');
+        map[id] = estado;
+        localStorage.setItem('pedidos_estados_map', JSON.stringify(map));
+      } catch (e) {}
+    }
+
+    let filtroPedidoEstado = 'todos';
+
+    function filtrarPedidosPorEstado(estado) {
+      filtroPedidoEstado = estado;
+      const botones = document.querySelectorAll('.btn-fc-ped');
+      botones.forEach(b => {
+        b.className = 'btn-fc-ped px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer';
+      });
+      
+      const idNormalizado = 'f-ped-' + estado.replace(/\s+/g, '-');
+      const activo = document.getElementById(idNormalizado);
+      if (activo) {
+        activo.className = 'btn-fc-ped px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold cursor-pointer';
+      }
+      renderizarTablaPedidos();
+    }
+
+    function obtenerEstiloSelectPedido(estado) {
+      switch (estado) {
+        case 'Recibido':
+          return 'bg-sky-950/90 text-sky-300 border-sky-800/80';
+        case 'Notificado':
+          return 'bg-amber-950/90 text-amber-300 border-amber-800/80';
+        case 'Confirmado':
+          return 'bg-emerald-950/90 text-emerald-300 border-emerald-800/80';
+        case 'Sin respuesta':
+          return 'bg-purple-950/90 text-purple-300 border-purple-800/80';
+        case 'Cancelado':
+          return 'bg-rose-950/90 text-rose-300 border-rose-800/80';
+        default:
+          return 'bg-slate-800 text-slate-300 border-slate-700';
+      }
+    }
+
+    function obtenerPedidosFiltrados() {
+      const query = (document.getElementById('buscador-pedidos')?.value || '').toLowerCase().trim();
+      return (datosDrop.ventas || []).filter(v => {
+        const estado = v.estado || 'Recibido';
+        const matchEstado = (filtroPedidoEstado === 'todos') || (estado.toLowerCase() === filtroPedidoEstado.toLowerCase());
+        const matchBusqueda = !query || 
+          (v.cliente_detalle && v.cliente_detalle.toLowerCase().includes(query)) ||
+          (v.fecha && v.fecha.toLowerCase().includes(query)) ||
+          (estado && estado.toLowerCase().includes(query));
+        return matchEstado && matchBusqueda;
+      });
+    }
+
+    function toggleSeleccionPedido(id, check) {
+      const v = datosDrop.ventas.find(x => x.id == id);
+      if (v) v.seleccionado = check;
+      actualizarEstadoCheckAllPedidos();
+    }
+
+    function toggleSeleccionarTodosPedidos(check) {
+      const filtrados = obtenerPedidosFiltrados();
+      filtrados.forEach(v => {
+        v.seleccionado = check;
+      });
+      renderizarTablaPedidos();
+    }
+
+    function actualizarEstadoCheckAllPedidos() {
+      const filtrados = obtenerPedidosFiltrados();
+      const total = filtrados.length;
+      const marcados = filtrados.filter(x => x.seleccionado).length;
+      const checkAll = document.getElementById('check-pedidos-all');
+      if (checkAll) {
+        checkAll.checked = total > 0 && marcados === total;
+        checkAll.indeterminate = marcados > 0 && marcados < total;
+      }
+      const btnEliminar = document.getElementById('btn-eliminar-pedidos-marcados');
+      if (btnEliminar) {
+        if (marcados > 0) {
+          btnEliminar.innerHTML = `<span>🗑️ Eliminar Marcados (${marcados})</span>`;
+          btnEliminar.className = 'bg-rose-600 hover:bg-rose-500 text-white font-semibold px-3 py-2 rounded-xl text-xs transition flex items-center gap-1 cursor-pointer shadow-lg shadow-rose-600/30';
+        } else {
+          btnEliminar.innerHTML = `<span>🗑️ Eliminar Marcados</span>`;
+          btnEliminar.className = 'bg-rose-950/40 text-rose-400 border border-rose-800/40 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 cursor-pointer opacity-70';
+        }
+      }
+    }
+
+    function renderizarTablaPedidos() {
+      const cuerpoVentas = document.getElementById('tabla-ventas');
+      if (!cuerpoVentas) return;
+
+      const pedidos = obtenerPedidosFiltrados();
+
+      if (pedidos.length === 0) {
+        const mensaje = datosDrop.ventas.length === 0 
+          ? 'Sin pedidos registrados en este período.'
+          : 'No se encontraron pedidos con los filtros aplicados.';
+        cuerpoVentas.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">${mensaje}</td></tr>`;
+        actualizarEstadoCheckAllPedidos();
+        return;
+      }
+
+      cuerpoVentas.innerHTML = pedidos.map(v => {
+        const costoDropi = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
+        const ingreso = Number(v.ingreso_total || 0);
+        const margen = ingreso - costoDropi;
+        const estado = v.estado || 'Recibido';
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition ${v.seleccionado ? 'bg-sky-950/20' : ''}">
+            <td class="p-3 text-center">
+              <input type="checkbox" onchange="toggleSeleccionPedido(${v.id}, this.checked)" ${v.seleccionado ? 'checked' : ''} class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+            </td>
+            <td class="p-3 text-slate-400 font-mono text-[11px] whitespace-nowrap">${v.fecha}</td>
+            <td class="p-3 font-medium text-slate-200">
+              <div class="line-clamp-2">${v.cliente_detalle}</div>
+            </td>
+            <td class="p-3 text-center">
+              <select onchange="cambiarEstadoPedidoRapido(${v.id}, this.value)" class="text-xs font-semibold px-2 py-1 rounded-lg border focus:outline-none cursor-pointer transition ${obtenerEstiloSelectPedido(estado)}">
+                <option value="Recibido" class="bg-slate-900 text-sky-300" ${estado === 'Recibido' ? 'selected' : ''}>📥 Recibido</option>
+                <option value="Notificado" class="bg-slate-900 text-amber-300" ${estado === 'Notificado' ? 'selected' : ''}>🔔 Notificado</option>
+                <option value="Confirmado" class="bg-slate-900 text-emerald-300" ${estado === 'Confirmado' ? 'selected' : ''}>✅ Confirmado</option>
+                <option value="Sin respuesta" class="bg-slate-900 text-purple-300" ${estado === 'Sin respuesta' ? 'selected' : ''}>⏳ Sin respuesta</option>
+                <option value="Cancelado" class="bg-slate-900 text-rose-300" ${estado === 'Cancelado' ? 'selected' : ''}>❌ Cancelado</option>
+              </select>
+            </td>
+            <td class="p-3 text-right font-medium text-emerald-400 whitespace-nowrap">${formatoCLP(ingreso)}</td>
+            <td class="p-3 text-right text-rose-300 whitespace-nowrap">-${formatoCLP(costoDropi)}</td>
+            <td class="p-3 text-right font-semibold whitespace-nowrap ${margen >= 0 ? 'text-sky-400' : 'text-rose-500'}">${formatoCLP(margen)}</td>
+            <td class="p-3 text-center whitespace-nowrap">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="abrirModalEditarPedido(${v.id})" class="p-1.5 px-2 rounded-lg bg-sky-950 text-sky-300 border border-sky-800/60 hover:bg-sky-900 hover:text-white transition text-xs font-medium cursor-pointer" title="Editar Pedido">
+                  ✏️
+                </button>
+                <button onclick="eliminarVenta(${v.id})" class="p-1.5 px-2 rounded-lg bg-rose-950 text-rose-300 border border-rose-800/60 hover:bg-rose-900 hover:text-white transition text-xs font-medium cursor-pointer" title="Eliminar Pedido">
+                  ✕
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      actualizarEstadoCheckAllPedidos();
+    }
+
     function procesarModuloDropshipping() {
       let totalVentas = 0;
       let totalCostosDropi = 0;
-      const cuerpoVentas = document.getElementById('tabla-ventas');
+      let totalCostoProd = 0;
+      let totalCostoEnvio = 0;
+      let totalComisionDropi = 0;
 
-      if (datosDrop.ventas.length === 0) {
-        cuerpoVentas.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin pedidos registrados en este período.</td></tr>';
-      } else {
-        cuerpoVentas.innerHTML = datosDrop.ventas.map(v => {
-          const costoDropi = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
-          const ingreso = Number(v.ingreso_total || 0);
-          const margen = ingreso - costoDropi;
-          totalVentas += ingreso;
-          totalCostosDropi += costoDropi;
+      // Conteo de estados
+      const conteoEstados = {
+        'Recibido': 0,
+        'Notificado': 0,
+        'Confirmado': 0,
+        'Sin respuesta': 0,
+        'Cancelado': 0
+      };
 
-          return `
-            <tr class="hover:bg-slate-800/40">
-              <td class="p-3 text-slate-400">${v.fecha}</td>
-              <td class="p-3 font-medium text-slate-200">${v.cliente_detalle}</td>
-              <td class="p-3 text-right font-medium text-emerald-400">${formatoCLP(ingreso)}</td>
-              <td class="p-3 text-right text-rose-300">-${formatoCLP(costoDropi)}</td>
-              <td class="p-3 text-right font-semibold ${margen >= 0 ? 'text-sky-400' : 'text-rose-500'}">${formatoCLP(margen)}</td>
-              <td class="p-3 text-center"><button onclick="eliminarVenta(${v.id})" class="text-rose-400">✕</button></td>
-            </tr>
-          `;
-        }).join('');
-      }
+      // Top productos map
+      const productosMap = {};
 
-      let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto), 0);
+      datosDrop.ventas.forEach(v => {
+        const cProd = Number(v.costo_producto || 0);
+        const cEnv = Number(v.costo_envio || 0);
+        const cCom = Number(v.comision_dropi || 0);
+        const costoDropi = cProd + cEnv + cCom;
+        const ingreso = Number(v.ingreso_total || 0);
+
+        totalVentas += ingreso;
+        totalCostosDropi += costoDropi;
+        totalCostoProd += cProd;
+        totalCostoEnvio += cEnv;
+        totalComisionDropi += cCom;
+
+        // Estado
+        const est = v.estado || 'Recibido';
+        if (conteoEstados[est] !== undefined) {
+          conteoEstados[est]++;
+        } else {
+          conteoEstados['Recibido']++;
+        }
+
+        // Agrupación de top productos
+        const prodKey = (v.cliente_detalle && v.cliente_detalle.trim()) ? v.cliente_detalle.trim() : 'Pedido Estándar';
+        if (!productosMap[prodKey]) {
+          productosMap[prodKey] = { nombre: prodKey, cantidad: 0, ventas: 0, costo: 0, margen: 0 };
+        }
+        productosMap[prodKey].cantidad++;
+        productosMap[prodKey].ventas += ingreso;
+        productosMap[prodKey].costo += costoDropi;
+        productosMap[prodKey].margen += (ingreso - costoDropi);
+      });
+
+      renderizarTablaPedidos();
+
+      let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
       document.getElementById('tabla-ads').innerHTML = datosDrop.ads.map(a => `
         <tr class="hover:bg-slate-800/40">
           <td class="p-3 text-slate-400">${a.fecha}</td>
           <td class="p-3 font-medium text-slate-200">${a.plataforma}</td>
           <td class="p-3 font-medium text-indigo-300 text-right">${formatoCLP(a.gasto)}</td>
-          <td class="p-3 text-center"><button onclick="eliminarAds(${a.id})" class="text-rose-400">✕</button></td>
+          <td class="p-3 text-center"><button onclick="eliminarAds(${a.id})" class="text-rose-400 hover:text-rose-300 cursor-pointer">✕</button></td>
         </tr>
       `).join('');
 
       let totalFijosMes = datosDrop.costos.reduce((acc, c) => {
-        let f = Number(c.monto);
+        let f = Number(c.monto || 0);
         if (c.frecuencia_dias === 90) f /= 3;
         if (c.frecuencia_dias === 365) f /= 12;
         return acc + f;
@@ -1075,27 +2254,229 @@
           <td class="p-3 text-slate-400">${c.frecuencia_dias}d</td>
           <td class="p-3 text-right text-slate-400">${formatoCLP(c.monto)}</td>
           <td class="p-3 text-right font-medium text-rose-400">${formatoCLP(c.monto / (c.frecuencia_dias === 90 ? 3 : (c.frecuencia_dias === 365 ? 12 : 1)))}</td>
-          <td class="p-3 text-center"><button onclick="eliminarCosto(${c.id})" class="text-rose-400">✕</button></td>
+          <td class="p-3 text-center"><button onclick="eliminarCosto(${c.id})" class="text-rose-400 hover:text-rose-300 cursor-pointer">✕</button></td>
         </tr>
       `).join('');
 
+      const totalPedidos = datosDrop.ventas.length;
       const margenContrib = totalVentas - totalCostosDropi;
       const utilidadNeta = margenContrib - totalAds - totalFijosMes;
       const roas = totalAds > 0 ? (totalVentas / totalAds).toFixed(2) : '0.0';
-      const margenPct = totalVentas > 0 ? ((utilidadNeta / totalVentas) * 100).toFixed(1) : 0;
+      const cpa = totalPedidos > 0 ? (totalAds / totalPedidos) : 0;
+      const margenNetoPct = totalVentas > 0 ? ((utilidadNeta / totalVentas) * 100).toFixed(1) : '0.0';
+      const margenBrutoPct = totalVentas > 0 ? ((margenContrib / totalVentas) * 100).toFixed(1) : '0.0';
 
+      // Métricas Unit Economics
+      const ticketProm = totalPedidos > 0 ? (totalVentas / totalPedidos) : 0;
+      const costoUnitDropi = totalPedidos > 0 ? (totalCostosDropi / totalPedidos) : 0;
+      const margenUnitProm = totalPedidos > 0 ? (margenContrib / totalPedidos) : 0;
+      const netoUnitProm = totalPedidos > 0 ? (utilidadNeta / totalPedidos) : 0;
+
+      // Días activos y Ventas diarias promedio
+      const diasVentasSet = new Set(datosDrop.ventas.map(v => v.fecha));
+      const diasActivos = diasVentasSet.size > 0 ? diasVentasSet.size : 1;
+      const ventasPorDiaProm = totalVentas / diasActivos;
+
+      // Actualizar Barra Superior de KPIs
       document.getElementById('kpi-ventas').textContent = formatoCLP(totalVentas);
-      document.getElementById('kpi-num-ventas').textContent = `${datosDrop.ventas.length} pedidos`;
+      document.getElementById('kpi-num-ventas').textContent = `${totalPedidos} pedidos`;
+      document.getElementById('kpi-ventas-dia').textContent = `Día: ${formatoCLP(ventasPorDiaProm)}`;
+
+      document.getElementById('kpi-ticket-prom').textContent = formatoCLP(ticketProm);
+      document.getElementById('kpi-margen-unit-prom').textContent = `${formatoCLP(margenUnitProm)}/u`;
+
       document.getElementById('kpi-dropi').textContent = formatoCLP(totalCostosDropi);
-      document.getElementById('kpi-margen-bruto').textContent = `Margen: ${formatoCLP(margenContrib)}`;
+      document.getElementById('kpi-margen-bruto').textContent = `Margen: ${formatoCLP(margenContrib)} (${margenBrutoPct}%)`;
+
       document.getElementById('kpi-ads').textContent = formatoCLP(totalAds);
       document.getElementById('kpi-roas').textContent = `ROAS: ${roas}x`;
-      document.getElementById('kpi-fijos').textContent = formatoCLP(totalFijosMes);
+      document.getElementById('kpi-cpa').textContent = `CPA: ${formatoCLP(cpa)}`;
 
       const elUt = document.getElementById('kpi-utilidad');
       elUt.textContent = formatoCLP(utilidadNeta);
-      elUt.className = `text-xl font-bold mt-1 ${utilidadNeta >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
-      document.getElementById('kpi-margen-neto').textContent = `Margen: ${margenPct}%`;
+      elUt.className = `text-lg md:text-xl font-bold mt-1 ${utilidadNeta >= 0 ? 'text-sky-400' : 'text-rose-500'}`;
+      document.getElementById('kpi-margen-neto').textContent = `${margenNetoPct}% Neto`;
+      document.getElementById('kpi-neto-pedido').textContent = `${formatoCLP(netoUnitProm)}/ped`;
+
+      // -------------------------------------------------------------
+      // 1. ALERTA DE PEDIDOS SIN RESPUESTA (>24H / > 1 DÍA)
+      // -------------------------------------------------------------
+      const pedidosSinRespuesta = datosDrop.ventas.filter(v => {
+        const est = v.estado || 'Recibido';
+        return est === 'Sin respuesta' || (v.fecha < hoyFechaStr && (est === 'Recibido' || est === 'Notificado'));
+      });
+      const cantSinRespuestaAntiguos = pedidosSinRespuesta.length;
+      const montoSinRespuesta = pedidosSinRespuesta.reduce((acc, v) => acc + Number(v.ingreso_total || 0), 0);
+
+      const elCardAlerta = document.getElementById('card-alerta-sin-respuesta');
+      const elBadgeAlerta = document.getElementById('alerta-sin-respuesta-badge');
+      const elDescAlerta = document.getElementById('alerta-sin-respuesta-desc');
+      const elMontoAlerta = document.getElementById('alerta-sin-respuesta-monto');
+
+      if (cantSinRespuestaAntiguos > 0) {
+        elCardAlerta.className = 'md:col-span-6 bg-purple-950/40 p-4 rounded-2xl border border-purple-800/80 flex flex-col justify-between transition shadow-lg shadow-purple-950/20';
+        elBadgeAlerta.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-900 text-purple-200 border border-purple-700 whitespace-nowrap animate-pulse';
+        elBadgeAlerta.textContent = `⚠️ ${cantSinRespuestaAntiguos} estancados`;
+        elDescAlerta.textContent = `Tienes ${cantSinRespuestaAntiguos} pedido(s) que llevan más de 24 horas sin respuesta o confirmación. ¡Recontáctalos hoy para rescatar la venta!`;
+        elMontoAlerta.textContent = `Total en riesgo: ${formatoCLP(montoSinRespuesta)}`;
+      } else {
+        elCardAlerta.className = 'md:col-span-6 bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between transition';
+        elBadgeAlerta.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 whitespace-nowrap';
+        elBadgeAlerta.textContent = '✅ Todo al día';
+        elDescAlerta.textContent = 'No hay pedidos con más de 24h sin respuesta pendientes. La atención al cliente está fluida.';
+        elMontoAlerta.textContent = 'Sin montos en riesgo';
+      }
+
+      // -------------------------------------------------------------
+      // 2. PUNTO DE EQUILIBRIO & DIAGNÓSTICO DE VIABILIDAD
+      // -------------------------------------------------------------
+      const ratioMargenContrib = totalVentas > 0 ? (margenContrib / totalVentas) : 0.4;
+      const costosAFinanciar = totalAds + totalFijosMes;
+      const ventaEquilibrio = ratioMargenContrib > 0 ? (costosAFinanciar / ratioMargenContrib) : 0;
+      const pedidosEquilibrio = ticketProm > 0 ? Math.ceil(ventaEquilibrio / ticketProm) : 0;
+
+      document.getElementById('diag-venta-equilibrio').textContent = formatoCLP(ventaEquilibrio);
+      document.getElementById('diag-pedidos-equilibrio').textContent = `${pedidosEquilibrio} pedidos`;
+      document.getElementById('kpi-break-even-mini').textContent = `Eq: ${formatoCLP(ventaEquilibrio)}`;
+
+      const cantConfirmados = conteoEstados['Confirmado'] || 0;
+      const tasaConfirmacion = totalPedidos > 0 ? ((cantConfirmados / totalPedidos) * 100).toFixed(1) : 0;
+      const elBadgeConf = document.getElementById('diagnostico-efectividad-badge');
+      elBadgeConf.textContent = `${tasaConfirmacion}% Confirmados`;
+      elBadgeConf.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${Number(tasaConfirmacion) >= 70 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (Number(tasaConfirmacion) >= 40 ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-rose-950 text-rose-400 border border-rose-800')}`;
+
+      // Texto de diagnóstico
+      const elDiagTexto = document.getElementById('diagnostico-viabilidad-texto');
+      if (totalVentas >= ventaEquilibrio && ventaEquilibrio > 0) {
+        const superavit = totalVentas - ventaEquilibrio;
+        elDiagTexto.textContent = `Operación sobre el punto de equilibrio (+${formatoCLP(superavit)}). El negocio cubre costos fijos y publicidad holgadamente.`;
+      } else if (ventaEquilibrio > 0) {
+        const deficit = ventaEquilibrio - totalVentas;
+        elDiagTexto.textContent = `Faltan ${formatoCLP(deficit)} (${Math.max(0, pedidosEquilibrio - totalPedidos)} pedidos) para alcanzar el punto de equilibrio este mes.`;
+      } else {
+        elDiagTexto.textContent = 'Registra tus costos fijos y ventas para calibrar el punto de equilibrio.';
+      }
+
+      // -------------------------------------------------------------
+      // 3. ÍNDICE DE SALUD Y VIABILIDAD DEL NEGOCIO (0 a 100 pts)
+      // -------------------------------------------------------------
+      let scoreNeto = 0;
+      const numMargenNeto = Number(margenNetoPct);
+      if (numMargenNeto >= 25) scoreNeto = 35;
+      else if (numMargenNeto >= 15) scoreNeto = 25 + ((numMargenNeto - 15) * 1);
+      else if (numMargenNeto >= 5) scoreNeto = 12 + ((numMargenNeto - 5) * 1.3);
+      else if (numMargenNeto > 0) scoreNeto = 5 + (numMargenNeto * 1.4);
+      else scoreNeto = 0;
+
+      let scoreRoas = 0;
+      const numRoas = Number(roas);
+      if (totalAds === 0) {
+        scoreRoas = utilidadNeta >= 0 ? 25 : 10;
+      } else {
+        if (numRoas >= 3.5) scoreRoas = 30;
+        else if (numRoas >= 2.5) scoreRoas = 22 + ((numRoas - 2.5) * 8);
+        else if (numRoas >= 1.8) scoreRoas = 14 + ((numRoas - 1.8) * 11);
+        else if (numRoas >= 1.2) scoreRoas = 5 + ((numRoas - 1.2) * 15);
+        else scoreRoas = 0;
+      }
+
+      const scoreConf = Math.min(20, Math.max(0, Math.round((Number(tasaConfirmacion) / 100) * 20)));
+      const ratioFijos = totalVentas > 0 ? (totalFijosMes / totalVentas) : 0;
+      const scoreFijos = ratioFijos < 0.12 ? 15 : (ratioFijos < 0.25 ? 10 : 4);
+
+      let viabilidadScore = Math.min(100, Math.max(0, Math.round(scoreNeto + scoreRoas + scoreConf + scoreFijos)));
+      if (totalPedidos === 0) viabilidadScore = 0;
+
+      const elViabScore = document.getElementById('kpi-viabilidad-score');
+      const elViabBadge = document.getElementById('kpi-viabilidad-badge');
+      elViabScore.textContent = `${viabilidadScore}/100`;
+
+      if (viabilidadScore >= 80) {
+        elViabScore.className = 'text-lg md:text-xl font-bold text-emerald-400';
+        elViabBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800';
+        elViabBadge.textContent = 'Excelente';
+      } else if (viabilidadScore >= 60) {
+        elViabScore.className = 'text-lg md:text-xl font-bold text-sky-400';
+        elViabBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-sky-950 text-sky-400 border border-sky-800';
+        elViabBadge.textContent = 'Saludable';
+      } else if (viabilidadScore >= 40) {
+        elViabScore.className = 'text-lg md:text-xl font-bold text-amber-400';
+        elViabBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800';
+        elViabBadge.textContent = 'Observación';
+      } else {
+        elViabScore.className = 'text-lg md:text-xl font-bold text-rose-400';
+        elViabBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-rose-950 text-rose-400 border border-rose-800';
+        elViabBadge.textContent = totalPedidos === 0 ? 'Sin datos' : 'Crítico';
+      }
+
+      // Etiquetas adicionales
+      document.getElementById('tag-ventas-dia-prom').textContent = formatoCLP(ventasPorDiaProm);
+      const totalCostosSuma = totalCostosDropi + totalAds + totalFijosMes;
+      document.getElementById('badge-total-costos-sum').textContent = `Costos: ${formatoCLP(totalCostosSuma)}`;
+
+      // -------------------------------------------------------------
+      // 4. EMBUDO DE CONVERSIÓN DE PEDIDOS
+      // -------------------------------------------------------------
+      const cantCancelados = conteoEstados['Cancelado'] || 0;
+      const tasaCancelacion = totalPedidos > 0 ? ((cantCancelados / totalPedidos) * 100).toFixed(1) : 0;
+      document.getElementById('tasa-efectividad-general').textContent = `${tasaConfirmacion}% Éxito`;
+      document.getElementById('funnel-confirmados-pct').textContent = `${tasaConfirmacion}% (${cantConfirmados} ped)`;
+      document.getElementById('funnel-cancelados-pct').textContent = `${tasaCancelacion}% (${cantCancelados} ped)`;
+
+      const configEstados = [
+        { nombre: 'Recibido', color: 'bg-sky-400', textColor: 'text-sky-300' },
+        { nombre: 'Notificado', color: 'bg-amber-400', textColor: 'text-amber-300' },
+        { nombre: 'Confirmado', color: 'bg-emerald-400', textColor: 'text-emerald-300' },
+        { nombre: 'Sin respuesta', color: 'bg-purple-400', textColor: 'text-purple-300' },
+        { nombre: 'Cancelado', color: 'bg-rose-400', textColor: 'text-rose-300' }
+      ];
+
+      document.getElementById('contenedor-embudo-estados').innerHTML = configEstados.map(cfg => {
+        const cant = conteoEstados[cfg.nombre] || 0;
+        const pct = totalPedidos > 0 ? ((cant / totalPedidos) * 100).toFixed(1) : 0;
+        return `
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="font-medium text-slate-300">${cfg.nombre}</span>
+              <span class="font-mono ${cfg.textColor} font-semibold">${cant} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/80">
+              <div class="${cfg.color} h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // -------------------------------------------------------------
+      // 5. TOP PRODUCTOS / PEDIDOS RENTABLES
+      // -------------------------------------------------------------
+      const listaTop = Object.values(productosMap).sort((a, b) => b.margen - a.margen).slice(0, 5);
+      const tablaTop = document.getElementById('tabla-top-productos');
+      if (listaTop.length === 0) {
+        tablaTop.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500">Sin datos de pedidos en este período.</td></tr>';
+        document.getElementById('top-total-generado').textContent = '$0 margen';
+      } else {
+        tablaTop.innerHTML = listaTop.map((item, idx) => {
+          const margenPctItem = item.ventas > 0 ? ((item.margen / item.ventas) * 100).toFixed(0) : 0;
+          return `
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="py-2.5 font-medium text-slate-200 truncate max-w-[140px]">
+                <span class="text-slate-500 text-[10px] mr-1.5 font-mono">#${idx + 1}</span>${item.nombre}
+              </td>
+              <td class="py-2.5 text-center text-slate-400 font-mono">${item.cantidad}</td>
+              <td class="py-2.5 text-right text-slate-300 font-mono">${formatoCLP(item.ventas)}</td>
+              <td class="py-2.5 text-right font-semibold font-mono text-emerald-400">
+                ${formatoCLP(item.margen)} <span class="text-[10px] text-emerald-500/80">(${margenPctItem}%)</span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+        const sumaMargenTop = listaTop.reduce((acc, i) => acc + i.margen, 0);
+        document.getElementById('top-total-generado').textContent = `${formatoCLP(sumaMargenTop)} margen Top 5`;
+      }
+
+      // Actualizar Simulador
+      actualizarSimuladorEscalamiento();
 
       setTimeout(renderizarGraficosDrop, 60);
     }
@@ -1246,45 +2627,55 @@
     // =========================================================
     function construirListaConsolidada() {
       listaConsolidada = [];
+      let idxG = 0, idxH = 0, idxI = 0;
 
       // 1. Agregar Gastos
-      datosPersonal.gastos.forEach(g => {
+      (datosPersonal.gastos || []).forEach(g => {
+        idxG++;
+        const idVal = g.id !== undefined && g.id !== null ? g.id : `g_${idxG}`;
         listaConsolidada.push({
+          uid: `gastos_personales_${idVal}`,
           idReal: g.id,
           tabla: 'gastos_personales',
           tipo: 'gasto',
-          fecha: g.fecha,
-          detalle: g.descripcion,
+          fecha: g.fecha || hoyFechaStr,
+          detalle: g.descripcion || 'Gasto Personal',
           categoria: g.categoria || 'Otros',
-          monto: Number(g.monto),
+          monto: Number(g.monto || 0),
           seleccionado: false
         });
       });
 
       // 2. Agregar Ingresos / Honorarios
-      datosPersonal.honorarios.forEach(h => {
+      (datosPersonal.honorarios || []).forEach(h => {
+        idxH++;
+        const idVal = h.id !== undefined && h.id !== null ? h.id : `h_${idxH}`;
         listaConsolidada.push({
+          uid: `honorarios_${idVal}`,
           idReal: h.id,
           tabla: 'honorarios',
           tipo: 'ingreso',
-          fecha: h.fecha,
-          detalle: `${h.cliente_empresa} (${h.detalle_servicio || 'Honorarios'})`,
+          fecha: h.fecha || hoyFechaStr,
+          detalle: `${h.cliente_empresa || 'Cliente'} (${h.detalle_servicio || 'Honorarios'})`,
           categoria: 'Ingreso Líquido',
-          monto: Number(h.monto_liquido || h.monto_bruto),
+          monto: Number(h.monto_liquido || h.monto_bruto || 0),
           seleccionado: false
         });
       });
 
       // 3. Agregar Inversiones
-      datosPersonal.inversiones.forEach(inv => {
+      (datosPersonal.inversiones || []).forEach(inv => {
+        idxI++;
+        const idVal = inv.id !== undefined && inv.id !== null ? inv.id : `inv_${idxI}`;
         listaConsolidada.push({
+          uid: `inversiones_${idVal}`,
           idReal: inv.id,
           tabla: 'inversiones',
           tipo: 'inversion',
           fecha: inv.fecha || (inv.created_at ? inv.created_at.slice(0, 10) : hoyFechaStr),
-          detalle: `${inv.nombre} (${inv.tipo})`,
+          detalle: `${inv.nombre || 'Activo'} (${inv.tipo || 'Inversión'})`,
           categoria: 'Inversión / Aporte',
-          monto: Number(inv.capital_invertido),
+          monto: Number(inv.capital_invertido || 0),
           seleccionado: false
         });
       });
@@ -1315,11 +2706,10 @@
       }
 
       tbody.innerHTML = filtrados.map((item) => {
-        const uniqueKey = `${item.tabla}_${item.idReal}`;
         return `
         <tr class="hover:bg-slate-800/40 transition">
           <td class="p-3 text-center">
-            <input type="checkbox" ${item.seleccionado ? 'checked' : ''} onchange="toggleSeleccionConsolidado('${uniqueKey}', this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
+            <input type="checkbox" id="chk-${item.uid}" ${item.seleccionado ? 'checked' : ''} onchange="toggleSeleccionConsolidado('${item.uid}', this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
           </td>
           <td class="p-3 text-slate-400 font-mono">${item.fecha}</td>
           <td class="p-3 font-medium text-slate-200">${item.detalle}</td>
@@ -1333,7 +2723,7 @@
             ${item.tipo==='gasto' ? '-' : '+'}${formatoCLP(item.monto)}
           </td>
           <td class="p-3 text-center">
-            <button onclick="eliminarFilaConsolidadaIndividual('${item.tabla}', ${item.idReal})" class="text-rose-400 hover:text-rose-200 text-xs px-1.5 py-0.5 bg-rose-950/40 rounded border border-rose-800/50 cursor-pointer" title="Eliminar este movimiento">✕</button>
+            <button onclick="eliminarFilaConsolidadaIndividual('${item.tabla}', '${item.idReal}', '${item.uid}')" class="text-rose-400 hover:text-rose-200 text-xs px-2 py-1 bg-rose-950/40 rounded border border-rose-800/50 cursor-pointer" title="Eliminar este movimiento">✕</button>
           </td>
         </tr>
       `;
@@ -1342,17 +2732,18 @@
       actualizarEstadoCheckAllConsolidado();
     }
 
-    function toggleSeleccionConsolidado(uniqueKey, checked) {
-      const item = listaConsolidada.find(x => `${x.tabla}_${x.idReal}` === uniqueKey);
+    function toggleSeleccionConsolidado(uid, checked) {
+      const item = listaConsolidada.find(x => x.uid === uid);
       if (item) {
-        item.seleccionado = checked;
+        item.seleccionado = Boolean(checked);
       }
       actualizarEstadoCheckAllConsolidado();
     }
 
     function actualizarEstadoCheckAllConsolidado() {
       const checkAll = document.getElementById('check-con-all');
-      if (!checkAll) return;
+      const btnEliminar = document.getElementById('btn-eliminar-marcados-cartola');
+      
       const busqueda = (document.getElementById('buscador-cartola')?.value || '').toLowerCase().trim();
       const filtrados = listaConsolidada.filter(item => {
         if (filtroConsolidadoTipo === 'gastos' && item.tipo !== 'gasto') return false;
@@ -1361,6 +2752,20 @@
         if (busqueda && !item.detalle.toLowerCase().includes(busqueda) && !item.categoria.toLowerCase().includes(busqueda)) return false;
         return true;
       });
+
+      const totalSeleccionados = listaConsolidada.filter(item => item.seleccionado).length;
+
+      if (btnEliminar) {
+        if (totalSeleccionados > 0) {
+          btnEliminar.innerHTML = `<span>🗑️ Eliminar Marcados (${totalSeleccionados})</span>`;
+          btnEliminar.className = 'bg-rose-600 hover:bg-rose-500 text-white border border-rose-500 px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1 cursor-pointer shadow-lg shadow-rose-600/20';
+        } else {
+          btnEliminar.innerHTML = `<span>🗑️ Eliminar Marcados</span>`;
+          btnEliminar.className = 'bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 cursor-pointer';
+        }
+      }
+
+      if (!checkAll) return;
       if (filtrados.length === 0) {
         checkAll.checked = false;
       } else {
@@ -1377,79 +2782,129 @@
         if (busqueda && !item.detalle.toLowerCase().includes(busqueda) && !item.categoria.toLowerCase().includes(busqueda)) return false;
         return true;
       });
-      filtrados.forEach(item => item.seleccionado = checked);
+      filtrados.forEach(item => item.seleccionado = Boolean(checked));
       renderizarPlanillaConsolidada();
     }
 
     function filtrarPlanillaConsolidada(tipo) {
       filtroConsolidadoTipo = tipo;
       document.querySelectorAll('.btn-fc-con').forEach(b => {
-        b.className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white';
+        b.className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer';
       });
       const btnActivo = document.getElementById(`f-con-${tipo}`);
-      if (btnActivo) btnActivo.className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold';
+      if (btnActivo) btnActivo.className = 'btn-fc-con px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold cursor-pointer';
       renderizarPlanillaConsolidada();
     }
 
-    async function eliminarFilaConsolidadaIndividual(tabla, id) {
-      if (!confirm("¿Eliminar este movimiento de la base de datos?")) return;
+    async function eliminarFilaConsolidadaIndividual(tabla, id, uid) {
+      const confirmado = await pedirConfirmacion({
+        titulo: 'Eliminar Movimiento',
+        mensaje: '¿Deseas eliminar este registro de la base de datos?',
+        btnTexto: 'Sí, Eliminar'
+      });
+      if (!confirmado) return;
+
       try {
-        const { error } = await db.from(tabla).delete().eq('id', id);
-        if (error) {
-          alert("Error al eliminar: " + error.message);
+        if (id && id !== 'undefined' && id !== 'null' && id !== '') {
+          const { error } = await db.from(tabla).delete().eq('id', id);
+          if (error) {
+            console.error("Error al eliminar en Supabase:", error);
+            mostrarToast("Advertencia: " + error.message, "warning");
+          }
         }
       } catch (err) {
         console.error("Error al eliminar:", err);
       }
-      if (tabla === 'gastos_personales') datosPersonal.gastos = datosPersonal.gastos.filter(x => x.id != id);
-      if (tabla === 'honorarios') datosPersonal.honorarios = datosPersonal.honorarios.filter(x => x.id != id);
-      if (tabla === 'inversiones') datosPersonal.inversiones = datosPersonal.inversiones.filter(x => x.id != id);
+      
+      if (tabla === 'gastos_personales') datosPersonal.gastos = (datosPersonal.gastos || []).filter(x => String(x.id) !== String(id));
+      if (tabla === 'honorarios') datosPersonal.honorarios = (datosPersonal.honorarios || []).filter(x => String(x.id) !== String(id));
+      if (tabla === 'inversiones') datosPersonal.inversiones = (datosPersonal.inversiones || []).filter(x => String(x.id) !== String(id));
+      
+      if (uid) {
+        listaConsolidada = listaConsolidada.filter(x => x.uid !== uid);
+      }
+      mostrarToast("Movimiento eliminado correctamente.", "success");
       await cargarTodo();
     }
 
     async function eliminarMovimientosConsolidadosSeleccionados() {
       const seleccionados = listaConsolidada.filter(item => item.seleccionado);
       if (seleccionados.length === 0) {
-        alert("Selecciona al menos un movimiento con la casilla de verificación.");
+        mostrarToast("Selecciona al menos un movimiento con la casilla de verificación.", "warning");
         return;
       }
 
-      if (!confirm(`¿Eliminar definitivamente ${seleccionados.length} movimientos seleccionados de la base de datos?`)) return;
+      const confirmado = await pedirConfirmacion({
+        titulo: 'Eliminar Movimientos Seleccionados',
+        mensaje: `¿Deseas eliminar definitivamente ${seleccionados.length} movimiento(s) seleccionado(s) de la base de datos? Esta acción es permanente.`,
+        btnTexto: `Sí, Eliminar (${seleccionados.length})`
+      });
 
-      const porTabla = {};
+      if (!confirmado) return;
+
+      const btn = document.getElementById('btn-eliminar-marcados-cartola');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳ Eliminando...</span>';
+      }
+
+      const porTabla = {
+        gastos_personales: [],
+        honorarios: [],
+        inversiones: []
+      };
+      const uidsEliminados = new Set();
+
       seleccionados.forEach(item => {
-        if (!porTabla[item.tabla]) porTabla[item.tabla] = [];
-        porTabla[item.tabla].push(item.idReal);
+        uidsEliminados.add(item.uid);
+        if (item.idReal !== undefined && item.idReal !== null && item.idReal !== 'undefined' && item.idReal !== 'null' && item.idReal !== '') {
+          if (!porTabla[item.tabla]) porTabla[item.tabla] = [];
+          porTabla[item.tabla].push(item.idReal);
+        }
       });
 
       let errores = [];
       for (const tabla of Object.keys(porTabla)) {
         const ids = porTabla[tabla];
+        if (!ids || ids.length === 0) continue;
+
         try {
           const { error } = await db.from(tabla).delete().in('id', ids);
           if (error) {
+            console.warn(`Error en lote para ${tabla}, intentando registro a registro:`, error);
             for (const singleId of ids) {
-              const { error: singleErr } = await db.from(tabla).delete().eq('id', singleId);
-              if (singleErr) errores.push(`${tabla} (#${singleId}): ${singleErr.message}`);
+              try {
+                const { error: sErr } = await db.from(tabla).delete().eq('id', singleId);
+                if (sErr) errores.push(`${tabla} (ID ${singleId}): ${sErr.message}`);
+              } catch (e) {
+                errores.push(`${tabla} (ID ${singleId}): ${e.message}`);
+              }
             }
           }
         } catch (err) {
+          console.error(`Error al ejecutar delete en ${tabla}:`, err);
           errores.push(`${tabla}: ${err.message}`);
         }
       }
 
-      const idsGastos = new Set(porTabla['gastos_personales'] || []);
-      const idsHon = new Set(porTabla['honorarios'] || []);
-      const idsInv = new Set(porTabla['inversiones'] || []);
+      const idsGastos = new Set((porTabla['gastos_personales'] || []).map(x => String(x)));
+      const idsHon = new Set((porTabla['honorarios'] || []).map(x => String(x)));
+      const idsInv = new Set((porTabla['inversiones'] || []).map(x => String(x)));
 
-      datosPersonal.gastos = datosPersonal.gastos.filter(g => !idsGastos.has(g.id));
-      datosPersonal.honorarios = datosPersonal.honorarios.filter(h => !idsHon.has(h.id));
-      datosPersonal.inversiones = datosPersonal.inversiones.filter(inv => !idsInv.has(inv.id));
+      datosPersonal.gastos = (datosPersonal.gastos || []).filter(g => !idsGastos.has(String(g.id)));
+      datosPersonal.honorarios = (datosPersonal.honorarios || []).filter(h => !idsHon.has(String(h.id)));
+      datosPersonal.inversiones = (datosPersonal.inversiones || []).filter(inv => !idsInv.has(String(inv.id)));
+      listaConsolidada = listaConsolidada.filter(item => !uidsEliminados.has(item.uid));
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🗑️ Eliminar Marcados</span>';
+      }
 
       if (errores.length > 0) {
-        alert("Advertencia al eliminar algunos registros:\n" + errores.join('\n'));
+        mostrarToast("Aviso al eliminar algunos registros:\n" + errores.join(', '), "warning");
       } else {
-        alert(`¡Éxito! Se eliminaron ${seleccionados.length} movimientos correctamente.`);
+        mostrarToast(`¡Éxito! Se eliminaron ${seleccionados.length} movimiento(s) correctamente.`, "success");
       }
 
       const checkAll = document.getElementById('check-con-all');
@@ -1462,11 +2917,13 @@
     // MODAL DE CARGA DE NUEVAS CARTOLAS (XLSX / CSV)
     // =========================================================
     function abrirModalSubirCartola() {
-      document.getElementById('modal-subir-cartola').classList.remove('hidden');
+      const m = document.getElementById('modal-subir-cartola');
+      if (m) m.classList.remove('hidden');
     }
 
     function cerrarModalSubirCartola() {
-      document.getElementById('modal-subir-cartola').classList.add('hidden');
+      const m = document.getElementById('modal-subir-cartola');
+      if (m) m.classList.add('hidden');
       bufferModalCartola = [];
     }
 
@@ -1780,20 +3237,25 @@
         document.getElementById('h-ret-tasa').value = retTasa;
         calcularLiquidoHonorario();
 
-        document.getElementById('modal-confirmar-boleta').classList.remove('hidden');
+        const modalBoleta = document.getElementById('modal-confirmar-boleta');
+        if (modalBoleta) modalBoleta.classList.remove('hidden');
       } catch (err) {
         alert("Error al leer el archivo PDF: " + err.message);
       }
     }
 
     function recalcularModalBoleta() {
-      const b = Number(document.getElementById('mb-bruto').value || 0);
-      const r = Number(document.getElementById('mb-ret').value || 15.25);
+      const b = Number(document.getElementById('mb-bruto')?.value || 0);
+      const r = Number(document.getElementById('mb-ret')?.value || 15.25);
       const liq = b - (b * (r / 100));
-      document.getElementById('mb-liq').value = formatoCLP(liq);
+      const mbLiq = document.getElementById('mb-liq');
+      if (mbLiq) mbLiq.value = formatoCLP(liq);
     }
 
-    function cerrarModalConfirmarBoleta() { document.getElementById('modal-confirmar-boleta').classList.add('hidden'); }
+    function cerrarModalConfirmarBoleta() {
+      const m = document.getElementById('modal-confirmar-boleta');
+      if (m) m.classList.add('hidden');
+    }
 
     async function guardarBoletaDesdeModal() {
       const btn = document.getElementById('btn-guardar-modal-boleta');
@@ -1834,6 +3296,80 @@
     }
 
     // ==========================================
+    // ESTADO & EDICIÓN DE HONORARIOS
+    // ==========================================
+    async function alternarEstadoHonorario(id, estadoActual) {
+      const nuevoEstado = estadoActual === 'pagada' ? 'pendiente' : 'pagada';
+      try {
+        const { error } = await db.from('honorarios').update({ estado: nuevoEstado }).eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error al cambiar estado de honorario:', err);
+      }
+      const item = datosPersonal.honorarios.find(h => h.id == id);
+      if (item) item.estado = nuevoEstado;
+      await cargarTodo();
+    }
+
+    function abrirModalEditarHonorario(id) {
+      const h = datosPersonal.honorarios.find(x => x.id == id);
+      if (!h) return;
+      const elId = document.getElementById('edit-h-id');
+      if (elId) elId.value = h.id;
+      const elFecha = document.getElementById('edit-h-fecha');
+      if (elFecha) elFecha.value = h.fecha;
+      const elCliente = document.getElementById('edit-h-cliente');
+      if (elCliente) elCliente.value = h.cliente_empresa || '';
+      const elDetalle = document.getElementById('edit-h-detalle');
+      if (elDetalle) elDetalle.value = h.detalle_servicio || '';
+      const elBruto = document.getElementById('edit-h-bruto');
+      if (elBruto) elBruto.value = h.monto_bruto || 0;
+      const elRetTasa = document.getElementById('edit-h-ret-tasa');
+      if (elRetTasa) elRetTasa.value = h.retencion_porcentaje !== undefined ? h.retencion_porcentaje : 15.25;
+      const elEstado = document.getElementById('edit-h-estado');
+      if (elEstado) elEstado.value = h.estado || 'pendiente';
+
+      const m = document.getElementById('modal-editar-honorario');
+      if (m) m.classList.remove('hidden');
+    }
+
+    function cerrarModalEditarHonorario() {
+      const m = document.getElementById('modal-editar-honorario');
+      if (m) m.classList.add('hidden');
+    }
+
+    document.getElementById('form-editar-honorario')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-h-id').value;
+      const fecha = document.getElementById('edit-h-fecha').value;
+      const cliente = document.getElementById('edit-h-cliente').value.trim();
+      const detalle = document.getElementById('edit-h-detalle').value.trim();
+      const bruto = Number(document.getElementById('edit-h-bruto').value);
+      const ret = Number(document.getElementById('edit-h-ret-tasa').value);
+      const liq = bruto - (bruto * (ret / 100));
+      const estado = document.getElementById('edit-h-estado').value;
+
+      try {
+        const { error } = await db.from('honorarios').update({
+          fecha: fecha,
+          cliente_empresa: cliente,
+          detalle_servicio: detalle,
+          monto_bruto: bruto,
+          retencion_porcentaje: ret,
+          monto_liquido: liq,
+          estado: estado
+        }).eq('id', id);
+
+        if (error) throw error;
+        mostrarToast('¡Registro de ingreso actualizado correctamente!', 'success');
+        cerrarModalEditarHonorario();
+        await cargarTodo();
+      } catch (err) {
+        mostrarToast('Error al actualizar honorario: ' + err.message, 'error');
+      }
+    });
+
+    // ==========================================
     // FORMULARIOS MANUALES
     // ==========================================
     document.getElementById('form-honorario').addEventListener('submit', async (e) => {
@@ -1852,9 +3388,9 @@
         estado: document.getElementById('h-pagada').checked ? 'pagada' : 'pendiente'
       }]);
 
-      if (error) alert("Error: " + error.message);
+      if (error) mostrarToast("Error: " + error.message, "error");
       else {
-        alert("¡Boleta guardada con éxito!");
+        mostrarToast("¡Boleta guardada con éxito!", "success");
         document.getElementById('h-cliente').value = '';
         document.getElementById('h-detalle').value = '';
         document.getElementById('h-bruto').value = '';
@@ -1877,9 +3413,9 @@
         estado: 'pagada'
       }]);
 
-      if (error) alert("Error: " + error.message);
+      if (error) mostrarToast("Error: " + error.message, "error");
       else {
-        alert("¡Ingreso extra guardado!");
+        mostrarToast("¡Ingreso extra guardado con éxito!", "success");
         document.getElementById('ie-fuente').value = '';
         document.getElementById('ie-monto').value = '';
         cargarTodo();
@@ -1898,8 +3434,9 @@
         plataforma: document.getElementById('inv-plataforma').value.trim()
       }]);
 
-      if (error) alert("Error: " + error.message);
+      if (error) mostrarToast("Error: " + error.message, "error");
       else {
+        mostrarToast("¡Activo de inversión guardado!", "success");
         document.getElementById('inv-nombre').value = '';
         document.getElementById('inv-capital').value = '';
         document.getElementById('inv-actual').value = '';
@@ -1907,22 +3444,49 @@
       }
     });
 
-    document.getElementById('form-venta').addEventListener('submit', async (e) => {
+    document.getElementById('form-venta')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      await db.from('ventas').insert([{
-        fecha: document.getElementById('v-fecha').value,
-        cliente_detalle: document.getElementById('v-detalle').value.trim(),
-        ingreso_total: Number(document.getElementById('v-ingreso').value),
-        costo_producto: Number(document.getElementById('v-costo-prod').value),
-        costo_envio: Number(document.getElementById('v-costo-envio').value || 0),
-        comision_dropi: Number(document.getElementById('v-comision-dropi').value || 0)
-      }]);
-      document.getElementById('v-detalle').value = '';
-      document.getElementById('v-ingreso').value = '';
-      document.getElementById('v-costo-prod').value = '';
-      document.getElementById('v-costo-envio').value = '';
-      document.getElementById('v-comision-dropi').value = '';
-      cargarTodo();
+      const fecha = document.getElementById('v-fecha').value;
+      const detalle = document.getElementById('v-detalle').value.trim();
+      const estado = document.getElementById('v-estado')?.value || 'Recibido';
+      const ingreso = Number(document.getElementById('v-ingreso').value);
+      const costoProd = Number(document.getElementById('v-costo-prod').value);
+      const costoEnvio = Number(document.getElementById('v-costo-envio').value || 0);
+      const comisionDropi = Number(document.getElementById('v-comision-dropi').value || 0);
+
+      const payload = {
+        fecha: fecha,
+        cliente_detalle: detalle,
+        ingreso_total: ingreso,
+        costo_producto: costoProd,
+        costo_envio: costoEnvio,
+        comision_dropi: comisionDropi
+      };
+
+      try {
+        let insertRes = await db.from('ventas').insert([payload]).select();
+        if (insertRes.error) {
+          // Si select() falla por políticas de Supabase, intentamos inserción estándar
+          insertRes = await db.from('ventas').insert([payload]);
+        }
+
+        if (insertRes.error) throw insertRes.error;
+
+        if (insertRes.data && insertRes.data[0] && insertRes.data[0].id) {
+          guardarEstadoPedidoLocal(insertRes.data[0].id, estado);
+        }
+        
+        mostrarToast('¡Pedido guardado con éxito!', 'success');
+        document.getElementById('v-detalle').value = '';
+        document.getElementById('v-ingreso').value = '';
+        document.getElementById('v-costo-prod').value = '';
+        document.getElementById('v-costo-envio').value = '';
+        document.getElementById('v-comision-dropi').value = '';
+        await cargarTodo();
+      } catch (err) {
+        console.error('Error al guardar pedido:', err);
+        mostrarToast('Error al guardar pedido: ' + err.message, 'error');
+      }
     });
 
     document.getElementById('form-ads').addEventListener('submit', async (e) => {
@@ -2116,15 +3680,29 @@
       if (workspaceActivo !== 'dropshipping') return;
       const canvasEvo = document.getElementById('chart-evolucion');
       const canvasDist = document.getElementById('chart-distribucion');
+      const canvasEstados = document.getElementById('chart-pedidos-estados');
       if (!canvasEvo || !canvasDist) return;
 
+      // -------------------------------------------------------------
+      // 1. GRÁFICO DE TENDENCIA DIARIA: VENTAS, COSTOS & UTILIDAD
+      // -------------------------------------------------------------
       const diasMap = {};
       datosDrop.ventas.forEach(v => {
         const dia = v.fecha;
-        if (!diasMap[dia]) diasMap[dia] = { ventas: 0, costos: 0 };
+        if (!diasMap[dia]) diasMap[dia] = { ventas: 0, costos: 0, ads: 0 };
         const costoDirecto = Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
         diasMap[dia].ventas += Number(v.ingreso_total || 0);
         diasMap[dia].costos += costoDirecto;
+      });
+
+      // Distribuir gasto de Ads por fecha si coincide
+      datosDrop.ads.forEach(a => {
+        const dia = a.fecha;
+        if (diasMap[dia]) {
+          diasMap[dia].ads += Number(a.gasto || 0);
+        } else if (dia) {
+          diasMap[dia] = { ventas: 0, costos: 0, ads: Number(a.gasto || 0) };
+        }
       });
 
       const labels = Object.keys(diasMap).sort();
@@ -2136,47 +3714,539 @@
         data: {
           labels: labels.length > 0 ? labels.map(d => d.slice(5)) : ['Sin datos'],
           datasets: [
-            { label: 'Ventas ($)', data: labels.map(d => diasMap[d].ventas), borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true, tension: 0.3 },
-            { label: 'Costos Dropi ($)', data: labels.map(d => diasMap[d].costos), borderColor: '#f87171', borderDash: [5, 5], tension: 0.3 }
+            {
+              label: 'Ventas ($)',
+              data: labels.map(d => diasMap[d].ventas),
+              borderColor: '#34d399',
+              backgroundColor: 'rgba(52, 211, 153, 0.12)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 3
+            },
+            {
+              label: 'Costos Directos ($)',
+              data: labels.map(d => diasMap[d].costos + diasMap[d].ads),
+              borderColor: '#f87171',
+              backgroundColor: 'transparent',
+              borderDash: [4, 4],
+              tension: 0.3,
+              pointRadius: 2
+            },
+            {
+              label: 'Margen Diario ($)',
+              data: labels.map(d => diasMap[d].ventas - (diasMap[d].costos + diasMap[d].ads)),
+              borderColor: '#38bdf8',
+              backgroundColor: 'transparent',
+              tension: 0.3,
+              pointRadius: 2
+            }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#94a3b8' } } },
-          scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } }
+          plugins: {
+            legend: {
+              labels: { color: '#94a3b8', boxWidth: 12, font: { size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${formatoCLP(context.raw)}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e293b' } },
+            y: {
+              ticks: {
+                color: '#64748b',
+                font: { size: 10 },
+                callback: (val) => formatoCLP(val)
+              },
+              grid: { color: '#1e293b' }
+            }
+          }
         }
       });
 
-      let totalCostosDropi = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0), 0);
+      // -------------------------------------------------------------
+      // 2. GRÁFICO DE DESGLOSE SEGMENTADO DE CADA COSTO (DONA)
+      // -------------------------------------------------------------
+      let totalCostoProd = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_producto || 0), 0);
+      let totalCostoEnvio = datosDrop.ventas.reduce((acc, v) => acc + Number(v.costo_envio || 0), 0);
+      let totalComisionDropi = datosDrop.ventas.reduce((acc, v) => acc + Number(v.comision_dropi || 0), 0);
       let totalAds = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
-      let totalFijosMes = datosDrop.costos.reduce((acc, c) => acc + Number(c.monto)/(c.frecuencia_dias===90?3:(c.frecuencia_dias===365?12:1)), 0);
+      let totalFijosMes = datosDrop.costos.reduce((acc, c) => acc + Number(c.monto || 0) / (c.frecuencia_dias === 90 ? 3 : (c.frecuencia_dias === 365 ? 12 : 1)), 0);
 
+      const sumaTotalCostos = totalCostoProd + totalCostoEnvio + totalComisionDropi + totalAds + totalFijosMes;
       const ctxDistribucion = canvasDist.getContext('2d');
       if (chartDistribucion) chartDistribucion.destroy();
+
+      const costData = [totalCostoProd, totalCostoEnvio, totalComisionDropi, totalAds, totalFijosMes];
+      const costLabels = ['Producto Proveedor', 'Envíos / Flete', 'Comisión Dropi', 'Meta Ads', 'Costos Fijos'];
+      const costColors = ['#f59e0b', '#06b6d4', '#ec4899', '#6366f1', '#f43f5e'];
 
       chartDistribucion = new Chart(ctxDistribucion, {
         type: 'doughnut',
         data: {
-          labels: ['Dropi', 'Meta Ads', 'Fijos'],
-          datasets: [{ data: [totalCostosDropi, totalAds, totalFijosMes], backgroundColor: ['#fbbf24', '#818cf8', '#f43f5e'], borderWidth: 0 }]
+          labels: costLabels,
+          datasets: [{
+            data: costData,
+            backgroundColor: costColors,
+            borderWidth: 2,
+            borderColor: '#0f172a'
+          }]
         },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw;
+                  const pct = sumaTotalCostos > 0 ? ((val / sumaTotalCostos) * 100).toFixed(1) : 0;
+                  return `${context.label}: ${formatoCLP(val)} (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
       });
-      document.getElementById('distribucion-leyenda').innerHTML = `<div>Dropi: ${formatoCLP(totalCostosDropi)}</div><div>Ads: ${formatoCLP(totalAds)}</div><div>Fijos: ${formatoCLP(totalFijosMes)}</div>`;
+
+      document.getElementById('distribucion-leyenda').innerHTML = costLabels.map((lbl, i) => {
+        const val = costData[i];
+        const pct = sumaTotalCostos > 0 ? ((val / sumaTotalCostos) * 100).toFixed(1) : 0;
+        return `
+          <div class="flex items-center justify-between text-[10px] p-1 rounded bg-slate-950/40 border border-slate-800/60">
+            <span class="flex items-center gap-1 text-slate-300 truncate">
+              <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: ${costColors[i]}"></span>
+              <span class="truncate">${lbl}</span>
+            </span>
+            <span class="font-mono text-slate-400 ml-1 font-semibold">${formatoCLP(val)} <span class="text-[9px] text-slate-500">(${pct}%)</span></span>
+          </div>
+        `;
+      }).join('');
+
+      // -------------------------------------------------------------
+      // 3. GRÁFICO DE ESTADOS DE PEDIDOS POR FECHA (STACKED BARS)
+      // -------------------------------------------------------------
+      if (canvasEstados) {
+        const diasEstadosMap = {};
+        datosDrop.ventas.forEach(v => {
+          const dia = v.fecha || 'Sin fecha';
+          if (!diasEstadosMap[dia]) {
+            diasEstadosMap[dia] = {
+              'Recibido': 0,
+              'Notificado': 0,
+              'Confirmado': 0,
+              'Sin respuesta': 0,
+              'Cancelado': 0
+            };
+          }
+          const est = v.estado || 'Recibido';
+          if (diasEstadosMap[dia][est] !== undefined) {
+            diasEstadosMap[dia][est]++;
+          } else {
+            diasEstadosMap[dia]['Recibido']++;
+          }
+        });
+
+        const diasLabels = Object.keys(diasEstadosMap).sort();
+        const ctxEstados = canvasEstados.getContext('2d');
+        if (chartPedidosEstados) chartPedidosEstados.destroy();
+
+        chartPedidosEstados = new Chart(ctxEstados, {
+          type: 'bar',
+          data: {
+            labels: diasLabels.length > 0 ? diasLabels.map(d => d.slice(5)) : ['Sin datos'],
+            datasets: [
+              {
+                label: 'Recibido',
+                data: diasLabels.map(d => diasEstadosMap[d]['Recibido']),
+                backgroundColor: '#38bdf8',
+                stack: 'pedidos',
+                borderRadius: 2
+              },
+              {
+                label: 'Notificado',
+                data: diasLabels.map(d => diasEstadosMap[d]['Notificado']),
+                backgroundColor: '#fbbf24',
+                stack: 'pedidos',
+                borderRadius: 2
+              },
+              {
+                label: 'Confirmado',
+                data: diasLabels.map(d => diasEstadosMap[d]['Confirmado']),
+                backgroundColor: '#34d399',
+                stack: 'pedidos',
+                borderRadius: 2
+              },
+              {
+                label: 'Sin respuesta',
+                data: diasLabels.map(d => diasEstadosMap[d]['Sin respuesta']),
+                backgroundColor: '#c084fc',
+                stack: 'pedidos',
+                borderRadius: 2
+              },
+              {
+                label: 'Cancelado',
+                data: diasLabels.map(d => diasEstadosMap[d]['Cancelado']),
+                backgroundColor: '#f87171',
+                stack: 'pedidos',
+                borderRadius: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.dataset.label}: ${context.raw} pedidos`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                stacked: true,
+                ticks: { color: '#64748b', font: { size: 10 } },
+                grid: { color: '#1e293b' }
+              },
+              y: {
+                stacked: true,
+                ticks: {
+                  color: '#64748b',
+                  font: { size: 10 },
+                  precision: 0,
+                  stepSize: 1
+                },
+                grid: { color: '#1e293b' }
+              }
+            }
+          }
+        });
+      }
     }
 
-    // Eliminaciones
-    async function eliminarInversion(id) { if (confirm("¿Eliminar activo?")) { await db.from('inversiones').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarHonorario(id) { if (confirm("¿Eliminar registro?")) { await db.from('honorarios').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarGastoPersonal(id) { if (confirm("¿Eliminar gasto?")) { await db.from('gastos_personales').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarVenta(id) { if (confirm("¿Eliminar venta?")) { await db.from('ventas').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarAds(id) { if (confirm("¿Eliminar pauta?")) { await db.from('gasto_publicidad').delete().eq('id', id); cargarTodo(); } }
-    async function eliminarCosto(id) { if (confirm("¿Eliminar costo?")) { await db.from('costos_recurrentes').delete().eq('id', id); cargarTodo(); } }
+    // -------------------------------------------------------------
+    // ACCIÓN RÁPIDA: FILTRAR Y ATENDER PEDIDOS SIN RESPUESTA
+    // -------------------------------------------------------------
+    function irAPedidosSinRespuesta() {
+      cambiarTabDrop('pedidos');
+      const sel = document.getElementById('filtro-estado-pedidos');
+      if (sel) {
+        sel.value = 'Sin respuesta';
+        filtrarTablaPedidos();
+      }
+      mostrarToast('Filtrando pedidos sin respuesta para contacto inmediato', 'warning');
+    }
+
+    // -------------------------------------------------------------
+    // SIMULADOR INTERACTIVO DE ESCALAMIENTO & CRECIMIENTO
+    // -------------------------------------------------------------
+    function actualizarSimuladorEscalamiento() {
+      const sliderAds = document.getElementById('sim-slider-ads');
+      const sliderTicket = document.getElementById('sim-slider-ticket');
+      if (!sliderAds || !sliderTicket) return;
+
+      const pctAds = parseInt(sliderAds.value, 10);
+      const pctTicket = parseInt(sliderTicket.value, 10);
+
+      document.getElementById('sim-ads-pct').textContent = (pctAds >= 0 ? `+${pctAds}%` : `${pctAds}%`);
+      document.getElementById('sim-ticket-pct').textContent = `+${pctTicket}%`;
+
+      let totalVentasActual = 0;
+      let totalCostosDropiActual = 0;
+      datosDrop.ventas.forEach(v => {
+        totalVentasActual += Number(v.ingreso_total || 0);
+        totalCostosDropiActual += Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0);
+      });
+      let totalAdsActual = datosDrop.ads.reduce((acc, a) => acc + Number(a.gasto || 0), 0);
+      let totalFijosMes = datosDrop.costos.reduce((acc, c) => acc + Number(c.monto || 0) / (c.frecuencia_dias === 90 ? 3 : (c.frecuencia_dias === 365 ? 12 : 1)), 0);
+      let utilidadActual = totalVentasActual - totalCostosDropiActual - totalAdsActual - totalFijosMes;
+
+      const factorAds = 1 + (pctAds / 100);
+      const factorTicket = 1 + (pctTicket / 100);
+
+      const nuevaPautaAds = totalAdsActual * factorAds;
+      const roasActual = totalAdsActual > 0 ? (totalVentasActual / totalAdsActual) : 3.0;
+      const nuevasVentas = (totalAdsActual > 0 ? (nuevaPautaAds * roasActual) : (totalVentasActual * factorAds)) * factorTicket;
+
+      const ratioCostosDropi = totalVentasActual > 0 ? (totalCostosDropiActual / totalVentasActual) : 0.6;
+      const nuevosCostosDropi = nuevasVentas * (ratioCostosDropi / factorTicket);
+      const nuevaUtilidad = nuevasVentas - nuevosCostosDropi - nuevaPautaAds - totalFijosMes;
+      const gananciaExtra = nuevaUtilidad - utilidadActual;
+
+      document.getElementById('sim-res-ventas').textContent = formatoCLP(nuevasVentas);
+      document.getElementById('sim-res-ads').textContent = formatoCLP(nuevaPautaAds);
+      document.getElementById('sim-res-utilidad').textContent = formatoCLP(nuevaUtilidad);
+
+      const elExtra = document.getElementById('sim-res-ganancia-extra');
+      elExtra.textContent = (gananciaExtra >= 0 ? `+${formatoCLP(gananciaExtra)} extra` : `${formatoCLP(gananciaExtra)}`);
+      elExtra.className = `font-mono font-bold ${gananciaExtra >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+      const elConsejo = document.getElementById('sim-res-consejo');
+      if (pctAds > 50 && roasActual >= 2.5) {
+        elConsejo.textContent = '🔥 Excelente oportunidad: Tu ROAS actual soporta escalar pauta agresivamente.';
+      } else if (pctAds > 50 && roasActual < 2.0 && totalAdsActual > 0) {
+        elConsejo.textContent = '⚠️ Cuidado: Con ROAS bajo (<2.0x), escalar pauta reduce el margen neto. Optimiza primero.';
+      } else if (pctTicket > 15) {
+        elConsejo.textContent = '💡 Alto impacto: Incrementar el ticket vía bundles/upsells mejora directamente el margen neto.';
+      } else {
+        elConsejo.textContent = 'Ajusta los sliders para simular distintos escenarios de inversión y ticket.';
+      }
+    }
+
+    // Eliminaciones Individuales con Diálogo In-App
+    async function eliminarInversion(id) { 
+      const c = await pedirConfirmacion({ titulo: 'Eliminar Activo de Inversión', mensaje: '¿Deseas eliminar este registro de inversión de la base de datos?' });
+      if (c) { 
+        await db.from('inversiones').delete().eq('id', id); 
+        mostrarToast("Activo de inversión eliminado.", "success");
+        cargarTodo(); 
+      } 
+    }
+    async function eliminarHonorario(id) { 
+      const c = await pedirConfirmacion({ titulo: 'Eliminar Registro de Ingreso', mensaje: '¿Deseas eliminar este registro de ingreso / boleta de la base de datos?' });
+      if (c) { 
+        await db.from('honorarios').delete().eq('id', id); 
+        mostrarToast("Ingreso eliminado.", "success");
+        cargarTodo(); 
+      } 
+    }
+    async function eliminarGastoPersonal(id) { 
+      const c = await pedirConfirmacion({ titulo: 'Eliminar Gasto Personal', mensaje: '¿Deseas eliminar este gasto de la base de datos?' });
+      if (c) { 
+        await db.from('gastos_personales').delete().eq('id', id); 
+        mostrarToast("Gasto eliminado.", "success");
+        cargarTodo(); 
+      } 
+    }
+    async function eliminarVenta(id) { 
+      const v = datosDrop.ventas.find(x => x.id == id);
+      const detalle = v ? ` "${v.cliente_detalle}"` : '';
+      const c = await pedirConfirmacion({ 
+        titulo: 'Eliminar Pedido', 
+        mensaje: `¿Deseas eliminar permanentemente el pedido${detalle} de la base de datos?`,
+        btnTexto: 'Sí, Eliminar Pedido'
+      });
+      if (c) { 
+        try {
+          const { error } = await db.from('ventas').delete().eq('id', id); 
+          if (error) throw error;
+          datosDrop.ventas = datosDrop.ventas.filter(x => x.id != id);
+          mostrarToast("Pedido eliminado correctamente.", "success");
+          cargarTodo(); 
+        } catch (err) {
+          console.error('Error al eliminar venta:', err);
+          mostrarToast("Error al eliminar pedido: " + err.message, "error");
+        }
+      } 
+    }
+    async function eliminarAds(id) { 
+      const c = await pedirConfirmacion({ titulo: 'Eliminar Registro de Publicidad', mensaje: '¿Deseas eliminar este gasto publicitario?' });
+      if (c) { 
+        await db.from('gasto_publicidad').delete().eq('id', id); 
+        mostrarToast("Pauta eliminada.", "success");
+        cargarTodo(); 
+      } 
+    }
+    async function eliminarCosto(id) { 
+      const c = await pedirConfirmacion({ titulo: 'Eliminar Costo Recurrente', mensaje: '¿Deseas eliminar este costo recurrente?' });
+      if (c) { 
+        await db.from('costos_recurrentes').delete().eq('id', id); 
+        mostrarToast("Costo eliminado.", "success");
+        cargarTodo(); 
+      } 
+    }
+
+    // ==========================================
+    // OPERACIONES DE PEDIDOS: EDICIÓN, ESTADOS Y ELIMINACIÓN MASIVA
+    // ==========================================
+    function toggleFormularioPedidoManual(forzar = null) {
+      const cont = document.getElementById('contenedor-form-pedido-manual');
+      const badge = document.getElementById('badge-toggle-form-pedido');
+      const chevron = document.getElementById('chevron-toggle-form-pedido');
+      const label = document.getElementById('label-toggle-form-pedido');
+      const btnTop = document.getElementById('btn-toggle-form-pedido-top');
+      const btnTopIcono = document.getElementById('btn-toggle-form-pedido-icono');
+      const btnTopTexto = document.getElementById('btn-toggle-form-pedido-texto');
+
+      if (!cont) return;
+
+      const estaOculto = cont.classList.contains('hidden');
+      const abrir = forzar !== null ? forzar : estaOculto;
+
+      if (abrir) {
+        cont.classList.remove('hidden');
+        if (badge) {
+          badge.textContent = 'Abierto';
+          badge.className = 'text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/60';
+        }
+        if (chevron) chevron.textContent = '▲';
+        if (label) label.textContent = 'Plegar';
+        if (btnTop) {
+          btnTop.className = 'bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-lg shadow-emerald-600/20';
+        }
+        if (btnTopIcono) btnTopIcono.textContent = '✕';
+        if (btnTopTexto) btnTopTexto.textContent = 'Cerrar Formulario';
+        
+        setTimeout(() => {
+          document.getElementById('v-detalle')?.focus();
+        }, 100);
+      } else {
+        cont.classList.add('hidden');
+        if (badge) {
+          badge.textContent = 'Plegado';
+          badge.className = 'text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+        }
+        if (chevron) chevron.textContent = '▼';
+        if (label) label.textContent = 'Desplegar';
+        if (btnTop) {
+          btnTop.className = 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer';
+        }
+        if (btnTopIcono) btnTopIcono.textContent = '➕';
+        if (btnTopTexto) btnTopTexto.textContent = 'Registrar Pedido Manual';
+      }
+    }
+
+    async function eliminarPedidosSeleccionados() {
+      const seleccionados = (datosDrop.ventas || []).filter(v => v.seleccionado);
+      if (seleccionados.length === 0) {
+        mostrarToast('Selecciona al menos un pedido marcando la casilla.', 'warning');
+        return;
+      }
+
+      const confirmado = await pedirConfirmacion({
+        titulo: `Eliminar ${seleccionados.length} Pedido(s)`,
+        mensaje: `¿Estás seguro de que deseas eliminar permanentemente estos ${seleccionados.length} pedido(s) de la base de datos? Esta acción no se puede deshacer.`,
+        btnTexto: `Sí, Eliminar (${seleccionados.length})`
+      });
+
+      if (!confirmado) return;
+
+      try {
+        const ids = seleccionados.map(s => s.id);
+        const { error } = await db.from('ventas').delete().in('id', ids);
+        if (error) throw error;
+
+        datosDrop.ventas = datosDrop.ventas.filter(v => !ids.includes(v.id));
+        mostrarToast(`¡Se eliminaron ${seleccionados.length} pedido(s) con éxito!`, 'success');
+        await cargarTodo();
+      } catch (err) {
+        console.error('Error al eliminar pedidos en lote:', err);
+        mostrarToast('Error al eliminar pedidos: ' + err.message, 'error');
+      }
+    }
+
+    async function cambiarEstadoPedidoRapido(id, nuevoEstado) {
+      try {
+        guardarEstadoPedidoLocal(id, nuevoEstado);
+        const v = datosDrop.ventas.find(x => x.id == id);
+        if (v) v.estado = nuevoEstado;
+        renderizarTablaPedidos();
+
+        // Intentar actualizar silenciosamente en Supabase si la columna existe en el futuro
+        try {
+          const { error } = await db.from('ventas').update({ estado: nuevoEstado }).eq('id', id);
+          if (error && error.code !== 'PGRST204' && !error.message?.includes('estado')) {
+            console.warn('Nota Supabase estado:', error.message);
+          }
+        } catch (ignored) {}
+
+        mostrarToast(`Pedido actualizado a "${nuevoEstado}"`, 'success');
+      } catch (err) {
+        console.error('Error al actualizar estado:', err);
+        mostrarToast('Error al actualizar estado: ' + err.message, 'error');
+        renderizarTablaPedidos();
+      }
+    }
+
+    function abrirModalEditarPedido(id) {
+      const p = datosDrop.ventas.find(x => x.id == id);
+      if (!p) return;
+      const elId = document.getElementById('edit-p-id');
+      if (elId) elId.value = p.id;
+      const elFecha = document.getElementById('edit-p-fecha');
+      if (elFecha) elFecha.value = p.fecha || hoyFechaStr;
+      const elEstado = document.getElementById('edit-p-estado');
+      if (elEstado) elEstado.value = p.estado || 'Recibido';
+      const elDetalle = document.getElementById('edit-p-detalle');
+      if (elDetalle) elDetalle.value = p.cliente_detalle || '';
+      const elIngreso = document.getElementById('edit-p-ingreso');
+      if (elIngreso) elIngreso.value = p.ingreso_total || 0;
+      const elCostoProd = document.getElementById('edit-p-costo-prod');
+      if (elCostoProd) elCostoProd.value = p.costo_producto || 0;
+      const elCostoEnvio = document.getElementById('edit-p-costo-envio');
+      if (elCostoEnvio) elCostoEnvio.value = p.costo_envio || 0;
+      const elComisionDropi = document.getElementById('edit-p-comision-dropi');
+      if (elComisionDropi) elComisionDropi.value = p.comision_dropi || 0;
+
+      const m = document.getElementById('modal-editar-pedido');
+      if (m) m.classList.remove('hidden');
+    }
+
+    function cerrarModalEditarPedido() {
+      const m = document.getElementById('modal-editar-pedido');
+      if (m) m.classList.add('hidden');
+    }
+
+    document.getElementById('form-editar-pedido')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-p-id')?.value;
+      const fecha = document.getElementById('edit-p-fecha')?.value;
+      const estado = document.getElementById('edit-p-estado')?.value;
+      const detalle = document.getElementById('edit-p-detalle')?.value?.trim() || '';
+      const ingreso = Number(document.getElementById('edit-p-ingreso')?.value || 0);
+      const costoProd = Number(document.getElementById('edit-p-costo-prod')?.value || 0);
+      const costoEnvio = Number(document.getElementById('edit-p-costo-envio')?.value || 0);
+      const comisionDropi = Number(document.getElementById('edit-p-comision-dropi')?.value || 0);
+
+      if (!id) return;
+
+      guardarEstadoPedidoLocal(id, estado);
+
+      const payload = {
+        fecha: fecha,
+        cliente_detalle: detalle,
+        ingreso_total: ingreso,
+        costo_producto: costoProd,
+        costo_envio: costoEnvio,
+        comision_dropi: comisionDropi
+      };
+
+      try {
+        const { error } = await db.from('ventas').update(payload).eq('id', id);
+
+        if (error) throw error;
+        
+        mostrarToast('¡Pedido actualizado con éxito!', 'success');
+        cerrarModalEditarPedido();
+        await cargarTodo();
+      } catch (err) {
+        console.error('Error al actualizar pedido:', err);
+        mostrarToast('Error al actualizar pedido: ' + err.message, 'error');
+      }
+    });
 
     // Modal CSV Shopify
-    function abrirModalCSV() { document.getElementById('modal-csv').classList.remove('hidden'); }
-    function cerrarModalCSV() { document.getElementById('modal-csv').classList.add('hidden'); }
+    function abrirModalCSV() {
+      const m = document.getElementById('modal-csv');
+      if (m) m.classList.remove('hidden');
+    }
+    function cerrarModalCSV() {
+      const m = document.getElementById('modal-csv');
+      if (m) m.classList.add('hidden');
+    }
 
     document.getElementById('input-csv').addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -2207,6 +4277,7 @@
           filasParaImportar.push({
             fecha: fecha,
             cliente_detalle: detalle,
+            estado: 'Recibido',
             ingreso_total: totalVenta,
             costo_producto: prodDef,
             costo_envio: envioDef,
@@ -2247,7 +4318,7 @@
 
       tbody.innerHTML = filasParaImportar.map((f, i) => `
         <tr class="hover:bg-slate-900/60">
-          <td class="p-2 text-slate-400">${f.fecha}</td>
+          <td class="p-2 text-slate-400 font-mono text-[11px]">${f.fecha}</td>
           <td class="p-2 font-medium text-slate-200 truncate max-w-xs">${f.cliente_detalle}</td>
           <td class="p-2 text-right text-emerald-400 font-semibold">${formatoCLP(f.ingreso_total)}</td>
           <td class="p-2 text-right"><input type="number" value="${f.costo_producto}" class="w-20 bg-slate-800 border border-slate-700 rounded p-1 text-right text-slate-200" onchange="filasParaImportar[${i}].costo_producto = Number(this.value)"></td>
@@ -2262,19 +4333,77 @@
       btn.disabled = true;
       btn.textContent = 'Guardando...';
 
-      const { error } = await db.from('ventas').insert(filasParaImportar);
+      const filasParaDB = filasParaImportar.map(f => ({
+        fecha: f.fecha,
+        cliente_detalle: f.cliente_detalle,
+        ingreso_total: f.ingreso_total,
+        costo_producto: f.costo_producto,
+        costo_envio: f.costo_envio,
+        comision_dropi: f.comision_dropi
+      }));
+
+      const { error } = await db.from('ventas').insert(filasParaDB);
       if (error) {
-        alert('Error: ' + error.message);
+        mostrarToast('Error al importar pedidos: ' + error.message, 'error');
         btn.disabled = false;
         btn.textContent = 'Confirmar y Cargar a Supabase';
       } else {
-        alert(`¡Éxito! Se importaron ${filasParaImportar.length} pedidos.`);
+        mostrarToast(`¡Éxito! Se importaron ${filasParaImportar.length} pedidos.`, 'success');
         cerrarModalCSV();
-        cargarTodo();
+        await cargarTodo();
       }
     }
 
+    // Exponer funciones globales para handlers inline
+    window.abrirModalAuth = abrirModalAuth;
+    window.cerrarModalAuth = cerrarModalAuth;
+    window.cambiarModoAuth = cambiarModoAuth;
+    window.alternarVisibilidadPassword = alternarVisibilidadPassword;
+    window.loginConGoogle = loginConGoogle;
+    window.loginConPassword = loginConPassword;
+    window.registrarUsuario = registrarUsuario;
+    window.confirmarCerrarSesion = confirmarCerrarSesion;
+    window.pedirConfirmacion = pedirConfirmacion;
+    window.mostrarToast = mostrarToast;
+    window.toggleSeleccionConsolidado = toggleSeleccionConsolidado;
+    window.toggleSeleccionarTodosConsolidados = toggleSeleccionarTodosConsolidados;
+    window.filtrarPlanillaConsolidada = filtrarPlanillaConsolidada;
+    window.eliminarFilaConsolidadaIndividual = eliminarFilaConsolidadaIndividual;
+    window.eliminarMovimientosConsolidadosSeleccionados = eliminarMovimientosConsolidadosSeleccionados;
+    window.renderizarPlanillaConsolidada = renderizarPlanillaConsolidada;
+    window.abrirModalSubirCartola = abrirModalSubirCartola;
+    window.cerrarModalSubirCartola = cerrarModalSubirCartola;
+    window.guardarMovimientosModalEnSupabase = guardarMovimientosModalEnSupabase;
+    window.alternarEstadoHonorario = alternarEstadoHonorario;
+    window.abrirModalEditarHonorario = abrirModalEditarHonorario;
+    window.cerrarModalEditarHonorario = cerrarModalEditarHonorario;
+    window.eliminarHonorario = eliminarHonorario;
+    window.eliminarGastoPersonal = eliminarGastoPersonal;
+    window.eliminarInversion = eliminarInversion;
+    window.eliminarVenta = eliminarVenta;
+    window.eliminarAds = eliminarAds;
+    window.eliminarCosto = eliminarCosto;
+    window.cambiarTabPers = cambiarTabPers;
+    window.cambiarTabDrop = cambiarTabDrop;
+    window.cambiarWorkspace = cambiarWorkspace;
+    window.cambiarSubTabIngreso = cambiarSubTabIngreso;
+    window.cargarTodo = cargarTodo;
+    window.toggleFormularioPedidoManual = toggleFormularioPedidoManual;
+    window.filtrarPedidosPorEstado = filtrarPedidosPorEstado;
+    window.toggleSeleccionPedido = toggleSeleccionPedido;
+    window.toggleSeleccionarTodosPedidos = toggleSeleccionarTodosPedidos;
+    window.eliminarPedidosSeleccionados = eliminarPedidosSeleccionados;
+    window.cambiarEstadoPedidoRapido = cambiarEstadoPedidoRapido;
+    window.abrirModalEditarPedido = abrirModalEditarPedido;
+    window.cerrarModalEditarPedido = cerrarModalEditarPedido;
+    window.renderizarTablaPedidos = renderizarTablaPedidos;
+    window.abrirModalCSV = abrirModalCSV;
+    window.cerrarModalCSV = cerrarModalCSV;
+    window.aplicarValoresDefecto = aplicarValoresDefecto;
+    window.guardarCSVEnSupabase = guardarCSVEnSupabase;
+
     // Inicialización general
+    inicializarAuth();
     aplicarConfiguraciones();
     setupDragAndDrop();
     cargarTodo();
