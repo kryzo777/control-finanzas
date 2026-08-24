@@ -1142,6 +1142,100 @@
     </div>
   </div>
 
+  <!-- MODAL AÑADIR APORTE A INVERSIÓN -->
+  <div id="modal-aporte-inversion" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-purple-900/60 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2"><span>🚀</span> Registrar Aporte de Capital</h2>
+        <button onclick="cerrarModalAporteInversion()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+      <form id="form-aporte-inversion" class="space-y-3 text-xs">
+        <input type="hidden" id="aporte-inv-id">
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <div class="text-[11px] text-slate-400 uppercase font-semibold">Activo Destino</div>
+          <div id="aporte-inv-nombre" class="text-sm font-bold text-purple-300 mt-0.5">ETF VOO</div>
+          <div id="aporte-inv-detalle" class="text-[10px] text-slate-500 mt-0.5">Capital actual: $0 • Rentabilidad est: 8%</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-slate-400">Fecha del Aporte</label>
+            <input type="date" id="aporte-inv-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Monto Aportado ($)</label>
+            <input type="number" id="aporte-inv-monto" min="1" required placeholder="Ej: 200000" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-purple-300 font-bold mt-1">
+          </div>
+        </div>
+        <div class="pt-1">
+          <label class="flex items-center gap-2 cursor-pointer text-slate-300 text-[11px]">
+            <input type="checkbox" id="aporte-inv-sumar-actual" checked class="rounded bg-slate-800 border-slate-700 text-purple-600 focus:ring-0">
+            <span>Sumar automáticamente al Valor Actual del activo</span>
+          </label>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalAporteInversion()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-xl transition shadow-lg shadow-purple-600/20">
+            Confirmar Aporte
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR ACTIVO DE INVERSIÓN -->
+  <div id="modal-editar-inversion" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2"><span>✏️</span> Editar Activo de Inversión</h2>
+        <button onclick="cerrarModalEditarInversion()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+      <form id="form-editar-inversion" class="space-y-3 text-xs">
+        <input type="hidden" id="edit-inv-id">
+        <div>
+          <label class="text-slate-400">Nombre del Activo / Instrumento</label>
+          <input type="text" id="edit-inv-nombre" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-slate-400">Tipo de Activo</label>
+            <select id="edit-inv-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+              <option value="ETF">ETF (Fondos Indexados)</option>
+              <option value="Fondo Mutuo">Fondo Mutuo</option>
+              <option value="Acciones">Acciones / Renta Variable</option>
+              <option value="DAP">Depósito a Plazo / Renta Fija</option>
+              <option value="Cripto">Criptomonedas</option>
+              <option value="Inmobiliario / Otros">Inmobiliario / Otros</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-slate-400">Plataforma / Broker</label>
+            <input type="text" id="edit-inv-plat" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-slate-400">Capital Invertido ($)</label>
+            <input type="number" id="edit-inv-cap" min="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200 mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Valor Actual ($)</label>
+            <input type="number" id="edit-inv-act" min="0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-bold mt-1">
+          </div>
+          <div>
+            <label class="text-slate-400">Rent. Estimada (%)</label>
+            <input type="number" step="0.1" id="edit-inv-tasa" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-purple-300 font-semibold mt-1">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalEditarInversion()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl transition shadow-lg shadow-sky-600/20">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL EDITAR PEDIDO / VENTA -->
   <div id="modal-editar-pedido" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
@@ -2821,20 +2915,22 @@
           return `
             <tr class="hover:bg-slate-800/40 transition">
               <td class="p-2.5">
-                <div class="font-medium text-slate-200 text-xs">${inv.nombre}</div>
+                <div class="font-bold text-slate-200 text-xs">${inv.nombre}</div>
                 <div class="text-[10px] text-slate-500">${inv.tipo || 'Activo'} • ${inv.fecha || (inv.created_at ? inv.created_at.slice(0,10) : '')}</div>
               </td>
               <td class="p-2.5 text-xs text-slate-300">
-                <span class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700/80 text-[11px]">${inv.plataforma || 'Broker'}</span>
+                <span class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700/80 text-[11px] font-medium text-slate-300">${inv.plataforma || 'Broker'}</span>
               </td>
-              <td class="p-2.5 text-right font-mono text-slate-400 text-xs">${formatoCLP(cap)}</td>
-              <td class="p-2.5 text-right font-mono font-semibold text-sky-400 text-xs">${formatoCLP(act)}</td>
+              <td class="p-2.5 text-right font-mono text-slate-300 text-xs font-semibold">${formatoCLP(cap)}</td>
+              <td class="p-2.5 text-right font-mono font-bold text-sky-400 text-xs">${formatoCLP(act)}</td>
               <td class="p-2.5 text-right text-purple-400 font-semibold text-xs">${rentEst.toFixed(1)}%</td>
               <td class="p-2.5 text-right font-semibold text-xs ${ret >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                 ${ret >= 0 ? '+' : ''}${formatoCLP(ret)} <span class="text-[10px] opacity-80">(${retPct}%)</span>
               </td>
-              <td class="p-2.5 text-center">
-                <button onclick="eliminarInversion(${inv.id})" class="text-rose-400 hover:text-rose-200 text-xs px-2 py-1 bg-rose-950/40 rounded border border-rose-800/50 cursor-pointer" title="Eliminar este activo">✕</button>
+              <td class="p-2.5 text-center whitespace-nowrap space-x-1">
+                <button onclick="abrirModalAporteInversion(${inv.id})" class="text-purple-300 hover:text-purple-100 text-xs px-2 py-1 bg-purple-950/70 hover:bg-purple-900 rounded border border-purple-800/70 cursor-pointer font-semibold transition" title="Registrar nuevo aporte a este activo">➕ Aporte</button>
+                <button onclick="abrirModalEditarInversion(${inv.id})" class="text-sky-400 hover:text-sky-200 text-xs px-2 py-1 bg-sky-950/50 hover:bg-sky-900 rounded border border-sky-800/50 cursor-pointer transition" title="Editar valor actual, rentabilidad o datos">✏️</button>
+                <button onclick="eliminarInversion(${inv.id})" class="text-rose-400 hover:text-rose-200 text-xs px-2 py-1 bg-rose-950/40 hover:bg-rose-900 rounded border border-rose-800/50 cursor-pointer transition" title="Eliminar este activo">✕</button>
               </td>
             </tr>
           `;
@@ -3840,33 +3936,77 @@
 
         let campoClasificacion = '';
         if (esInv) {
-          campoClasificacion = `
-            <div class="space-y-1">
-              <div class="flex items-center gap-1">
-                <span class="text-[10px] text-purple-400 font-bold">Activo:</span>
-                <input type="text" value="${m.activoNombre || 'Fondo / ETF'}" placeholder="Nombre del activo" 
-                  oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoNombre = this.value"
-                  class="bg-slate-900 border border-purple-800/80 rounded px-1.5 py-0.5 text-xs text-purple-200 w-full focus:outline-none focus:border-purple-400">
+          const activosExistentes = (datosPersonal.inversiones || []);
+          const tieneExistentes = activosExistentes.length > 0;
+          
+          let optionsHtml = '';
+          if (tieneExistentes) {
+            optionsHtml = activosExistentes.map(inv => {
+              const isSelected = (!m.esNuevoActivo && (m.activoNombre === inv.nombre || m.activoId === inv.id));
+              return `<option value="existente:${inv.id}" ${isSelected ? 'selected' : ''}>📈 ${inv.nombre} (${inv.plataforma || 'Broker'} - ${Number(inv.rentabilidad_anual_estimada || 8)}%)</option>`;
+            }).join('');
+            optionsHtml += `<option value="nuevo" ${m.esNuevoActivo ? 'selected' : ''}>✨ + Crear Nuevo Activo...</option>`;
+          }
+
+          if (tieneExistentes && !m.esNuevoActivo) {
+            campoClasificacion = `
+              <div class="space-y-1.5 py-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-purple-400 font-bold uppercase shrink-0">Activo:</span>
+                  <select class="bg-slate-900 border border-purple-800/90 rounded px-2 py-1 text-xs text-purple-200 font-medium w-full focus:outline-none focus:border-purple-400 cursor-pointer"
+                    onchange="seleccionarOpcionActivoBufferModal(${m.idTemporal}, this.value)">
+                    ${optionsHtml}
+                  </select>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-slate-400 bg-purple-950/30 px-2 py-1 rounded border border-purple-900/40">
+                  <span class="truncate">Tipo: <strong class="text-purple-300">${m.activoTipo || 'ETF'}</strong> • Broker: <strong class="text-purple-300">${m.activoPlataforma || 'Broker'}</strong></span>
+                  <div class="flex items-center gap-1 shrink-0 ml-1">
+                    <span>Rent:</span>
+                    <input type="number" step="0.1" value="${m.activoTasa || 8.0}" title="Rentabilidad Anual Estimada (%)"
+                      oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTasa = Number(this.value)"
+                      class="bg-slate-900 border border-purple-900/80 rounded px-1 py-0.5 text-[10px] text-purple-200 w-12 text-center">%
+                  </div>
+                </div>
               </div>
-              <div class="flex items-center gap-1 text-[10px] text-slate-400">
-                <span>Rent. Est:</span>
-                <input type="number" step="0.1" value="${m.activoTasa || 8.0}" 
-                  oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTasa = Number(this.value)"
-                  class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200 w-12 text-center">%
-                <select onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTipo = this.value" class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200">
-                  <option value="ETF" ${m.activoTipo==='ETF'?'selected':''}>ETF</option>
-                  <option value="Fondo Mutuo" ${m.activoTipo==='Fondo Mutuo'?'selected':''}>Fondo Mutuo</option>
-                  <option value="Acciones" ${m.activoTipo==='Acciones'?'selected':''}>Acciones</option>
-                  <option value="DAP" ${m.activoTipo==='DAP'?'selected':''}>DAP</option>
-                  <option value="Cripto" ${m.activoTipo==='Cripto'?'selected':''}>Cripto</option>
-                  <option value="Otros" ${m.activoTipo==='Otros'?'selected':''}>Otros</option>
-                </select>
+            `;
+          } else {
+            campoClasificacion = `
+              <div class="space-y-1.5 py-1 bg-purple-950/20 p-2 rounded-lg border border-purple-900/50">
+                ${tieneExistentes ? `
+                  <div class="flex justify-between items-center pb-1 mb-1 border-b border-purple-900/40">
+                    <span class="text-[10px] font-bold text-purple-300">Nuevo Activo a Crear</span>
+                    <button type="button" onclick="cancelarNuevoActivoBufferModal(${m.idTemporal})" class="text-[10px] text-purple-400 hover:text-purple-200 underline cursor-pointer">Elegir Existente</button>
+                  </div>
+                ` : ''}
+                <div>
+                  <input type="text" value="${m.activoNombre || ''}" placeholder="Nombre del activo (ej: ETF VOO, Fintual, DAP...)" 
+                    oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoNombre = this.value"
+                    class="bg-slate-900 border border-purple-800/80 rounded px-2 py-1 text-xs text-purple-200 w-full focus:outline-none focus:border-purple-400 placeholder:text-purple-400/40">
+                </div>
+                <div class="grid grid-cols-3 gap-1 text-[10px]">
+                  <select onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTipo = this.value" class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200">
+                    <option value="ETF" ${m.activoTipo==='ETF'?'selected':''}>ETF</option>
+                    <option value="Fondo Mutuo" ${m.activoTipo==='Fondo Mutuo'?'selected':''}>Fondo Mutuo</option>
+                    <option value="Acciones" ${m.activoTipo==='Acciones'?'selected':''}>Acciones</option>
+                    <option value="DAP" ${m.activoTipo==='DAP'?'selected':''}>DAP</option>
+                    <option value="Cripto" ${m.activoTipo==='Cripto'?'selected':''}>Cripto</option>
+                    <option value="Inmobiliario / Otros" ${m.activoTipo==='Inmobiliario / Otros'?'selected':''}>Otros</option>
+                  </select>
+                  <input type="text" value="${m.activoPlataforma || ''}" placeholder="Broker / Banco"
+                    oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoPlataforma = this.value"
+                    class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200 placeholder:text-slate-500">
+                  <div class="flex items-center gap-0.5">
+                    <input type="number" step="0.1" value="${m.activoTasa || 8.0}" placeholder="8.0"
+                      oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTasa = Number(this.value)"
+                      class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-purple-300 w-full text-center">%
+                  </div>
+                </div>
               </div>
-            </div>
-          `;
+            `;
+          }
         } else if (esGas) {
           campoClasificacion = `
-            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200 w-full" onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).categoria = this.value">
+            <select class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200 w-full focus:outline-none focus:border-sky-500 cursor-pointer" onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).categoria = this.value">
               <option value="Otros" ${m.categoria==='Otros'?'selected':''}>Otros Gastos</option>
               <option value="Supermercado/Comida" ${m.categoria==='Supermercado/Comida'?'selected':''}>Supermercado & Comida</option>
               <option value="Servicios Básicos" ${m.categoria==='Servicios Básicos'?'selected':''}>Servicios Básicos</option>
@@ -3877,9 +4017,9 @@
           `;
         } else {
           campoClasificacion = `
-            <span class="text-[11px] text-emerald-400 font-medium bg-emerald-950/60 px-2 py-1 rounded border border-emerald-800/60 block text-center">
-              Ingreso / Abono a Cuenta
-            </span>
+            <div class="text-[11px] text-emerald-400 font-medium bg-emerald-950/60 px-2 py-1.5 rounded-lg border border-emerald-800/60 flex items-center justify-center gap-1.5">
+              <span>💵</span> Ingreso / Abono a Cuenta
+            </div>
           `;
         }
 
@@ -3891,13 +4031,13 @@
           <td class="p-2.5 text-slate-400 font-mono text-xs">${m.fecha}</td>
           <td class="p-2.5 font-medium text-slate-200 text-xs">${m.descripcion}</td>
           <td class="p-2.5">
-            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200 font-semibold cursor-pointer" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
+            <select class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs font-semibold cursor-pointer ${esInv ? 'text-purple-300 border-purple-700' : (esGas ? 'text-rose-300' : 'text-emerald-300')}" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
               <option value="gasto" ${esGas?'selected':''}>💸 Gasto</option>
               <option value="inversion" ${esInv?'selected':''}>🚀 Inversión (Aporte)</option>
               <option value="ingreso" ${esIng?'selected':''}>💵 Ingreso</option>
             </select>
           </td>
-          <td class="p-2.5 min-w-[200px]">
+          <td class="p-2.5 min-w-[240px]">
             ${campoClasificacion}
           </td>
           <td class="p-2.5 text-right font-semibold text-xs ${esGas?'text-rose-400':(esInv?'text-purple-400':'text-emerald-400')}">
@@ -3908,6 +4048,47 @@
       }).join('');
 
       actualizarTotalesResumenModal();
+    }
+
+    function seleccionarOpcionActivoBufferModal(idTemporal, val) {
+      const item = bufferModalCartola.find(x => x.idTemporal === idTemporal);
+      if (!item) return;
+
+      if (val === 'nuevo') {
+        item.esNuevoActivo = true;
+        item.activoId = null;
+        item.activoNombre = '';
+        item.activoTipo = 'ETF';
+        item.activoPlataforma = '';
+        item.activoTasa = 8.0;
+      } else if (val.startsWith('existente:')) {
+        item.esNuevoActivo = false;
+        const invId = val.split(':')[1];
+        const inv = (datosPersonal.inversiones || []).find(i => String(i.id) === String(invId));
+        if (inv) {
+          item.activoId = inv.id;
+          item.activoNombre = inv.nombre;
+          item.activoTipo = inv.tipo || 'ETF';
+          item.activoPlataforma = inv.plataforma || '';
+          item.activoTasa = Number(inv.rentabilidad_anual_estimada || 8.0);
+        }
+      }
+      renderizarBufferModal();
+    }
+
+    function cancelarNuevoActivoBufferModal(idTemporal) {
+      const item = bufferModalCartola.find(x => x.idTemporal === idTemporal);
+      if (!item) return;
+      item.esNuevoActivo = false;
+      const primerInv = (datosPersonal.inversiones || [])[0];
+      if (primerInv) {
+        item.activoId = primerInv.id;
+        item.activoNombre = primerInv.nombre;
+        item.activoTipo = primerInv.tipo || 'ETF';
+        item.activoPlataforma = primerInv.plataforma || '';
+        item.activoTasa = Number(primerInv.rentabilidad_anual_estimada || 8.0);
+      }
+      renderizarBufferModal();
     }
 
     function toggleItemBufferModal(id, checked) {
@@ -3921,11 +4102,24 @@
       if (item) {
         item.destinoFinanciero = dest;
         if (dest === 'inversion') {
-          if (!item.activoNombre) {
-            const existentes = obtenerOpcionesActivosDatalist();
-            item.activoNombre = existentes[0] || 'Fondo / ETF';
-            item.activoTipo = 'ETF';
-            item.activoTasa = 8.0;
+          const activosExistentes = (datosPersonal.inversiones || []);
+          if (activosExistentes.length > 0) {
+            // Check if one matches description
+            const match = activosExistentes.find(i => item.descripcion && i.nombre && item.descripcion.toLowerCase().includes(i.nombre.toLowerCase()));
+            const activo = match || activosExistentes[0];
+            item.esNuevoActivo = false;
+            item.activoId = activo.id;
+            item.activoNombre = activo.nombre;
+            item.activoTipo = activo.tipo || 'ETF';
+            item.activoPlataforma = activo.plataforma || '';
+            item.activoTasa = Number(activo.rentabilidad_anual_estimada || 8.0);
+          } else {
+            item.esNuevoActivo = true;
+            item.activoId = null;
+            item.activoNombre = item.activoNombre || item.descripcion || 'ETF VOO (S&P 500)';
+            item.activoTipo = item.activoTipo || 'ETF';
+            item.activoPlataforma = item.activoPlataforma || 'Racional';
+            item.activoTasa = item.activoTasa || 8.0;
           }
         }
       }
@@ -3950,7 +4144,7 @@
         fecha: m.fecha,
         categoria: m.categoria || 'Otros',
         descripcion: m.descripcion,
-        monto: m.monto,
+        monto: Math.abs(m.monto),
         tipo: 'variable'
       }));
 
@@ -3958,9 +4152,9 @@
         fecha: m.fecha,
         cliente_empresa: m.descripcion,
         detalle_servicio: 'Ingreso Bancario / Abono',
-        monto_bruto: m.monto,
+        monto_bruto: Math.abs(m.monto),
         retencion_porcentaje: 0,
-        monto_liquido: m.monto,
+        monto_liquido: Math.abs(m.monto),
         estado: 'pagada'
       }));
 
@@ -3981,15 +4175,23 @@
       // Manejo inteligente de Inversiones: Si el activo ya existe, se acumula el capital; si no, se crea uno nuevo
       if (movimientosInversion.length > 0) {
         for (const movInv of movimientosInversion) {
+          const montoAporte = Math.abs(movInv.monto);
           const nombreActivo = (movInv.activoNombre || movInv.descripcion || 'Fondo / ETF').trim();
-          const activoExistente = (datosPersonal.inversiones || []).find(inv => 
-            inv.nombre && inv.nombre.toLowerCase().trim() === nombreActivo.toLowerCase()
-          );
+          
+          let activoExistente = null;
+          if (movInv.activoId) {
+            activoExistente = (datosPersonal.inversiones || []).find(inv => inv.id === movInv.activoId);
+          }
+          if (!activoExistente && !movInv.esNuevoActivo) {
+            activoExistente = (datosPersonal.inversiones || []).find(inv => 
+              inv.nombre && inv.nombre.toLowerCase().trim() === nombreActivo.toLowerCase()
+            );
+          }
 
           if (activoExistente && activoExistente.id) {
             // Acumular capital invertido y valor actual
-            const nuevoCap = Number(activoExistente.capital_invertido || 0) + Number(movInv.monto);
-            const nuevoActual = Number(activoExistente.valor_actual || 0) + Number(movInv.monto);
+            const nuevoCap = Number(activoExistente.capital_invertido || 0) + montoAporte;
+            const nuevoActual = Number(activoExistente.valor_actual || 0) + montoAporte;
             const nuevaTasa = movInv.activoTasa || activoExistente.rentabilidad_anual_estimada || 8.0;
 
             const { error: errUpdate } = await ejecutarConReintentos(() => 
@@ -4009,8 +4211,8 @@
                 fecha: movInv.fecha,
                 nombre: nombreActivo,
                 tipo: movInv.activoTipo || 'ETF',
-                capital_invertido: movInv.monto,
-                valor_actual: movInv.monto,
+                capital_invertido: montoAporte,
+                valor_actual: montoAporte,
                 rentabilidad_anual_estimada: movInv.activoTasa || 8.0,
                 plataforma: movInv.activoPlataforma || 'Broker / Cuenta Inversión'
               }])
@@ -4654,6 +4856,117 @@
         `;
       }
     }
+
+    // ==========================================
+    // MODALES Y GESTIÓN DE ACTIVOS DE INVERSIÓN
+    // ==========================================
+    function abrirModalAporteInversion(id) {
+      const inv = (datosPersonal.inversiones || []).find(i => i.id === id);
+      if (!inv) return;
+      document.getElementById('aporte-inv-id').value = inv.id;
+      document.getElementById('aporte-inv-nombre').textContent = inv.nombre;
+      document.getElementById('aporte-inv-detalle').textContent = `Plataforma: ${inv.plataforma || 'Broker'} • Capital actual: ${formatoCLP(Number(inv.capital_invertido || 0))} • Rentabilidad est: ${Number(inv.rentabilidad_anual_estimada || 8)}%`;
+      document.getElementById('aporte-inv-fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('aporte-inv-monto').value = '';
+      document.getElementById('aporte-inv-sumar-actual').checked = true;
+      document.getElementById('modal-aporte-inversion').classList.remove('hidden');
+    }
+
+    function cerrarModalAporteInversion() {
+      document.getElementById('modal-aporte-inversion').classList.add('hidden');
+    }
+
+    function abrirModalEditarInversion(id) {
+      const inv = (datosPersonal.inversiones || []).find(i => i.id === id);
+      if (!inv) return;
+      document.getElementById('edit-inv-id').value = inv.id;
+      document.getElementById('edit-inv-nombre').value = inv.nombre || '';
+      document.getElementById('edit-inv-tipo').value = inv.tipo || 'ETF';
+      document.getElementById('edit-inv-plat').value = inv.plataforma || '';
+      document.getElementById('edit-inv-cap').value = Number(inv.capital_invertido || 0);
+      document.getElementById('edit-inv-act').value = Number(inv.valor_actual || 0);
+      document.getElementById('edit-inv-tasa').value = Number(inv.rentabilidad_anual_estimada || 8.0);
+      document.getElementById('modal-editar-inversion').classList.remove('hidden');
+    }
+
+    function cerrarModalEditarInversion() {
+      document.getElementById('modal-editar-inversion').classList.add('hidden');
+    }
+
+    document.getElementById('form-aporte-inversion')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = Number(document.getElementById('aporte-inv-id').value);
+      const fecha = document.getElementById('aporte-inv-fecha').value;
+      const montoAporte = Number(document.getElementById('aporte-inv-monto').value);
+      const sumarActual = document.getElementById('aporte-inv-sumar-actual').checked;
+
+      if (!id || isNaN(montoAporte) || montoAporte <= 0) {
+        mostrarToast('Por favor ingresa un monto válido mayor a 0.', 'warning');
+        return;
+      }
+
+      const inv = (datosPersonal.inversiones || []).find(i => i.id === id);
+      if (!inv) {
+        mostrarToast('Activo no encontrado.', 'error');
+        return;
+      }
+
+      const nuevoCap = Number(inv.capital_invertido || 0) + montoAporte;
+      const nuevoActual = sumarActual ? (Number(inv.valor_actual || 0) + montoAporte) : Number(inv.valor_actual || 0);
+
+      try {
+        const { error } = await db.from('inversiones').update({
+          capital_invertido: nuevoCap,
+          valor_actual: nuevoActual,
+          fecha: fecha
+        }).eq('id', id);
+
+        if (error) throw error;
+
+        mostrarToast(`¡Aporte de ${formatoCLP(montoAporte)} registrado con éxito en "${inv.nombre}"!`, 'success');
+        cerrarModalAporteInversion();
+        await cargarTodo();
+      } catch (err) {
+        console.error('Error al registrar aporte:', err);
+        mostrarToast('Error al registrar aporte: ' + err.message, 'error');
+      }
+    });
+
+    document.getElementById('form-editar-inversion')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = Number(document.getElementById('edit-inv-id').value);
+      const nombre = document.getElementById('edit-inv-nombre').value.trim();
+      const tipo = document.getElementById('edit-inv-tipo').value;
+      const plat = document.getElementById('edit-inv-plat').value.trim();
+      const cap = Number(document.getElementById('edit-inv-cap').value);
+      const act = Number(document.getElementById('edit-inv-act').value);
+      const tasa = Number(document.getElementById('edit-inv-tasa').value);
+
+      if (!id || !nombre) {
+        mostrarToast('Por favor completa todos los campos requeridos.', 'warning');
+        return;
+      }
+
+      try {
+        const { error } = await db.from('inversiones').update({
+          nombre: nombre,
+          tipo: tipo,
+          plataforma: plat,
+          capital_invertido: cap,
+          valor_actual: act,
+          rentabilidad_anual_estimada: tasa
+        }).eq('id', id);
+
+        if (error) throw error;
+
+        mostrarToast(`¡Activo "${nombre}" actualizado correctamente!`, 'success');
+        cerrarModalEditarInversion();
+        await cargarTodo();
+      } catch (err) {
+        console.error('Error al editar inversión:', err);
+        mostrarToast('Error al guardar cambios: ' + err.message, 'error');
+      }
+    });
 
     async function eliminarInversion(id) {
       const confirmado = await pedirConfirmacion({
