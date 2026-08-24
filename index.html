@@ -170,6 +170,63 @@
             </div>
           </div>
         </div>
+
+        <!-- WIDGET INTEGRADO: SALDO DISPONIBLE EN TARJETA DE NEGOCIO & MOVIMIENTOS DE CAPITAL -->
+        <div id="seccion-tarjeta-negocio-widget" class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 p-4 md:p-5 rounded-2xl border border-indigo-900/60 shadow-xl space-y-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-xl text-indigo-400">
+                💳
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-sm font-bold text-white tracking-wide">Saldo Operativo en Tarjeta del Negocio</h3>
+                  <span id="badge-tarjeta-negocio-nombre" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/80">Tarjeta Negocio</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">Alimentado en tiempo real por inyecciones de capital, márgenes de pedidos entregados y pagos de costos.</p>
+              </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="abrirModalTraspasoNegocioInyeccion()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
+                <span>➕ Inyectar Capital</span>
+              </button>
+              <button onclick="abrirModalTraspasoNegocioRetiro()" class="bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-lg shadow-amber-600/20 cursor-pointer flex items-center gap-1.5">
+                <span>💸 Retirar Ganancias / Sueldo</span>
+              </button>
+              <button onclick="irATabTarjetasDesdeNegocio()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs px-3 py-2 rounded-xl transition cursor-pointer flex items-center gap-1">
+                <span>⚙️ Ver Cuentas</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Desglose Contable del Saldo de Negocio -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase font-semibold text-slate-400 block">Saldo Disponible Neto</span>
+              <p id="widget-negocio-saldo-disponible" class="text-xl font-extrabold text-indigo-300 font-mono mt-0.5">$0</p>
+              <span id="widget-negocio-tarjeta-detalle" class="text-[10px] text-slate-500 block truncate">•••• 0000</span>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase font-semibold text-emerald-400 block">Inyecciones Recibidas</span>
+              <p id="widget-negocio-total-inyecciones" class="text-base font-bold text-emerald-400 font-mono mt-0.5">+$0</p>
+              <span class="text-[10px] text-slate-500 block">Desde Inversión / Principal</span>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase font-semibold text-sky-400 block">Márgenes Pedidos Entregados</span>
+              <p id="widget-negocio-margen-entregados" class="text-base font-bold text-sky-400 font-mono mt-0.5">+$0</p>
+              <span id="widget-negocio-num-entregados" class="text-[10px] text-slate-500 block">0 pedidos entregados</span>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase font-semibold text-amber-400 block">Retiros Realizados</span>
+              <p id="widget-negocio-total-retiros" class="text-base font-bold text-amber-400 font-mono mt-0.5">-$0</p>
+              <span class="text-[10px] text-slate-500 block">Hacia Cuenta Principal</span>
+            </div>
+          </div>
+        </div>
         
         <!-- Panel de Alertas Inteligentes & Diagnóstico Ejecutivo -->
         <div id="seccion-alertas-negocio" class="grid grid-cols-1 md:grid-cols-12 gap-3">
@@ -620,6 +677,9 @@
         <button onclick="cambiarTabPers('dashboard')" id="tab-pers-dash-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-emerald-500 text-emerald-400 font-semibold transition">
           📊 Dashboard Financiero Total
         </button>
+        <button onclick="cambiarTabPers('tarjetas')" id="tab-pers-tarjetas-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+          <span>💳</span> Tarjetas & Cuentas Bancarias
+        </button>
         <button onclick="cambiarTabPers('auditoria_cartola')" id="tab-pers-cartola-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
           <span>🏦</span> Auditoría de Cartola Bancaria
         </button>
@@ -631,27 +691,47 @@
         </button>
       </nav>
 
-      <!-- KPIs Personal Consolidados -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">1. Total Ganado (Líquido)</span>
-          <p id="kpi-pers-ingresos" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
-          <span id="kpi-pers-bruto" class="text-[11px] text-slate-500">Honorarios + Extras</span>
+      <!-- KPIs Personal Consolidados (Desplegable) -->
+      <div class="bg-slate-900/70 rounded-2xl border border-slate-800 overflow-hidden transition-all duration-200">
+        <div class="p-3 md:px-4 md:py-3 flex items-center justify-between cursor-pointer select-none hover:bg-slate-800/40 transition" onclick="toggleDesplegableKpisPersonal()">
+          <div class="flex items-center gap-2.5">
+            <span class="text-emerald-400 font-bold text-sm">📊</span>
+            <div>
+              <h2 class="text-xs md:text-sm font-semibold uppercase tracking-wider text-slate-200">Resumen Financiero Personal (KPIs)</h2>
+              <span class="text-[10px] text-slate-400">Total ganado, gastado, invertido y saldo neto disponible</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="btn-toggle-kpi-pers-text" class="text-xs font-medium text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5 hover:bg-slate-700 transition">
+              <span>Plegar</span>
+              <span id="btn-toggle-kpi-pers-icon" class="text-xs transition-transform duration-200">▲</span>
+            </span>
+          </div>
         </div>
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">2. Total Gastado</span>
-          <p id="kpi-pers-gastos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
-          <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Gastos registrados</span>
-        </div>
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">3. Total Invertido</span>
-          <p id="kpi-pers-invertido-periodo" class="text-xl font-bold text-purple-400 mt-1">$0</p>
-          <span class="text-[11px] text-slate-500">Aportes a fondos y ETFs</span>
-        </div>
-        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <span class="text-slate-400 text-xs font-semibold uppercase">4. Flujo Libre / Saldo Neto</span>
-          <p id="kpi-pers-ahorro" class="text-xl font-bold text-sky-400 mt-1">$0</p>
-          <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa de Ahorro: 0%</span>
+
+        <div id="contenedor-kpis-personal" class="p-3 pt-1 border-t border-slate-800/80">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+              <span class="text-slate-400 text-xs font-semibold uppercase">1. Total Ganado (Líquido)</span>
+              <p id="kpi-pers-ingresos" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
+              <span id="kpi-pers-bruto" class="text-[11px] text-slate-500">Honorarios + Extras</span>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+              <span class="text-slate-400 text-xs font-semibold uppercase">2. Total Gastado</span>
+              <p id="kpi-pers-gastos" class="text-xl font-bold text-rose-400 mt-1">$0</p>
+              <span id="kpi-pers-gastos-fijos" class="text-[11px] text-slate-500">Gastos registrados</span>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+              <span class="text-slate-400 text-xs font-semibold uppercase">3. Total Invertido</span>
+              <p id="kpi-pers-invertido-periodo" class="text-xl font-bold text-purple-400 mt-1">$0</p>
+              <span class="text-[11px] text-slate-500">Aportes a fondos y ETFs</span>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+              <span class="text-slate-400 text-xs font-semibold uppercase">4. Flujo Libre / Saldo Neto</span>
+              <p id="kpi-pers-ahorro" class="text-xl font-bold text-sky-400 mt-1">$0</p>
+              <span id="kpi-pers-capacidad" class="text-[11px] font-medium text-slate-300">Tasa de Ahorro: 0%</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -690,6 +770,123 @@
             <span class="text-[10px] text-slate-500">Fondo de emergencia o excedente</span>
           </div>
         </div>
+      </div>
+
+      <!-- TAB: TARJETAS & CUENTAS BANCARIAS MULTI-ÁREA -->
+      <div id="tab-pers-tarjetas" class="tab-pers-content hidden space-y-5">
+        
+        <!-- Métricas Superiores de Cuentas (Desplegable) -->
+        <div class="bg-slate-900/70 rounded-2xl border border-slate-800 overflow-hidden transition-all duration-200">
+          <div class="p-3 md:px-4 md:py-3 flex items-center justify-between cursor-pointer select-none hover:bg-slate-800/40 transition" onclick="toggleDesplegableKpisTarjetas()">
+            <div class="flex items-center gap-2.5">
+              <span class="text-indigo-400 font-bold text-sm">💳</span>
+              <div>
+                <h2 class="text-xs md:text-sm font-semibold uppercase tracking-wider text-slate-200">Métricas Globales de Cuentas & Tarjetas</h2>
+                <span class="text-[10px] text-slate-400">Total en cuentas, saldo operativo de negocio, inversión y rendimientos</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="btn-toggle-kpi-tarjetas-text" class="text-xs font-medium text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5 hover:bg-slate-700 transition">
+                <span>Plegar</span>
+                <span id="btn-toggle-kpi-tarjetas-icon" class="text-xs transition-transform duration-200">▲</span>
+              </span>
+            </div>
+          </div>
+
+          <div id="contenedor-kpis-tarjetas" class="p-3 pt-1 border-t border-slate-800/80">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                <span class="text-slate-400 text-xs font-semibold uppercase">Total en Cuentas & Tarjetas</span>
+                <p id="kpi-tarjetas-total-saldo" class="text-xl font-bold text-emerald-400 mt-1 font-mono">$0</p>
+                <span id="kpi-tarjetas-conteo" class="text-[11px] text-slate-500">0 cuentas activas</span>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                <span class="text-slate-400 text-xs font-semibold uppercase">Tarjeta Negocio / Operativa</span>
+                <p id="kpi-tarjetas-saldo-negocio" class="text-xl font-bold text-indigo-400 mt-1 font-mono">$0</p>
+                <span class="text-[11px] text-slate-500">Fondos de trabajo e-commerce</span>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                <span class="text-slate-400 text-xs font-semibold uppercase">Cuentas Inversión / Remuneradas</span>
+                <p id="kpi-tarjetas-saldo-inversion" class="text-xl font-bold text-purple-400 mt-1 font-mono">$0</p>
+                <span class="text-[11px] text-slate-500">Activos líquidos con interés</span>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                <span class="text-slate-400 text-xs font-semibold uppercase">Interés Anual Proyectado</span>
+                <p id="kpi-tarjetas-interes-anual" class="text-xl font-bold text-sky-400 mt-1 font-mono">+$0/año</p>
+                <span id="kpi-tarjetas-tasa-prom" class="text-[11px] text-slate-400">Tasa prom: 0.0% anual</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Acciones y Controles de Tarjetas -->
+        <div class="bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <span>💳</span> Billetera Multi-Tarjeta & Cuentas Bancarias
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Administra tus tarjetas personales, de negocio e inversión, con control de traspasos e inyecciones de capital.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="abrirModalNuevaTarjeta()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-emerald-600/20 cursor-pointer">
+                <span>➕ Nueva Tarjeta / Cuenta</span>
+              </button>
+              <button onclick="abrirModalTraspaso()" class="bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-sky-600/20 cursor-pointer">
+                <span>🔄 Realizar Traspaso</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Galería Visual de Tarjetas (Cards Wallet) -->
+          <div id="contenedor-tarjetas-galeria" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+            <!-- Renderizado dinámico de tarjetas -->
+          </div>
+        </div>
+
+        <!-- Historial y Libro de Traspasos entre Tarjetas -->
+        <div class="bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>🔄</span> Historial de Traspasos & Auditoría de Cuentas
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">Registro de inyecciones de capital, retiros de ganancias y aportes entre tarjetas.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+              <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs overflow-x-auto">
+                <button onclick="filtrarTraspasosPorTipo('todos')" id="btn-filtro-traspaso-todos" class="btn-fc-traspaso px-2.5 py-1 rounded-lg bg-sky-600 text-white font-semibold cursor-pointer">Todos</button>
+                <button onclick="filtrarTraspasosPorTipo('inyeccion')" id="btn-filtro-traspaso-inyeccion" class="btn-fc-traspaso px-2.5 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer whitespace-nowrap">Inyección Negocio</button>
+                <button onclick="filtrarTraspasosPorTipo('retiro')" id="btn-filtro-traspaso-retiro" class="btn-fc-traspaso px-2.5 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer whitespace-nowrap">Retiro Ganancia</button>
+                <button onclick="filtrarTraspasosPorTipo('inversion')" id="btn-filtro-traspaso-inversion" class="btn-fc-traspaso px-2.5 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer whitespace-nowrap">Aporte Inversión</button>
+              </div>
+
+              <input type="text" id="buscador-traspasos" placeholder="🔍 Buscar traspaso..." oninput="renderizarTablaTraspasos()" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+            </div>
+          </div>
+
+          <!-- Tabla de Traspasos -->
+          <div class="overflow-x-auto border border-slate-800 rounded-xl max-h-96">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950 sticky top-0 text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="p-3">Fecha</th>
+                  <th class="p-3">Cuenta Origen ➔ Destino</th>
+                  <th class="p-3">Clasificación Contable</th>
+                  <th class="p-3 text-right">Monto ($)</th>
+                  <th class="p-3">Glosa / Detalle</th>
+                  <th class="p-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-traspasos-tarjetas" class="divide-y divide-slate-800">
+                <!-- Se llena dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
       <!-- TAB 2: AUDITORÍA DE CARTOLA BANCARIA (LIBRO MAYOR CONSOLIDADO) -->
@@ -768,85 +965,104 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
           <div class="lg:col-span-7 space-y-4">
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
-              <div class="flex border-b border-slate-800 pb-2 justify-between items-center">
-                <div class="flex gap-2">
-                  <button onclick="cambiarSubTabIngreso('boleta')" id="subtab-boleta-btn" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition">
-                    📄 Boletas Honorarios SII
-                  </button>
-                  <button onclick="cambiarSubTabIngreso('extra')" id="subtab-extra-btn" class="text-xs font-medium px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
-                    💵 Otros Ingresos Extra
-                  </button>
+            <!-- Módulo Desplegable: Registro de Ingresos (Boletas SII & Extras) -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden transition-all duration-200">
+              <div class="p-4 flex items-center justify-between cursor-pointer select-none hover:bg-slate-800/40 transition" onclick="toggleDesplegableHonorarios()">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-emerald-400 font-bold text-base">📄</span>
+                  <div>
+                    <h2 class="text-sm font-semibold uppercase text-emerald-400">Registrar Boleta SII / Ingreso Extra</h2>
+                    <span class="text-[11px] text-slate-400">Emisión de boletas de honorarios, subida de PDF o ingresos adicionales</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span id="btn-toggle-hono-text" class="text-xs font-medium text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5 hover:bg-slate-700 transition">
+                    <span>Plegar</span>
+                    <span id="btn-toggle-hono-icon" class="text-xs transition-transform duration-200">▲</span>
+                  </span>
                 </div>
               </div>
 
-              <!-- Boletas SII con Drag & Drop PDF -->
-              <div id="subseccion-boleta" class="space-y-3">
-                <div id="dropzone-pdf" class="border-2 border-dashed border-slate-700 hover:border-emerald-500 bg-slate-950/60 p-4 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5" onclick="document.getElementById('input-pdf-boleta').click()">
-                  <span class="text-2xl">📎</span>
-                  <span class="text-xs font-semibold text-emerald-400">Arrastra tu Boleta PDF del SII aquí o haz clic para subir</span>
-                  <span class="text-[10px] text-slate-500">Detecta automáticamente Cliente, Monto Bruto, Retención y Líquido</span>
-                  <input type="file" id="input-pdf-boleta" accept=".pdf" class="hidden" onchange="procesarPDFSubido(event)">
+              <div id="contenedor-form-honorarios" class="p-4 pt-1 border-t border-slate-800/80 space-y-3">
+                <div class="flex border-b border-slate-800 pb-2 justify-between items-center">
+                  <div class="flex gap-2">
+                    <button onclick="cambiarSubTabIngreso('boleta')" id="subtab-boleta-btn" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 text-white transition cursor-pointer">
+                      📄 Boletas Honorarios SII
+                    </button>
+                    <button onclick="cambiarSubTabIngreso('extra')" id="subtab-extra-btn" class="text-xs font-medium px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+                      💵 Otros Ingresos Extra
+                    </button>
+                  </div>
                 </div>
 
-                <form id="form-honorario" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
-                  <div>
-                    <label class="text-slate-400">Fecha Emisión</label>
-                    <input type="date" id="h-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                <!-- Boletas SII con Drag & Drop PDF -->
+                <div id="subseccion-boleta" class="space-y-3">
+                  <div id="dropzone-pdf" class="border-2 border-dashed border-slate-700 hover:border-emerald-500 bg-slate-950/60 p-4 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5" onclick="document.getElementById('input-pdf-boleta').click()">
+                    <span class="text-2xl">📎</span>
+                    <span class="text-xs font-semibold text-emerald-400">Arrastra tu Boleta PDF del SII aquí o haz clic para subir</span>
+                    <span class="text-[10px] text-slate-500">Detecta automáticamente Cliente, Monto Bruto, Retención y Líquido</span>
+                    <input type="file" id="input-pdf-boleta" accept=".pdf" class="hidden" onchange="procesarPDFSubido(event)">
                   </div>
-                  <div class="col-span-2">
-                    <label class="text-slate-400">Cliente / Empresa</label>
-                    <input type="text" id="h-cliente" placeholder="Ej: Rincon Fotografico SpA" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                  </div>
-                  <div class="col-span-3">
-                    <label class="text-slate-400">Glosa / Detalle del Servicio</label>
-                    <input type="text" id="h-detalle" placeholder="Ej: Gestion, Asesoria y Atencion de Clientes" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                  </div>
-                  <div>
-                    <label class="text-slate-400">Monto Bruto ($)</label>
-                    <input type="number" id="h-bruto" min="1" placeholder="Ej: 1312511" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1" oninput="calcularLiquidoHonorario()">
-                  </div>
-                  <div>
-                    <label class="text-slate-400">Retención SII (%)</label>
-                    <input type="number" id="h-ret-tasa" step="0.01" value="15.25" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="calcularLiquidoHonorario()">
-                  </div>
-                  <div>
-                    <label class="text-slate-400">Líquido a Recibir</label>
-                    <input type="text" id="h-liquido-calc" readonly value="$0" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sky-400 font-bold mt-1">
-                  </div>
-                  <div class="col-span-3 flex items-center justify-between pt-1">
-                    <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                      <input type="checkbox" id="h-pagada" class="rounded bg-slate-800 border-slate-700 text-emerald-600 focus:ring-0">
-                      <span>¿Ya pagada / depositada?</span>
-                    </label>
-                    <button type="submit" id="btn-guardar-honorario" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-xl transition text-xs">
-                      Guardar Boleta
-                    </button>
-                  </div>
-                </form>
-              </div>
 
-              <!-- Otros Ingresos Extra -->
-              <div id="subseccion-extra" class="hidden space-y-3">
-                <form id="form-ingreso-extra" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
-                  <div>
-                    <label class="text-slate-400">Fecha</label>
-                    <input type="date" id="ie-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                  </div>
-                  <div class="col-span-2">
-                    <label class="text-slate-400">Fuente / Concepto</label>
-                    <input type="text" id="ie-fuente" placeholder="Ej: Venta de equipo usado, Dividendos, Asesoría" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                  </div>
-                  <div class="col-span-2">
-                    <label class="text-slate-400">Monto Recibido Líquido ($)</label>
-                    <input type="number" id="ie-monto" min="1" placeholder="Ej: 250000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
-                  </div>
-                  <div class="flex items-end">
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-xl transition text-xs">
-                      Guardar Ingreso Extra
-                    </button>
-                  </div>
-                </form>
+                  <form id="form-honorario" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                    <div>
+                      <label class="text-slate-400">Fecha Emisión</label>
+                      <input type="date" id="h-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                    </div>
+                    <div class="col-span-2">
+                      <label class="text-slate-400">Cliente / Empresa</label>
+                      <input type="text" id="h-cliente" placeholder="Ej: Rincon Fotografico SpA" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                    </div>
+                    <div class="col-span-3">
+                      <label class="text-slate-400">Glosa / Detalle del Servicio</label>
+                      <input type="text" id="h-detalle" placeholder="Ej: Gestion, Asesoria y Atencion de Clientes" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                    </div>
+                    <div>
+                      <label class="text-slate-400">Monto Bruto ($)</label>
+                      <input type="number" id="h-bruto" min="1" placeholder="Ej: 1312511" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1" oninput="calcularLiquidoHonorario()">
+                    </div>
+                    <div>
+                      <label class="text-slate-400">Retención SII (%)</label>
+                      <input type="number" id="h-ret-tasa" step="0.01" value="15.25" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="calcularLiquidoHonorario()">
+                    </div>
+                    <div>
+                      <label class="text-slate-400">Líquido a Recibir</label>
+                      <input type="text" id="h-liquido-calc" readonly value="$0" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sky-400 font-bold mt-1">
+                    </div>
+                    <div class="col-span-3 flex items-center justify-between pt-1">
+                      <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                        <input type="checkbox" id="h-pagada" class="rounded bg-slate-800 border-slate-700 text-emerald-600 focus:ring-0">
+                        <span>¿Ya pagada / depositada?</span>
+                      </label>
+                      <button type="submit" id="btn-guardar-honorario" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-xl transition text-xs cursor-pointer">
+                        Guardar Boleta
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Otros Ingresos Extra -->
+                <div id="subseccion-extra" class="hidden space-y-3">
+                  <form id="form-ingreso-extra" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                    <div>
+                      <label class="text-slate-400">Fecha</label>
+                      <input type="date" id="ie-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                    </div>
+                    <div class="col-span-2">
+                      <label class="text-slate-400">Fuente / Concepto</label>
+                      <input type="text" id="ie-fuente" placeholder="Ej: Venta de equipo usado, Dividendos, Asesoría" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                    </div>
+                    <div class="col-span-2">
+                      <label class="text-slate-400">Monto Recibido Líquido ($)</label>
+                      <input type="number" id="ie-monto" min="1" placeholder="Ej: 250000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
+                    </div>
+                    <div class="flex items-end">
+                      <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-xl transition text-xs cursor-pointer">
+                        Guardar Ingreso Extra
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
 
@@ -913,54 +1129,68 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-7 space-y-4">
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-              <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-semibold uppercase text-sky-400 flex items-center gap-2"><span>➕</span> Crear Activo / Registrar Inversión</h2>
-                <span class="text-[11px] text-slate-400">Permite acumular aportes desde cartolas</span>
+            <!-- Módulo Desplegable: Crear Activo / Registrar Inversión -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden transition-all duration-200">
+              <div class="p-4 flex items-center justify-between cursor-pointer select-none hover:bg-slate-800/40 transition" onclick="toggleDesplegableInversion()">
+                <div class="flex items-center gap-2">
+                  <span class="text-sky-400 font-bold text-base">➕</span>
+                  <div>
+                    <h2 class="text-sm font-semibold uppercase text-sky-400">Crear Activo / Registrar Inversión</h2>
+                    <span class="text-[11px] text-slate-400">Permite registrar nuevos activos o acumular aportes</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span id="btn-toggle-inv-text" class="text-xs font-medium text-sky-400 bg-sky-950/60 px-2.5 py-1 rounded-lg border border-sky-800/60 flex items-center gap-1.5 hover:bg-sky-900/80 transition">
+                    <span>Desplegar</span>
+                    <span id="btn-toggle-inv-icon" class="text-xs transition-transform duration-200">▼</span>
+                  </span>
+                </div>
               </div>
-              <form id="form-inversion" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
-                <div>
-                  <label class="text-slate-400">Fecha Aporte</label>
-                  <input type="date" id="inv-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                </div>
-                <div class="col-span-2">
-                  <label class="text-slate-400">Nombre Activo / Instrumento</label>
-                  <input type="text" id="inv-nombre" list="lista-activos-existentes" placeholder="Ej: ETF VOO, Fintual Risky, DAP Santander" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                  <datalist id="lista-activos-existentes"></datalist>
-                </div>
-                <div>
-                  <label class="text-slate-400">Tipo de Activo</label>
-                  <select id="inv-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                    <option value="ETF">ETF (Fondos Indexados)</option>
-                    <option value="Fondo Mutuo">Fondo Mutuo</option>
-                    <option value="Acciones">Acciones / Renta Variable</option>
-                    <option value="DAP">Depósito a Plazo / Renta Fija</option>
-                    <option value="Cripto">Criptomonedas</option>
-                    <option value="Inmobiliario / Otros">Inmobiliario / Otros</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="text-slate-400">Capital Aportado ($)</label>
-                  <input type="number" id="inv-capital" min="1" placeholder="Ej: 500000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="if(!document.getElementById('inv-actual').value) document.getElementById('inv-actual').value = this.value">
-                </div>
-                <div>
-                  <label class="text-slate-400">Valor Actual ($)</label>
-                  <input type="number" id="inv-actual" min="1" placeholder="Ej: 500000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
-                </div>
-                <div>
-                  <label class="text-slate-400">Rentabilidad Anual Estimada (%)</label>
-                  <input type="number" step="0.1" id="inv-tasa" value="8.0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                </div>
-                <div class="col-span-2">
-                  <label class="text-slate-400">Plataforma / Broker / Cuenta de Inversión</label>
-                  <input type="text" id="inv-plataforma" placeholder="Ej: Racional, Fintual, Banchile, Santander, Buda" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                </div>
-                <div class="flex items-end col-span-2 md:col-span-3">
-                  <button type="submit" id="btn-guardar-inversion" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs shadow-lg shadow-sky-600/20">
-                    Guardar / Actualizar Activo de Inversión
-                  </button>
-                </div>
-              </form>
+              <div id="contenedor-form-inversion" class="hidden p-4 pt-1 border-t border-slate-800/80">
+                <form id="form-inversion" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                  <div>
+                    <label class="text-slate-400">Fecha Aporte</label>
+                    <input type="date" id="inv-fecha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  </div>
+                  <div class="col-span-2">
+                    <label class="text-slate-400">Nombre Activo / Instrumento</label>
+                    <input type="text" id="inv-nombre" list="lista-activos-existentes" placeholder="Ej: ETF VOO, Fintual Risky, DAP Santander" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                    <datalist id="lista-activos-existentes"></datalist>
+                  </div>
+                  <div>
+                    <label class="text-slate-400">Tipo de Activo</label>
+                    <select id="inv-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                      <option value="ETF">ETF (Fondos Indexados)</option>
+                      <option value="Fondo Mutuo">Fondo Mutuo</option>
+                      <option value="Acciones">Acciones / Renta Variable</option>
+                      <option value="DAP">Depósito a Plazo / Renta Fija</option>
+                      <option value="Cripto">Criptomonedas</option>
+                      <option value="Inmobiliario / Otros">Inmobiliario / Otros</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-slate-400">Capital Aportado ($)</label>
+                    <input type="number" id="inv-capital" min="1" placeholder="Ej: 500000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="if(!document.getElementById('inv-actual').value) document.getElementById('inv-actual').value = this.value">
+                  </div>
+                  <div>
+                    <label class="text-slate-400">Valor Actual ($)</label>
+                    <input type="number" id="inv-actual" min="1" placeholder="Ej: 500000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
+                  </div>
+                  <div>
+                    <label class="text-slate-400">Rentabilidad Anual Estimada (%)</label>
+                    <input type="number" step="0.1" id="inv-tasa" value="8.0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  </div>
+                  <div class="col-span-2">
+                    <label class="text-slate-400">Plataforma / Broker / Cuenta de Inversión</label>
+                    <input type="text" id="inv-plataforma" placeholder="Ej: Racional, Fintual, Banchile, Santander, Buda" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  </div>
+                  <div class="flex items-end col-span-2 md:col-span-3">
+                    <button type="submit" id="btn-guardar-inversion" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2.5 rounded-xl text-white transition text-xs shadow-lg shadow-sky-600/20 cursor-pointer">
+                      Guardar / Actualizar Activo de Inversión
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
 
             <!-- Tabla de Activos y Desglose de Inversiones -->
@@ -1230,6 +1460,241 @@
           <button type="button" onclick="cerrarModalEditarInversion()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
           <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl transition shadow-lg shadow-sky-600/20">
             Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CREAR / EDITAR TARJETA O CUENTA BANCARIA -->
+  <div id="modal-tarjeta" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl my-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">💳</span>
+          <div>
+            <h2 id="modal-tarjeta-titulo" class="text-base font-bold text-white">Nueva Tarjeta o Cuenta Bancaria</h2>
+            <p class="text-xs text-slate-400">Configura tarjetas personales, operativas de negocio o vehículos de inversión.</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalTarjeta()" class="text-slate-400 hover:text-white text-lg p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer">✕</button>
+      </div>
+
+      <!-- Previsualización Visual en Vivo de la Tarjeta -->
+      <div class="p-1">
+        <div id="tarjeta-preview-card" class="w-full max-w-sm mx-auto h-44 rounded-2xl p-4 text-white shadow-xl flex flex-col justify-between relative overflow-hidden transition-all duration-300 bg-gradient-to-r from-red-600 to-rose-950 border border-white/10">
+          <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div class="flex justify-between items-start z-10">
+            <div>
+              <span id="preview-banco-nombre" class="text-xs font-black uppercase tracking-wider block">BANCO SANTANDER</span>
+              <span id="preview-formato-tarjeta" class="text-[10px] text-white/80 font-medium">Cuenta Corriente</span>
+            </div>
+            <span id="preview-tipo-badge" class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-white/20 backdrop-blur-md uppercase tracking-wider">Principal</span>
+          </div>
+
+          <div class="flex items-center gap-3 z-10 my-auto">
+            <!-- Chip EMV Dorado -->
+            <div class="w-9 h-7 rounded-md bg-gradient-to-tr from-amber-300 via-amber-200 to-yellow-500 border border-amber-400/80 shadow-sm flex flex-col justify-around p-1">
+              <div class="h-[1px] bg-amber-700/40"></div>
+              <div class="h-[1px] bg-amber-700/40"></div>
+            </div>
+            <div class="flex items-center gap-1 font-mono text-sm tracking-widest text-white/90">
+              <span>••••</span>
+              <span>••••</span>
+              <span>••••</span>
+              <span id="preview-digitos" class="font-bold">4589</span>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-end z-10">
+            <div>
+              <span class="text-[9px] text-white/70 block uppercase">Titular / Nombre</span>
+              <span id="preview-nombre-titular" class="text-xs font-bold truncate max-w-[170px] block">Mi Cuenta Principal</span>
+            </div>
+            <div class="text-right">
+              <span class="text-[9px] text-white/70 block uppercase">Saldo Disponible</span>
+              <span id="preview-saldo-monto" class="text-sm font-extrabold font-mono text-emerald-300">$0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Configuración de la Tarjeta -->
+      <form id="form-tarjeta" onsubmit="guardarTarjeta(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="tarjeta-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Nombre / Identificador de la Tarjeta</label>
+            <input type="text" id="tarjeta-nombre" required placeholder="Ej: Santander Principal, Débito Negocio" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition" oninput="actualizarPreviewTarjetaModal()">
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Banco Emisor / Entidad Financiera</label>
+            <select id="tarjeta-banco" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-sky-500 transition cursor-pointer" onchange="cambiarBancoModalTarjeta(this.value)">
+              <option value="Banco Santander">Banco Santander (Rojo)</option>
+              <option value="Banco de Chile">Banco de Chile / Edwards (Azul)</option>
+              <option value="Banco Estado">Banco Estado / CuentaRUT (Naranja)</option>
+              <option value="BCI">BCI (Turquesa / Marino)</option>
+              <option value="Banco Falabella">Banco Falabella (Verde Esmeralda)</option>
+              <option value="Scotiabank">Scotiabank (Rojo Rubí)</option>
+              <option value="Itaú">Itaú (Naranja)</option>
+              <option value="Mercado Pago">Mercado Pago (Celeste)</option>
+              <option value="Tenpo">Tenpo (Morado / Rosa)</option>
+              <option value="Global66">Global66 (Verde Lima)</option>
+              <option value="Mach">Mach (Morado Intenso)</option>
+              <option value="Racional / Fintual">Racional / Fintual (Violeta Inversión)</option>
+              <option value="Otro">Otro Banco / Personalizado (Gris Oscuro)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Propósito / Rol</label>
+            <select id="tarjeta-tipo" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-sky-500 transition cursor-pointer" onchange="cambiarTipoTarjetaModal(this.value)">
+              <option value="principal">⭐ Tarjeta Principal Personal</option>
+              <option value="negocio">🏢 Tarjeta del Negocio (E-commerce / Dropi)</option>
+              <option value="inversion">🚀 Vehículo de Inversión (Remunerada)</option>
+              <option value="costos">💸 Tarjeta de Pago de Costos / Fijos</option>
+              <option value="ahorro">🛡️ Fondo de Emergencia / Ahorro</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Formato / Instrumento</label>
+            <select id="tarjeta-formato" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-sky-500 transition cursor-pointer" onchange="actualizarPreviewTarjetaModal()">
+              <option value="Cuenta Corriente">Cuenta Corriente</option>
+              <option value="Cuenta Vista / Débito">Cuenta Vista / Débito / RUT</option>
+              <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+              <option value="Cuenta Digital Remunerada">Cuenta Digital Remunerada</option>
+              <option value="Billetera Prepago">Billetera Prepago / Digital</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Últimos 4 Dígitos</label>
+            <input type="text" id="tarjeta-digitos" maxlength="4" placeholder="Ej: 4589" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:border-sky-500 transition" oninput="actualizarPreviewTarjetaModal()">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Saldo Base / Inicial ($)</label>
+            <input type="number" id="tarjeta-saldo-inicial" min="0" required placeholder="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-emerald-400 font-mono font-bold focus:outline-none focus:border-sky-500 transition" oninput="actualizarPreviewTarjetaModal()">
+          </div>
+
+          <div id="campo-tasa-interes-tarjeta" class="transition-all">
+            <label class="text-purple-300 font-semibold block mb-1">Crecimiento / Interés Anual (%)</label>
+            <input type="number" step="0.1" min="0" id="tarjeta-tasa-interes" placeholder="Ej: 7.2" class="w-full bg-slate-950 border border-purple-800/80 rounded-xl p-2.5 text-purple-300 font-mono font-bold focus:outline-none focus:border-purple-500 transition" oninput="actualizarPreviewTarjetaModal()">
+            <span class="text-[10px] text-slate-500 mt-0.5 block">Se calculará en el área de inversiones y proyecciones</span>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalTarjeta()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition shadow-lg shadow-emerald-600/20 cursor-pointer">
+            💾 Guardar Tarjeta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL REGISTRAR TRASPASO ENTRE TARJETAS / CUENTAS -->
+  <div id="modal-traspaso-tarjeta" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl my-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🔄</span>
+          <div>
+            <h2 id="modal-traspaso-titulo" class="text-base font-bold text-white">Nuevo Traspaso entre Tarjetas</h2>
+            <p class="text-xs text-slate-400">Transfiere fondos y registra inyecciones, retiros o aportes contables.</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalTraspaso()" class="text-slate-400 hover:text-white text-lg p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer">✕</button>
+      </div>
+
+      <!-- Visualizador Dinámico de la Operación -->
+      <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2 text-xs">
+        <div class="flex items-center justify-between text-slate-400">
+          <span class="font-semibold">Flujo de Dinero:</span>
+          <span id="preview-traspaso-tipo-tag" class="px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-800 text-[10px] font-bold">Traspaso Directo</span>
+        </div>
+        
+        <div class="flex items-center justify-between gap-2 pt-1">
+          <div class="flex-1 bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-center">
+            <span class="text-[10px] text-slate-500 uppercase block font-semibold">Origen (Emisor)</span>
+            <span id="preview-traspaso-origen-txt" class="font-bold text-slate-200 block truncate mt-0.5">Seleccionar</span>
+            <span id="preview-traspaso-origen-saldo" class="text-[10px] text-slate-400 font-mono">Disp: $0</span>
+          </div>
+
+          <div class="w-8 h-8 rounded-full bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0 text-sm">
+            ➔
+          </div>
+
+          <div class="flex-1 bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-center">
+            <span class="text-[10px] text-slate-500 uppercase block font-semibold">Destino (Receptor)</span>
+            <span id="preview-traspaso-destino-txt" class="font-bold text-slate-200 block truncate mt-0.5">Seleccionar</span>
+            <span id="preview-traspaso-destino-saldo" class="text-[10px] text-slate-400 font-mono">Disp: $0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Traspaso -->
+      <form id="form-traspaso" onsubmit="guardarTraspaso(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="traspaso-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Cuenta / Tarjeta Origen (Desde)</label>
+            <select id="traspaso-origen" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-sky-500 transition cursor-pointer" onchange="alCambiarCuentasTraspaso()">
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Cuenta / Tarjeta Destino (Hacia)</label>
+            <select id="traspaso-destino" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-sky-500 transition cursor-pointer" onchange="alCambiarCuentasTraspaso()">
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Monto a Traspasar ($)</label>
+            <input type="number" id="traspaso-monto" min="1" required placeholder="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-emerald-400 font-mono font-bold focus:outline-none focus:border-sky-500 transition" oninput="alCambiarMontoTraspaso()">
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Fecha del Traspaso</label>
+            <input type="date" id="traspaso-fecha" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-sky-500 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Clasificación Contable / Tipo de Movimiento</label>
+          <select id="traspaso-clasificacion" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-sky-500 transition cursor-pointer">
+            <option value="inversion_a_negocio">💼 Inyección de Capital / Aporte de Socios (Inversión ➔ Negocio)</option>
+            <option value="principal_a_inversion">🚀 Aporte a Inversión / Ahorro (Principal ➔ Inversión)</option>
+            <option value="negocio_a_principal">💸 Retiro de Ganancias / Sueldo (Negocio ➔ Principal)</option>
+            <option value="principal_a_negocio">🏢 Inyección de Capital Personal (Principal ➔ Negocio)</option>
+            <option value="negocio_a_inversion">📈 Inversión de Utilidades (Negocio ➔ Inversión)</option>
+            <option value="traspaso_general">🔄 Traspaso General Entre Cuentas</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Glosa / Detalle del Traspaso</label>
+          <input type="text" id="traspaso-glosa" placeholder="Ej: Traspaso de capital de trabajo para comprar stock / pauta" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalTraspaso()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl transition shadow-lg shadow-sky-600/20 cursor-pointer">
+            ⚡ Confirmar Traspaso
           </button>
         </div>
       </form>
@@ -1548,6 +2013,27 @@
 
     // Buffer del modal para subir cartolas nuevas
     let bufferModalCartola = [];
+
+    // Sistema de Tarjetas & Cuentas Bancarias Multi-Área
+    let tarjetasUsuario = [];
+    let traspasosTarjetas = [];
+    let filtroTraspasosTipo = 'todos';
+
+    const PRESETS_BANCOS = {
+      'Banco Santander': { gradiente: 'from-red-600 via-red-700 to-rose-950', badge: 'bg-red-500/20 text-red-300 border-red-500/40', texto: 'BANCO SANTANDER', chip: 'gold' },
+      'Banco de Chile': { gradiente: 'from-blue-700 via-indigo-900 to-slate-950', badge: 'bg-blue-500/20 text-blue-300 border-blue-500/40', texto: 'BANCO DE CHILE', chip: 'gold' },
+      'Banco Estado': { gradiente: 'from-amber-600 via-orange-700 to-slate-950', badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40', texto: 'BANCO ESTADO / CUENTARUT', chip: 'gold' },
+      'BCI': { gradiente: 'from-teal-600 via-cyan-800 to-slate-950', badge: 'bg-teal-500/20 text-teal-300 border-teal-500/40', texto: 'BANCO BCI', chip: 'silver' },
+      'Banco Falabella': { gradiente: 'from-emerald-600 via-green-800 to-slate-950', badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40', texto: 'BANCO FALABELLA / CMR', chip: 'silver' },
+      'Scotiabank': { gradiente: 'from-red-700 via-rose-900 to-slate-950', badge: 'bg-rose-500/20 text-rose-300 border-rose-500/40', texto: 'SCOTIABANK', chip: 'gold' },
+      'Itaú': { gradiente: 'from-orange-600 via-amber-800 to-slate-950', badge: 'bg-orange-500/20 text-orange-300 border-orange-500/40', texto: 'BANCO ITAÚ', chip: 'gold' },
+      'Mercado Pago': { gradiente: 'from-sky-500 via-blue-700 to-slate-950', badge: 'bg-sky-500/20 text-sky-300 border-sky-500/40', texto: 'MERCADO PAGO', chip: 'silver' },
+      'Tenpo': { gradiente: 'from-fuchsia-600 via-purple-800 to-slate-950', badge: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40', texto: 'TENPO REMUNERADA', chip: 'gold' },
+      'Global66': { gradiente: 'from-lime-600 via-emerald-800 to-slate-950', badge: 'bg-lime-500/20 text-lime-300 border-lime-500/40', texto: 'GLOBAL66 SMART', chip: 'gold' },
+      'Mach': { gradiente: 'from-purple-700 via-violet-900 to-slate-950', badge: 'bg-purple-500/20 text-purple-300 border-purple-500/40', texto: 'MACH BCI', chip: 'silver' },
+      'Racional / Fintual': { gradiente: 'from-violet-600 via-indigo-900 to-slate-950', badge: 'bg-violet-500/20 text-violet-300 border-violet-500/40', texto: 'RACIONAL / FINTUAL', chip: 'gold' },
+      'Otro': { gradiente: 'from-slate-700 via-slate-800 to-slate-950', badge: 'bg-slate-500/20 text-slate-300 border-slate-500/40', texto: 'CUENTA BANCARIA', chip: 'gold' }
+    };
 
     // Usuario autenticado
     let usuarioActual = null;
@@ -2090,6 +2576,7 @@
       if (target) target.classList.remove('hidden');
 
       let btnId = 'tab-pers-dash-btn';
+      if (tab === 'tarjetas') btnId = 'tab-pers-tarjetas-btn';
       if (tab === 'ingresos_gastos') btnId = 'tab-pers-ing-btn';
       if (tab === 'auditoria_cartola') btnId = 'tab-pers-cartola-btn';
       if (tab === 'inversiones') btnId = 'tab-pers-inv-btn';
@@ -2101,6 +2588,7 @@
       }
 
       if (tab === 'dashboard') setTimeout(renderizarGraficosPersonal, 60);
+      if (tab === 'tarjetas') procesarModuloTarjetas();
       if (tab === 'auditoria_cartola') renderizarPlanillaConsolidada();
       if (tab === 'inversiones') setTimeout(renderizarGraficoInversiones, 60);
     }
@@ -2218,6 +2706,7 @@
       procesarModuloDropshipping();
       procesarModuloPersonal();
       procesarModuloInversiones();
+      procesarModuloTarjetas();
       construirListaConsolidada();
     }
 
@@ -4860,6 +5349,99 @@
     // ==========================================
     // MODALES Y GESTIÓN DE ACTIVOS DE INVERSIÓN
     // ==========================================
+    function toggleDesplegableInversion(forzarEstado = null) {
+      const contenedor = document.getElementById('contenedor-form-inversion');
+      const btnText = document.getElementById('btn-toggle-inv-text');
+      const icon = document.getElementById('btn-toggle-inv-icon');
+      if (!contenedor) return;
+
+      const estaOculto = contenedor.classList.contains('hidden');
+      const abrir = forzarEstado !== null ? forzarEstado : estaOculto;
+
+      if (abrir) {
+        contenedor.classList.remove('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Ocultar</span> <span id="btn-toggle-inv-icon" class="text-xs transition-transform duration-200">▲</span>`;
+          btnText.className = "text-xs font-medium text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5 hover:bg-slate-700 transition";
+        }
+      } else {
+        contenedor.classList.add('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Desplegar</span> <span id="btn-toggle-inv-icon" class="text-xs transition-transform duration-200">▼</span>`;
+          btnText.className = "text-xs font-medium text-sky-400 bg-sky-950/60 px-2.5 py-1 rounded-lg border border-sky-800/60 flex items-center gap-1.5 hover:bg-sky-900/80 transition";
+        }
+      }
+    }
+
+    function toggleDesplegableHonorarios(forzarEstado = null) {
+      const contenedor = document.getElementById('contenedor-form-honorarios');
+      const btnText = document.getElementById('btn-toggle-hono-text');
+      if (!contenedor) return;
+
+      const estaOculto = contenedor.classList.contains('hidden');
+      const abrir = forzarEstado !== null ? forzarEstado : estaOculto;
+
+      if (abrir) {
+        contenedor.classList.remove('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Plegar</span> <span id="btn-toggle-hono-icon" class="text-xs transition-transform duration-200">▲</span>`;
+          btnText.className = "text-xs font-medium text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5 hover:bg-slate-700 transition";
+        }
+      } else {
+        contenedor.classList.add('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Desplegar</span> <span id="btn-toggle-hono-icon" class="text-xs transition-transform duration-200">▼</span>`;
+          btnText.className = "text-xs font-medium text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/60 flex items-center gap-1.5 hover:bg-emerald-900/80 transition";
+        }
+      }
+    }
+
+    function toggleDesplegableKpisPersonal(forzarEstado = null) {
+      const contenedor = document.getElementById('contenedor-kpis-personal');
+      const btnText = document.getElementById('btn-toggle-kpi-pers-text');
+      if (!contenedor) return;
+
+      const estaOculto = contenedor.classList.contains('hidden');
+      const abrir = forzarEstado !== null ? forzarEstado : estaOculto;
+
+      if (abrir) {
+        contenedor.classList.remove('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Plegar</span> <span id="btn-toggle-kpi-pers-icon" class="text-xs transition-transform duration-200">▲</span>`;
+          btnText.className = "text-xs font-medium text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5 hover:bg-slate-700 transition";
+        }
+      } else {
+        contenedor.classList.add('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Desplegar</span> <span id="btn-toggle-kpi-pers-icon" class="text-xs transition-transform duration-200">▼</span>`;
+          btnText.className = "text-xs font-medium text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/60 flex items-center gap-1.5 hover:bg-emerald-900/80 transition";
+        }
+      }
+    }
+
+    function toggleDesplegableKpisTarjetas(forzarEstado = null) {
+      const contenedor = document.getElementById('contenedor-kpis-tarjetas');
+      const btnText = document.getElementById('btn-toggle-kpi-tarjetas-text');
+      if (!contenedor) return;
+
+      const estaOculto = contenedor.classList.contains('hidden');
+      const abrir = forzarEstado !== null ? forzarEstado : estaOculto;
+
+      if (abrir) {
+        contenedor.classList.remove('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Plegar</span> <span id="btn-toggle-kpi-tarjetas-icon" class="text-xs transition-transform duration-200">▲</span>`;
+          btnText.className = "text-xs font-medium text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5 hover:bg-slate-700 transition";
+        }
+      } else {
+        contenedor.classList.add('hidden');
+        if (btnText) {
+          btnText.innerHTML = `<span>Desplegar</span> <span id="btn-toggle-kpi-tarjetas-icon" class="text-xs transition-transform duration-200">▼</span>`;
+          btnText.className = "text-xs font-medium text-indigo-400 bg-indigo-950/60 px-2.5 py-1 rounded-lg border border-indigo-800/60 flex items-center gap-1.5 hover:bg-indigo-900/80 transition";
+        }
+      }
+    }
+
     function abrirModalAporteInversion(id) {
       const inv = (datosPersonal.inversiones || []).find(i => i.id === id);
       if (!inv) return;
@@ -5470,7 +6052,13 @@
           }
         } catch (ignored) {}
 
-        mostrarToast(`Pedido actualizado a "${nuevoEstado}"`, 'success');
+        if (nuevoEstado === 'Entregado') {
+          mostrarToast(`¡Pedido marcado como Entregado! El margen fue acreditado a la tarjeta de Negocio.`, 'success');
+        } else {
+          mostrarToast(`Pedido actualizado a "${nuevoEstado}"`, 'success');
+        }
+        procesarModuloDropshipping();
+        procesarModuloTarjetas();
       } catch (err) {
         console.error('Error al actualizar estado:', err);
         mostrarToast('Error al actualizar estado: ' + err.message, 'error');
@@ -5816,8 +6404,775 @@
       }
     }
 
-    // Exponer funciones globales para handlers inline
-    window.abrirModalAuth = abrirModalAuth;
+    // =========================================================
+    // SISTEMA DE GESTIÓN MULTI-TARJETAS & CUENTAS BANCARIAS
+    // =========================================================
+    function cargarTarjetasDeAlmacenamiento() {
+      try {
+        const raw = localStorage.getItem('tarjetas_usuario_suite');
+        if (raw) {
+          tarjetasUsuario = JSON.parse(raw);
+          if (Array.isArray(tarjetasUsuario) && tarjetasUsuario.length > 0) return tarjetasUsuario;
+        }
+      } catch (e) {
+        console.warn('Error al leer tarjetas locales:', e);
+      }
+
+      // Tarjetas iniciales por defecto
+      tarjetasUsuario = [
+        {
+          id: 1,
+          nombre: 'Cuenta Corriente Principal',
+          banco: 'Banco Santander',
+          tipo: 'principal',
+          digitos: '4589',
+          saldo_inicial: 1500000,
+          formato: 'Cuenta Corriente',
+          color_personalizado: '',
+          tasa_anual_interes: 0
+        },
+        {
+          id: 2,
+          nombre: 'Débito Operación Negocio',
+          banco: 'Banco de Chile',
+          tipo: 'negocio',
+          digitos: '5521',
+          saldo_inicial: 500000,
+          formato: 'Cuenta Vista / Débito',
+          color_personalizado: '',
+          tasa_anual_interes: 0
+        },
+        {
+          id: 3,
+          nombre: 'Cuenta Inversión Remunerada',
+          banco: 'Tenpo',
+          tipo: 'inversion',
+          digitos: '8834',
+          saldo_inicial: 850000,
+          formato: 'Cuenta Digital Remunerada',
+          color_personalizado: '',
+          tasa_anual_interes: 7.2
+        }
+      ];
+      guardarTarjetasEnAlmacenamiento();
+      return tarjetasUsuario;
+    }
+
+    function guardarTarjetasEnAlmacenamiento() {
+      try {
+        localStorage.setItem('tarjetas_usuario_suite', JSON.stringify(tarjetasUsuario));
+      } catch (e) {
+        console.error('Error al guardar tarjetas:', e);
+      }
+    }
+
+    function cargarTraspasosDeAlmacenamiento() {
+      try {
+        const raw = localStorage.getItem('traspasos_tarjetas_suite');
+        if (raw) {
+          traspasosTarjetas = JSON.parse(raw);
+          if (Array.isArray(traspasosTarjetas) && traspasosTarjetas.length > 0) return traspasosTarjetas;
+        }
+      } catch (e) {
+        console.warn('Error al leer traspasos locales:', e);
+      }
+
+      // Traspasos iniciales de ejemplo
+      traspasosTarjetas = [
+        {
+          id: 1,
+          fecha: hoyFechaStr,
+          origen_id: 1,
+          origen_nombre: 'Cuenta Corriente Principal (Banco Santander)',
+          destino_id: 2,
+          destino_nombre: 'Débito Operación Negocio (Banco de Chile)',
+          monto: 300000,
+          tipo_operacion: 'inyeccion_negocio',
+          glosa: 'Inyección de capital para pauta publicitaria y reposición de stock'
+        },
+        {
+          id: 2,
+          fecha: hoyFechaStr,
+          origen_id: 1,
+          origen_nombre: 'Cuenta Corriente Principal (Banco Santander)',
+          destino_id: 3,
+          destino_nombre: 'Cuenta Inversión Remunerada (Tenpo)',
+          monto: 250000,
+          tipo_operacion: 'aporte_inversion',
+          glosa: 'Aporte de ahorro a cuenta remunerada con interés diario'
+        }
+      ];
+      guardarTraspasosEnAlmacenamiento();
+      return traspasosTarjetas;
+    }
+
+    function guardarTraspasosEnAlmacenamiento() {
+      try {
+        localStorage.setItem('traspasos_tarjetas_suite', JSON.stringify(traspasosTarjetas));
+      } catch (e) {
+        console.error('Error al guardar traspasos:', e);
+      }
+    }
+
+    function calcularSaldosTarjeta(tarjetaId) {
+      const tarjeta = tarjetasUsuario.find(t => t.id == tarjetaId);
+      if (!tarjeta) return { saldoBase: 0, traspasosEntrantes: 0, traspasosSalientes: 0, margenEntregados: 0, pedidosEntregadosCount: 0, saldoFinal: 0 };
+
+      const saldoBase = Number(tarjeta.saldo_inicial || 0);
+      let traspasosEntrantes = 0;
+      let traspasosSalientes = 0;
+
+      (traspasosTarjetas || []).forEach(tr => {
+        const monto = Number(tr.monto || 0);
+        if (tr.destino_id == tarjetaId) traspasosEntrantes += monto;
+        if (tr.origen_id == tarjetaId) traspasosSalientes += monto;
+      });
+
+      let margenEntregados = 0;
+      let pedidosEntregadosCount = 0;
+
+      if (tarjeta.tipo === 'negocio') {
+        (datosDrop.ventas || []).forEach(v => {
+          const est = (v.estado || '').trim().toLowerCase();
+          if (est === 'entregado') {
+            const ing = Number(v.ingreso_total || 0);
+            const prod = Number(v.costo_producto || 0);
+            const env = Number(v.costo_envio || 0);
+            const dropi = Number(v.comision_dropi || 0);
+            const margen = ing - prod - env - dropi;
+            margenEntregados += margen;
+            pedidosEntregadosCount++;
+          }
+        });
+      }
+
+      const saldoFinal = saldoBase + traspasosEntrantes - traspasosSalientes + margenEntregados;
+
+      return {
+        saldoBase,
+        traspasosEntrantes,
+        traspasosSalientes,
+        margenEntregados,
+        pedidosEntregadosCount,
+        saldoFinal
+      };
+    }
+
+    function procesarModuloTarjetas() {
+      cargarTarjetasDeAlmacenamiento();
+      cargarTraspasosDeAlmacenamiento();
+
+      let totalEnTarjetas = 0;
+      let totalEnNegocio = 0;
+      let totalEnInversion = 0;
+      let interesAnualTotalProyectado = 0;
+
+      tarjetasUsuario.forEach(tar => {
+        const info = calcularSaldosTarjeta(tar.id);
+        tar.saldo_calculado = info.saldoFinal;
+        totalEnTarjetas += info.saldoFinal;
+
+        if (tar.tipo === 'negocio') {
+          totalEnNegocio += info.saldoFinal;
+        } else if (tar.tipo === 'inversion') {
+          totalEnInversion += info.saldoFinal;
+          const tasa = Number(tar.tasa_anual_interes || 0);
+          if (tasa > 0 && info.saldoFinal > 0) {
+            interesAnualTotalProyectado += (info.saldoFinal * (tasa / 100));
+          }
+        }
+      });
+
+      // Actualizar KPIs de la pestaña de Tarjetas
+      const elKpiTotal = document.getElementById('kpi-tarjetas-total-saldo');
+      if (elKpiTotal) elKpiTotal.textContent = formatoCLP(totalEnTarjetas);
+
+      const elKpiNegocio = document.getElementById('kpi-tarjetas-negocio-saldo');
+      if (elKpiNegocio) elKpiNegocio.textContent = formatoCLP(totalEnNegocio);
+
+      const elKpiInv = document.getElementById('kpi-tarjetas-inversion-saldo');
+      if (elKpiInv) elKpiInv.textContent = formatoCLP(totalEnInversion);
+
+      const elKpiInteres = document.getElementById('kpi-tarjetas-interes-proyectado');
+      if (elKpiInteres) elKpiInteres.textContent = formatoCLP(interesAnualTotalProyectado);
+
+      // Renderizar Galería de Tarjetas
+      renderizarGaleriaTarjetas();
+
+      // Renderizar Tabla de Traspasos
+      renderizarTablaTraspasos();
+
+      // Poblar selects del modal de traspasos
+      poblarSelectsModalTraspaso();
+
+      // Actualizar widget de Dropshipping
+      renderizarWidgetTarjetaNegocio();
+    }
+
+    function renderizarGaleriaTarjetas() {
+      const cont = document.getElementById('contenedor-tarjetas-galeria');
+      if (!cont) return;
+
+      if (!tarjetasUsuario || tarjetasUsuario.length === 0) {
+        cont.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/60 rounded-2xl border border-dashed border-slate-800 p-6">
+            <div class="text-3xl mb-2">💳</div>
+            <div class="text-sm font-semibold text-slate-300">No tienes tarjetas ni cuentas configuradas</div>
+            <div class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">Añade tu cuenta principal, cuenta de negocio o billetera de inversión para gestionar tus saldos y traspasos inter-áreas.</div>
+            <button onclick="abrirModalNuevaTarjeta()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 cursor-pointer">
+              ➕ Añadir Primera Tarjeta
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = tarjetasUsuario.map(tar => {
+        const info = calcularSaldosTarjeta(tar.id);
+        const preset = PRESETS_BANCOS[tar.banco] || PRESETS_BANCOS['Otro'];
+        const gradiente = tar.color_personalizado || preset.gradiente;
+        const tasa = Number(tar.tasa_anual_interes || 0);
+
+        let badgeTipoHtml = '';
+        if (tar.tipo === 'principal') {
+          badgeTipoHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">👑 Cuenta Principal</span>';
+        } else if (tar.tipo === 'negocio') {
+          badgeTipoHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-400/20 text-sky-300 border border-sky-400/40">💼 Flujo Negocio</span>';
+        } else if (tar.tipo === 'inversion') {
+          badgeTipoHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-400/20 text-purple-300 border border-purple-400/40">📈 Inversión ${tasa > 0 ? `(${tasa}% EA)` : ''}</span>`;
+        } else {
+          badgeTipoHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-400/20 text-slate-300 border border-slate-400/40">💳 Personal</span>';
+        }
+
+        return `
+          <div class="relative rounded-2xl bg-gradient-to-br ${gradiente} p-5 text-white shadow-xl shadow-black/40 border border-white/15 flex flex-col justify-between min-h-[220px] group transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl overflow-hidden">
+            <!-- Patrón de brillo de fondo -->
+            <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <!-- Encabezado Tarjeta -->
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-3">
+                <div class="flex flex-col">
+                  <span class="text-[10px] font-mono tracking-widest text-white/70 uppercase font-semibold">${tar.banco}</span>
+                  <h4 class="text-sm font-bold text-white leading-tight drop-shadow-sm">${tar.nombre}</h4>
+                </div>
+                <div>${badgeTipoHtml}</div>
+              </div>
+
+              <!-- Chip EMV & Contactless -->
+              <div class="flex items-center gap-2 my-2 opacity-90">
+                <div class="w-8 h-6 rounded bg-gradient-to-tr from-amber-200 via-amber-400 to-amber-200 border border-amber-300/80 shadow-sm flex items-center justify-center">
+                  <div class="w-6 h-4 border border-amber-600/40 rounded-sm grid grid-cols-2 gap-0.5 p-0.5">
+                    <div class="bg-amber-500/30 rounded-xs"></div>
+                    <div class="bg-amber-500/30 rounded-xs"></div>
+                  </div>
+                </div>
+                <span class="text-xs text-white/70 font-mono tracking-widest">•••• ${tar.digitos || '0000'}</span>
+              </div>
+            </div>
+
+            <!-- Cuerpo / Saldo Disponible -->
+            <div class="my-2 bg-black/25 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] text-white/80 font-medium tracking-wide">SALDO DISPONIBLE</span>
+                <span class="text-[10px] text-white/60 font-mono">${tar.formato || 'Cuenta'}</span>
+              </div>
+              <div class="text-xl md:text-2xl font-extrabold font-mono text-white tracking-tight drop-shadow-md mt-0.5">
+                ${formatoCLP(info.saldoFinal)}
+              </div>
+              
+              <!-- Desglose según tipo de tarjeta -->
+              ${tar.tipo === 'negocio' ? `
+                <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/80">
+                  <span>📦 Entregados (+${formatoCLP(info.margenEntregados)})</span>
+                  <span>Inyecciones (+${formatoCLP(info.traspasosEntrantes)})</span>
+                </div>
+              ` : (tar.tipo === 'inversion' && tasa > 0 ? `
+                <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/80">
+                  <span>⚡ Rentabilidad estimada:</span>
+                  <span class="font-bold text-emerald-300">+${formatoCLP(info.saldoFinal * (tasa / 100))}/año</span>
+                </div>
+              ` : `
+                <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/80">
+                  <span>📥 Entradas: ${formatoCLP(info.traspasosEntrantes)}</span>
+                  <span>📤 Salidas: ${formatoCLP(info.traspasosSalientes)}</span>
+                </div>
+              `)}
+            </div>
+
+            <!-- Botones de Acción Rápida -->
+            <div class="flex items-center justify-between gap-1.5 pt-1">
+              <button onclick="abrirModalTraspaso(${tar.id})" class="flex-1 py-1.5 px-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-[11px] font-semibold backdrop-blur-sm transition flex items-center justify-center gap-1 cursor-pointer">
+                <span>🔄</span> <span>Traspasar</span>
+              </button>
+              <button onclick="abrirModalEditarTarjeta(${tar.id})" class="p-1.5 bg-black/20 hover:bg-black/40 text-white/90 hover:text-white rounded-lg text-xs backdrop-blur-sm transition cursor-pointer" title="Editar detalles de la tarjeta">
+                ✏️
+              </button>
+              <button onclick="eliminarTarjeta(${tar.id})" class="p-1.5 bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white rounded-lg text-xs backdrop-blur-sm transition cursor-pointer" title="Eliminar tarjeta">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderizarTablaTraspasos() {
+      const tbody = document.getElementById('tabla-traspasos-tarjetas');
+      if (!tbody) return;
+
+      let filtrados = traspasosTarjetas || [];
+      if (filtroTraspasosTipo !== 'todos') {
+        filtrados = filtrados.filter(t => t.tipo_operacion === filtroTraspasosTipo);
+      }
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">No hay transferencias ni traspasos registrados con el filtro actual.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map(tr => {
+        let badgeHtml = '';
+        if (tr.tipo_operacion === 'inyeccion_negocio') {
+          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-700 whitespace-nowrap">🚀 Inyección Negocio</span>';
+        } else if (tr.tipo_operacion === 'retiro_negocio') {
+          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700 whitespace-nowrap">💵 Retiro Ganancia / Sueldo</span>';
+        } else if (tr.tipo_operacion === 'aporte_inversion') {
+          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-700 whitespace-nowrap">📈 Aporte Inversión</span>';
+        } else if (tr.tipo_operacion === 'retiro_inversion') {
+          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700 whitespace-nowrap">💰 Retiro Inversión</span>';
+        } else {
+          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700 whitespace-nowrap">🔄 Traspaso Interno</span>';
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-2.5 text-slate-400 font-mono text-xs whitespace-nowrap">${tr.fecha || hoyFechaStr}</td>
+            <td class="p-2.5 text-xs">${badgeHtml}</td>
+            <td class="p-2.5 text-xs text-rose-300 font-medium">${tr.origen_nombre || 'Cuenta Origen'}</td>
+            <td class="p-2.5 text-center text-xs text-slate-500 font-bold">➔</td>
+            <td class="p-2.5 text-xs text-emerald-300 font-medium">${tr.destino_nombre || 'Cuenta Destino'}</td>
+            <td class="p-2.5 text-right font-mono font-bold text-white text-xs">${formatoCLP(Number(tr.monto || 0))}</td>
+            <td class="p-2.5 text-center">
+              <button onclick="eliminarTraspaso(${tr.id})" class="text-rose-400 hover:text-rose-200 text-xs px-2 py-0.5 bg-rose-950/50 hover:bg-rose-900 rounded border border-rose-800/60 transition cursor-pointer" title="Eliminar este movimiento">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function poblarSelectsModalTraspaso() {
+      const selOri = document.getElementById('traspaso-cuenta-origen');
+      const selDes = document.getElementById('traspaso-cuenta-destino');
+      if (!selOri || !selDes) return;
+
+      const opts = tarjetasUsuario.map(t => {
+        const info = calcularSaldosTarjeta(t.id);
+        return `<option value="${t.id}">${t.nombre} (${t.banco} •••• ${t.digitos || '0000'}) - Saldo: ${formatoCLP(info.saldoFinal)}</option>`;
+      }).join('');
+
+      selOri.innerHTML = opts;
+      selDes.innerHTML = opts;
+
+      // Seleccionar diferentes por defecto si hay al menos 2
+      if (tarjetasUsuario.length > 1) {
+        selOri.selectedIndex = 0;
+        selDes.selectedIndex = 1;
+      }
+    }
+
+    function renderizarWidgetTarjetaNegocio() {
+      const seccion = document.getElementById('seccion-tarjeta-negocio-widget');
+      if (!seccion) return;
+
+      const tarjetasNegocio = tarjetasUsuario.filter(t => t.tipo === 'negocio');
+      const tarjetaNegocio = tarjetasNegocio[0] || null;
+
+      if (!tarjetaNegocio) {
+        document.getElementById('widget-negocio-tarjeta-nombre').textContent = 'Sin Tarjeta de Negocio Asignada';
+        document.getElementById('widget-negocio-tarjeta-banco').textContent = 'Configura una tarjeta como "Negocio" en Finanzas Personales';
+        document.getElementById('widget-negocio-saldo-disponible').textContent = '$0';
+        document.getElementById('widget-negocio-inyecciones-total').textContent = '$0';
+        document.getElementById('widget-negocio-margen-entregados').textContent = '$0';
+        document.getElementById('widget-negocio-pedidos-entregados-count').textContent = '0 pedidos';
+        document.getElementById('widget-negocio-retiros-total').textContent = '$0';
+        return;
+      }
+
+      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
+
+      // Calcular retiros específicos desde esta tarjeta hacia cuentas personales
+      let totalRetirosNegocio = 0;
+      (traspasosTarjetas || []).forEach(tr => {
+        if (tr.origen_id == tarjetaNegocio.id) {
+          totalRetirosNegocio += Number(tr.monto || 0);
+        }
+      });
+
+      document.getElementById('widget-negocio-tarjeta-nombre').textContent = tarjetaNegocio.nombre;
+      document.getElementById('widget-negocio-tarjeta-banco').textContent = `${tarjetaNegocio.banco} •••• ${tarjetaNegocio.digitos || '0000'} (${tarjetaNegocio.formato || 'Cuenta'})`;
+      document.getElementById('widget-negocio-saldo-disponible').textContent = formatoCLP(info.saldoFinal);
+      document.getElementById('widget-negocio-inyecciones-total').textContent = `+${formatoCLP(info.traspasosEntrantes)}`;
+      document.getElementById('widget-negocio-margen-entregados').textContent = `+${formatoCLP(info.margenEntregados)}`;
+      document.getElementById('widget-negocio-pedidos-entregados-count').textContent = `${info.pedidosEntregadosCount} pedido(s) entregados`;
+      document.getElementById('widget-negocio-retiros-total').textContent = `-${formatoCLP(totalRetirosNegocio)}`;
+    }
+
+    // ==========================================
+    // MODAL DE CREAR / EDITAR TARJETA
+    // ==========================================
+    function abrirModalNuevaTarjeta() {
+      document.getElementById('tarjeta-form-id').value = '';
+      document.getElementById('modal-tarjeta-titulo').textContent = 'Añadir Nueva Tarjeta / Cuenta';
+      document.getElementById('tarjeta-input-nombre').value = '';
+      document.getElementById('tarjeta-input-banco').value = 'Banco Santander';
+      document.getElementById('tarjeta-input-formato').value = 'Cuenta Corriente';
+      document.getElementById('tarjeta-input-digitos').value = '';
+      document.getElementById('tarjeta-input-tipo').value = 'personal';
+      document.getElementById('tarjeta-input-saldo-inicial').value = '0';
+      document.getElementById('tarjeta-input-interes').value = '0';
+      document.getElementById('tarjeta-input-color').value = '';
+
+      cambiarBancoModalTarjeta('Banco Santander');
+      cambiarTipoTarjetaModal('personal');
+      actualizarPreviewTarjetaModal();
+
+      document.getElementById('modal-tarjeta').classList.remove('hidden');
+    }
+
+    function abrirModalEditarTarjeta(id) {
+      const tar = tarjetasUsuario.find(t => t.id == id);
+      if (!tar) return;
+
+      document.getElementById('tarjeta-form-id').value = tar.id;
+      document.getElementById('modal-tarjeta-titulo').textContent = 'Editar Tarjeta / Cuenta';
+      document.getElementById('tarjeta-input-nombre').value = tar.nombre || '';
+      document.getElementById('tarjeta-input-banco').value = tar.banco || 'Banco Santander';
+      document.getElementById('tarjeta-input-formato').value = tar.formato || 'Cuenta Corriente';
+      document.getElementById('tarjeta-input-digitos').value = tar.digitos || '';
+      document.getElementById('tarjeta-input-tipo').value = tar.tipo || 'personal';
+      document.getElementById('tarjeta-input-saldo-inicial').value = Number(tar.saldo_inicial || 0);
+      document.getElementById('tarjeta-input-interes').value = Number(tar.tasa_anual_interes || 0);
+      document.getElementById('tarjeta-input-color').value = tar.color_personalizado || '';
+
+      cambiarBancoModalTarjeta(tar.banco || 'Banco Santander');
+      cambiarTipoTarjetaModal(tar.tipo || 'personal');
+      actualizarPreviewTarjetaModal();
+
+      document.getElementById('modal-tarjeta').classList.remove('hidden');
+    }
+
+    function cerrarModalTarjeta() {
+      const m = document.getElementById('modal-tarjeta');
+      if (m) m.classList.add('hidden');
+    }
+
+    function cambiarBancoModalTarjeta(banco) {
+      const preset = PRESETS_BANCOS[banco] || PRESETS_BANCOS['Otro'];
+      const previewCard = document.getElementById('tarjeta-preview-card');
+      const inputColor = document.getElementById('tarjeta-input-color');
+
+      if (!inputColor.value) {
+        previewCard.className = `rounded-2xl bg-gradient-to-br ${preset.gradiente} p-4 text-white shadow-lg border border-white/20 flex flex-col justify-between min-h-[160px]`;
+      }
+      actualizarPreviewTarjetaModal();
+    }
+
+    function cambiarTipoTarjetaModal(tipo) {
+      const contenedorInteres = document.getElementById('tarjeta-contenedor-interes');
+      const contenedorNegocio = document.getElementById('tarjeta-contenedor-info-negocio');
+
+      if (tipo === 'inversion') {
+        if (contenedorInteres) contenedorInteres.classList.remove('hidden');
+        if (contenedorNegocio) contenedorNegocio.classList.add('hidden');
+      } else if (tipo === 'negocio') {
+        if (contenedorInteres) contenedorInteres.classList.add('hidden');
+        if (contenedorNegocio) contenedorNegocio.classList.remove('hidden');
+      } else {
+        if (contenedorInteres) contenedorInteres.classList.add('hidden');
+        if (contenedorNegocio) contenedorNegocio.classList.add('hidden');
+      }
+      actualizarPreviewTarjetaModal();
+    }
+
+    function actualizarPreviewTarjetaModal() {
+      const nombre = document.getElementById('tarjeta-input-nombre')?.value || 'Nombre de la Tarjeta';
+      const banco = document.getElementById('tarjeta-input-banco')?.value || 'Banco Emisor';
+      const digitos = document.getElementById('tarjeta-input-digitos')?.value || '4589';
+      const tipo = document.getElementById('tarjeta-input-tipo')?.value || 'personal';
+      const saldo = Number(document.getElementById('tarjeta-input-saldo-inicial')?.value || 0);
+      const colorCustom = document.getElementById('tarjeta-input-color')?.value;
+      const preset = PRESETS_BANCOS[banco] || PRESETS_BANCOS['Otro'];
+
+      const prevBanco = document.getElementById('tarjeta-preview-banco');
+      const prevNombre = document.getElementById('tarjeta-preview-nombre');
+      const prevDigitos = document.getElementById('tarjeta-preview-digitos');
+      const prevTipo = document.getElementById('tarjeta-preview-tipo');
+      const prevSaldo = document.getElementById('tarjeta-preview-saldo');
+      const prevCard = document.getElementById('tarjeta-preview-card');
+
+      if (prevBanco) prevBanco.textContent = banco.toUpperCase();
+      if (prevNombre) prevNombre.textContent = nombre;
+      if (prevDigitos) prevDigitos.textContent = `•••• ${digitos.slice(-4) || '0000'}`;
+      if (prevSaldo) prevSaldo.textContent = formatoCLP(saldo);
+
+      let tipoLabel = 'Personal';
+      if (tipo === 'principal') tipoLabel = '👑 Principal';
+      if (tipo === 'negocio') tipoLabel = '💼 Negocio';
+      if (tipo === 'inversion') tipoLabel = '📈 Inversión';
+      if (prevTipo) prevTipo.textContent = tipoLabel;
+
+      if (prevCard) {
+        const gradiente = colorCustom ? `from-[${colorCustom}] to-slate-950` : preset.gradiente;
+        prevCard.className = `rounded-2xl bg-gradient-to-br ${gradiente} p-4 text-white shadow-lg border border-white/20 flex flex-col justify-between min-h-[160px]`;
+      }
+    }
+
+    document.getElementById('form-tarjeta')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const idInput = document.getElementById('tarjeta-form-id').value;
+      const nombre = document.getElementById('tarjeta-input-nombre').value.trim();
+      const banco = document.getElementById('tarjeta-input-banco').value;
+      const formato = document.getElementById('tarjeta-input-formato').value;
+      const digitos = document.getElementById('tarjeta-input-digitos').value.trim();
+      const tipo = document.getElementById('tarjeta-input-tipo').value;
+      const saldoInicial = Number(document.getElementById('tarjeta-input-saldo-inicial').value || 0);
+      const tasa = Number(document.getElementById('tarjeta-input-interes').value || 0);
+      const colorCustom = document.getElementById('tarjeta-input-color').value.trim();
+
+      if (!nombre) {
+        mostrarToast('Ingresa un nombre para la tarjeta o cuenta.', 'warning');
+        return;
+      }
+
+      if (idInput) {
+        // Editar existente
+        const tar = tarjetasUsuario.find(t => t.id == idInput);
+        if (tar) {
+          tar.nombre = nombre;
+          tar.banco = banco;
+          tar.formato = formato;
+          tar.digitos = digitos;
+          tar.tipo = tipo;
+          tar.saldo_inicial = saldoInicial;
+          tar.tasa_anual_interes = tasa;
+          tar.color_personalizado = colorCustom;
+        }
+        mostrarToast('¡Tarjeta actualizada con éxito!', 'success');
+      } else {
+        // Crear nueva
+        const nuevoId = Date.now();
+        tarjetasUsuario.push({
+          id: nuevoId,
+          nombre,
+          banco,
+          formato,
+          digitos,
+          tipo,
+          saldo_inicial: saldoInicial,
+          tasa_anual_interes: tasa,
+          color_personalizado: colorCustom
+        });
+        mostrarToast('¡Tarjeta agregada correctamente!', 'success');
+      }
+
+      guardarTarjetasEnAlmacenamiento();
+      cerrarModalTarjeta();
+      procesarModuloTarjetas();
+    });
+
+    async function eliminarTarjeta(id) {
+      const tar = tarjetasUsuario.find(t => t.id == id);
+      if (!tar) return;
+
+      const confirmado = await pedirConfirmacion({
+        titulo: `¿Eliminar Tarjeta "${tar.nombre}"?`,
+        mensaje: `Se removerá esta cuenta de tus tarjetas activas. Los traspasos históricos asociados mantendrán su registro.`,
+        btnTexto: 'Sí, Eliminar'
+      });
+
+      if (!confirmado) return;
+
+      tarjetasUsuario = tarjetasUsuario.filter(t => t.id != id);
+      guardarTarjetasEnAlmacenamiento();
+      mostrarToast('Tarjeta eliminada.', 'success');
+      procesarModuloTarjetas();
+    }
+
+    // ==========================================
+    // MODAL DE TRASPASO ENTRE CUENTAS / TARJETAS
+    // ==========================================
+    function abrirModalTraspaso(origenId = null, destinoId = null, tipoSugerido = null) {
+      poblarSelectsModalTraspaso();
+
+      const selOri = document.getElementById('traspaso-cuenta-origen');
+      const selDes = document.getElementById('traspaso-cuenta-destino');
+      const selTipo = document.getElementById('traspaso-tipo-operacion');
+      const inpFecha = document.getElementById('traspaso-input-fecha');
+      const inpMonto = document.getElementById('traspaso-input-monto');
+      const inpGlosa = document.getElementById('traspaso-input-glosa');
+
+      if (inpFecha) inpFecha.value = hoyFechaStr;
+      if (inpMonto) inpMonto.value = '';
+      if (inpGlosa) inpGlosa.value = '';
+
+      if (origenId && selOri) selOri.value = origenId;
+      if (destinoId && selDes) selDes.value = destinoId;
+      if (tipoSugerido && selTipo) selTipo.value = tipoSugerido;
+
+      alCambiarCuentasTraspaso();
+      document.getElementById('modal-traspaso-tarjeta').classList.remove('hidden');
+    }
+
+    function abrirModalTraspasoNegocioInyeccion() {
+      // Buscar tarjeta principal como origen y tarjeta negocio como destino
+      const tPrinc = tarjetasUsuario.find(t => t.tipo === 'principal') || tarjetasUsuario[0];
+      const tNeg = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[1] || tarjetasUsuario[0];
+
+      abrirModalTraspaso(tPrinc?.id, tNeg?.id, 'inyeccion_negocio');
+      const glosa = document.getElementById('traspaso-input-glosa');
+      if (glosa) glosa.value = 'Inyección de capital de trabajo a la cuenta del negocio';
+    }
+
+    function abrirModalTraspasoNegocioRetiro() {
+      // Buscar tarjeta negocio como origen y tarjeta principal como destino
+      const tNeg = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
+      const tPrinc = tarjetasUsuario.find(t => t.tipo === 'principal') || tarjetasUsuario[1] || tarjetasUsuario[0];
+
+      abrirModalTraspaso(tNeg?.id, tPrinc?.id, 'retiro_negocio');
+      const glosa = document.getElementById('traspaso-input-glosa');
+      if (glosa) glosa.value = 'Retiro de utilidades del negocio a la cuenta principal';
+    }
+
+    function cerrarModalTraspaso() {
+      const m = document.getElementById('modal-traspaso-tarjeta');
+      if (m) m.classList.add('hidden');
+    }
+
+    function alCambiarCuentasTraspaso() {
+      const oriId = document.getElementById('traspaso-cuenta-origen')?.value;
+      const desId = document.getElementById('traspaso-cuenta-destino')?.value;
+      const selTipo = document.getElementById('traspaso-tipo-operacion');
+
+      const tOri = tarjetasUsuario.find(t => t.id == oriId);
+      const tDes = tarjetasUsuario.find(t => t.id == desId);
+
+      // Sugerir tipo de operación inteligente según combinación
+      if (tOri && tDes && selTipo) {
+        if (tDes.tipo === 'negocio' && (tOri.tipo === 'principal' || tOri.tipo === 'inversion' || tOri.tipo === 'personal')) {
+          selTipo.value = 'inyeccion_negocio';
+        } else if (tOri.tipo === 'negocio' && (tDes.tipo === 'principal' || tDes.tipo === 'personal')) {
+          selTipo.value = 'retiro_negocio';
+        } else if (tDes.tipo === 'inversion') {
+          selTipo.value = 'aporte_inversion';
+        } else if (tOri.tipo === 'inversion') {
+          selTipo.value = 'retiro_inversion';
+        } else {
+          selTipo.value = 'traspaso_interno';
+        }
+      }
+
+      alCambiarMontoTraspaso();
+    }
+
+    function alCambiarMontoTraspaso() {
+      const oriId = document.getElementById('traspaso-cuenta-origen')?.value;
+      const desId = document.getElementById('traspaso-cuenta-destino')?.value;
+      const monto = Number(document.getElementById('traspaso-input-monto')?.value || 0);
+
+      const infoOri = calcularSaldosTarjeta(oriId);
+      const infoDes = calcularSaldosTarjeta(desId);
+
+      const nuevoSaldoOri = infoOri.saldoFinal - monto;
+      const nuevoSaldoDes = infoDes.saldoFinal + monto;
+
+      const elOri = document.getElementById('traspaso-preview-saldo-origen');
+      const elDes = document.getElementById('traspaso-preview-saldo-destino');
+
+      if (elOri) {
+        elOri.textContent = `${formatoCLP(infoOri.saldoFinal)} ➔ ${formatoCLP(nuevoSaldoOri)}`;
+        elOri.className = `font-mono font-bold ${nuevoSaldoOri < 0 ? 'text-rose-400' : 'text-slate-300'}`;
+      }
+      if (elDes) {
+        elDes.textContent = `${formatoCLP(infoDes.saldoFinal)} ➔ ${formatoCLP(nuevoSaldoDes)}`;
+        elDes.className = 'font-mono font-bold text-emerald-400';
+      }
+    }
+
+    document.getElementById('form-traspaso-tarjeta')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fecha = document.getElementById('traspaso-input-fecha').value || hoyFechaStr;
+      const oriId = document.getElementById('traspaso-cuenta-origen').value;
+      const desId = document.getElementById('traspaso-cuenta-destino').value;
+      const tipoOperacion = document.getElementById('traspaso-tipo-operacion').value;
+      const monto = Number(document.getElementById('traspaso-input-monto').value || 0);
+      const glosa = document.getElementById('traspaso-input-glosa').value.trim();
+
+      if (!oriId || !desId) {
+        mostrarToast('Selecciona ambas cuentas para el traspaso.', 'warning');
+        return;
+      }
+
+      if (oriId == desId) {
+        mostrarToast('La cuenta de origen y destino deben ser distintas.', 'warning');
+        return;
+      }
+
+      if (isNaN(monto) || monto <= 0) {
+        mostrarToast('Ingresa un monto válido mayor a 0.', 'warning');
+        return;
+      }
+
+      const tOri = tarjetasUsuario.find(t => t.id == oriId);
+      const tDes = tarjetasUsuario.find(t => t.id == desId);
+
+      const nuevoTraspaso = {
+        id: Date.now(),
+        fecha,
+        origen_id: Number(oriId),
+        origen_nombre: `${tOri?.nombre || 'Origen'} (${tOri?.banco || ''})`,
+        destino_id: Number(desId),
+        destino_nombre: `${tDes?.nombre || 'Destino'} (${tDes?.banco || ''})`,
+        monto,
+        tipo_operacion: tipoOperacion,
+        glosa: glosa || 'Traspaso entre cuentas'
+      };
+
+      traspasosTarjetas.unshift(nuevoTraspaso);
+      guardarTraspasosEnAlmacenamiento();
+
+      mostrarToast(`¡Traspaso de ${formatoCLP(monto)} registrado con éxito!`, 'success');
+      cerrarModalTraspaso();
+      procesarModuloTarjetas();
+    });
+
+    async function eliminarTraspaso(id) {
+      const tr = traspasosTarjetas.find(t => t.id == id);
+      if (!tr) return;
+
+      const confirmado = await pedirConfirmacion({
+        titulo: `¿Eliminar Traspaso de ${formatoCLP(tr.monto)}?`,
+        mensaje: `Se revertirá el movimiento entre "${tr.origen_nombre}" y "${tr.destino_nombre}".`,
+        btnTexto: 'Sí, Eliminar'
+      });
+
+      if (!confirmado) return;
+
+      traspasosTarjetas = traspasosTarjetas.filter(t => t.id != id);
+      guardarTraspasosEnAlmacenamiento();
+      mostrarToast('Traspaso eliminado y saldos recalculados.', 'success');
+      procesarModuloTarjetas();
+    }
+
+    function filtrarTraspasosPorTipo(tipo) {
+      filtroTraspasosTipo = tipo;
+      renderizarTablaTraspasos();
+    }
+
+    function irATabTarjetasDesdeNegocio() {
+      cambiarWorkspace('personal');
+      cambiarTabPers('tarjetas');
+    }
     window.cerrarModalAuth = cerrarModalAuth;
     window.cambiarModoAuth = cambiarModoAuth;
     window.alternarVisibilidadPassword = alternarVisibilidadPassword;
@@ -5866,6 +7221,26 @@
     window.procesarArchivoPedidosGenerico = procesarArchivoPedidosGenerico;
     window.aplicarValoresDefecto = aplicarValoresDefecto;
     window.guardarCSVEnSupabase = guardarCSVEnSupabase;
+    window.abrirModalNuevaTarjeta = abrirModalNuevaTarjeta;
+    window.abrirModalEditarTarjeta = abrirModalEditarTarjeta;
+    window.cerrarModalTarjeta = cerrarModalTarjeta;
+    window.cambiarBancoModalTarjeta = cambiarBancoModalTarjeta;
+    window.cambiarTipoTarjetaModal = cambiarTipoTarjetaModal;
+    window.actualizarPreviewTarjetaModal = actualizarPreviewTarjetaModal;
+    window.eliminarTarjeta = eliminarTarjeta;
+    window.abrirModalTraspaso = abrirModalTraspaso;
+    window.abrirModalTraspasoNegocioInyeccion = abrirModalTraspasoNegocioInyeccion;
+    window.abrirModalTraspasoNegocioRetiro = abrirModalTraspasoNegocioRetiro;
+    window.cerrarModalTraspaso = cerrarModalTraspaso;
+    window.alCambiarCuentasTraspaso = alCambiarCuentasTraspaso;
+    window.alCambiarMontoTraspaso = alCambiarMontoTraspaso;
+    window.eliminarTraspaso = eliminarTraspaso;
+    window.filtrarTraspasosPorTipo = filtrarTraspasosPorTipo;
+    window.irATabTarjetasDesdeNegocio = irATabTarjetasDesdeNegocio;
+    window.procesarModuloTarjetas = procesarModuloTarjetas;
+    window.toggleDesplegableHonorarios = toggleDesplegableHonorarios;
+    window.toggleDesplegableKpisPersonal = toggleDesplegableKpisPersonal;
+    window.toggleDesplegableKpisTarjetas = toggleDesplegableKpisTarjetas;
 
     // Inicialización general
     inicializarAuth();
