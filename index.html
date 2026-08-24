@@ -914,7 +914,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-7 space-y-4">
             <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-              <h2 class="text-sm font-semibold uppercase text-sky-400 mb-3">➕ Registrar Activo / Inversión Manual</h2>
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-semibold uppercase text-sky-400 flex items-center gap-2"><span>➕</span> Crear Activo / Registrar Inversión</h2>
+                <span class="text-[11px] text-slate-400">Permite acumular aportes desde cartolas</span>
+              </div>
               <form id="form-inversion" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
                 <div>
                   <label class="text-slate-400">Fecha Aporte</label>
@@ -922,44 +925,65 @@
                 </div>
                 <div class="col-span-2">
                   <label class="text-slate-400">Nombre Activo / Instrumento</label>
-                  <input type="text" id="inv-nombre" placeholder="Ej: ETF VOO (S&P 500) o Fintual Risky" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <input type="text" id="inv-nombre" list="lista-activos-existentes" placeholder="Ej: ETF VOO, Fintual Risky, DAP Santander" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <datalist id="lista-activos-existentes"></datalist>
                 </div>
                 <div>
-                  <label class="text-slate-400">Tipo</label>
+                  <label class="text-slate-400">Tipo de Activo</label>
                   <select id="inv-tipo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
-                    <option value="ETF">ETF</option><option value="Fondo Mutuo">Fondo Mutuo</option><option value="Acciones">Acciones</option><option value="DAP">Depósito a Plazo</option><option value="Cripto">Criptomonedas</option>
+                    <option value="ETF">ETF (Fondos Indexados)</option>
+                    <option value="Fondo Mutuo">Fondo Mutuo</option>
+                    <option value="Acciones">Acciones / Renta Variable</option>
+                    <option value="DAP">Depósito a Plazo / Renta Fija</option>
+                    <option value="Cripto">Criptomonedas</option>
+                    <option value="Inmobiliario / Otros">Inmobiliario / Otros</option>
                   </select>
                 </div>
                 <div>
-                  <label class="text-slate-400">Capital Invertido ($)</label>
-                  <input type="number" id="inv-capital" min="1" placeholder="Ej: 500000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <label class="text-slate-400">Capital Aportado ($)</label>
+                  <input type="number" id="inv-capital" min="1" placeholder="Ej: 500000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1" oninput="if(!document.getElementById('inv-actual').value) document.getElementById('inv-actual').value = this.value">
                 </div>
                 <div>
                   <label class="text-slate-400">Valor Actual ($)</label>
-                  <input type="number" id="inv-actual" min="1" placeholder="Ej: 580000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
+                  <input type="number" id="inv-actual" min="1" placeholder="Ej: 500000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-emerald-400 font-semibold mt-1">
                 </div>
                 <div>
-                  <label class="text-slate-400">Rendimiento Anual Estimado (%)</label>
+                  <label class="text-slate-400">Rentabilidad Anual Estimada (%)</label>
                   <input type="number" step="0.1" id="inv-tasa" value="8.0" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
                 </div>
                 <div class="col-span-2">
-                  <label class="text-slate-400">Plataforma / Broker</label>
-                  <input type="text" id="inv-plataforma" placeholder="Ej: Racional, Fintual, Banco, Buda" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+                  <label class="text-slate-400">Plataforma / Broker / Cuenta de Inversión</label>
+                  <input type="text" id="inv-plataforma" placeholder="Ej: Racional, Fintual, Banchile, Santander, Buda" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
                 </div>
-                <div class="flex items-end">
-                  <button type="submit" id="btn-guardar-inversion" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs">
-                    Guardar Activo
+                <div class="flex items-end col-span-2 md:col-span-3">
+                  <button type="submit" id="btn-guardar-inversion" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2 rounded-xl text-white transition text-xs shadow-lg shadow-sky-600/20">
+                    Guardar / Actualizar Activo de Inversión
                   </button>
                 </div>
               </form>
             </div>
 
+            <!-- Tabla de Activos y Desglose de Inversiones -->
             <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-              <div class="p-3.5 border-b border-slate-800"><h3 class="text-xs font-semibold uppercase text-slate-400">Cartera de Inversiones Actual</h3></div>
-              <div class="overflow-x-auto max-h-80">
+              <div class="p-3.5 border-b border-slate-800 flex justify-between items-center">
+                <div>
+                  <h3 class="text-xs font-semibold uppercase text-slate-400">Cartera Consolidada por Activos</h3>
+                  <p class="text-[10px] text-slate-500">Muestra el capital acumulado invertido en cada activo</p>
+                </div>
+                <span id="badge-total-activos" class="text-xs font-bold text-sky-400">0 Activos</span>
+              </div>
+              <div class="overflow-x-auto max-h-96">
                 <table class="w-full text-left text-xs text-slate-300">
                   <thead class="bg-slate-800/80 sticky top-0 text-slate-400">
-                    <tr><th class="p-2.5">Fecha</th><th class="p-2.5">Activo</th><th class="p-2.5 text-right">Invertido</th><th class="p-2.5 text-right">Actual</th><th class="p-2.5 text-right">Retorno</th><th class="p-2.5 text-center">x</th></tr>
+                    <tr>
+                      <th class="p-2.5">Activo / Instrumento</th>
+                      <th class="p-2.5">Plataforma</th>
+                      <th class="p-2.5 text-right">Capital Invertido</th>
+                      <th class="p-2.5 text-right">Valor Actual</th>
+                      <th class="p-2.5 text-right">Rent. Est.</th>
+                      <th class="p-2.5 text-right">Retorno</th>
+                      <th class="p-2.5 text-center">Acciones</th>
+                    </tr>
                   </thead>
                   <tbody id="tabla-inversiones" class="divide-y divide-slate-800"></tbody>
                 </table>
@@ -970,7 +994,7 @@
           <div class="lg:col-span-5 bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-sm font-bold uppercase text-purple-400">🚀 Proyección de Crecimiento Patrimonial</h3>
-              <p class="text-xs text-slate-400 mt-1">Simulación con interés compuesto continuo</p>
+              <p class="text-xs text-slate-400 mt-1">Simulación con rentabilidad ponderada de tus activos</p>
             </div>
             <div class="h-64 relative w-full"><canvas id="chart-inversiones"></canvas></div>
             <div id="simulacion-texto" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1"></div>
@@ -1013,9 +1037,9 @@
                 <input type="checkbox" id="check-modal-all" checked onchange="toggleSeleccionarTodosModal(this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0">
               </th>
               <th class="p-2.5">Fecha</th>
-              <th class="p-2.5">Detalle</th>
-              <th class="p-2.5">Destino</th>
-              <th class="p-2.5">Categoría</th>
+              <th class="p-2.5">Detalle Original</th>
+              <th class="p-2.5">Destino / Tipo</th>
+              <th class="p-2.5">Clasificación / Activo Destino</th>
               <th class="p-2.5 text-right">Monto ($)</th>
             </tr>
           </thead>
@@ -2772,33 +2796,46 @@
     function procesarModuloInversiones() {
       let totalCapital = 0, totalValorActual = 0, rendimientoPromedioPonderado = 0;
 
+      // Actualizar datalist para autocompletar activos en formularios y modales
+      const datalistActivos = document.getElementById('lista-activos-existentes');
+      if (datalistActivos) {
+        const nombresUnicos = Array.from(new Set(datosPersonal.inversiones.map(i => i.nombre).filter(Boolean)));
+        datalistActivos.innerHTML = nombresUnicos.map(n => `<option value="${n}">`).join('');
+      }
+
       const cuerpoInv = document.getElementById('tabla-inversiones');
       if (datosPersonal.inversiones.length === 0) {
-        cuerpoInv.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Sin inversiones registradas.</td></tr>';
+        cuerpoInv.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Sin activos ni inversiones registradas. Crea uno arriba o importa movimientos desde tu cartola.</td></tr>';
       } else {
         cuerpoInv.innerHTML = datosPersonal.inversiones.map(inv => {
-          const cap = Number(inv.capital_invertido);
-          const act = Number(inv.valor_actual);
+          const cap = Number(inv.capital_invertido || 0);
+          const act = Number(inv.valor_actual || 0);
           const ret = act - cap;
           const retPct = cap > 0 ? ((ret / cap) * 100).toFixed(1) : 0;
+          const rentEst = Number(inv.rentabilidad_anual_estimada || 8.0);
 
           totalCapital += cap;
           totalValorActual += act;
-          rendimientoPromedioPonderado += (Number(inv.rentabilidad_anual_estimada || 8) * act);
+          rendimientoPromedioPonderado += (rentEst * (act > 0 ? act : cap));
 
           return `
-            <tr class="hover:bg-slate-800/40">
-              <td class="p-2.5 text-slate-400">${inv.fecha || inv.created_at.slice(0,10)}</td>
+            <tr class="hover:bg-slate-800/40 transition">
               <td class="p-2.5">
-                <div class="font-medium text-slate-200">${inv.nombre}</div>
-                <div class="text-[10px] text-slate-500">${inv.tipo} • ${inv.plataforma || 'Broker'}</div>
+                <div class="font-medium text-slate-200 text-xs">${inv.nombre}</div>
+                <div class="text-[10px] text-slate-500">${inv.tipo || 'Activo'} • ${inv.fecha || (inv.created_at ? inv.created_at.slice(0,10) : '')}</div>
               </td>
-              <td class="p-2.5 text-right text-slate-400">${formatoCLP(cap)}</td>
-              <td class="p-2.5 text-right font-semibold text-sky-400">${formatoCLP(act)}</td>
-              <td class="p-2.5 text-right font-semibold ${ret >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                ${ret >= 0 ? '+' : ''}${formatoCLP(ret)} (${retPct}%)
+              <td class="p-2.5 text-xs text-slate-300">
+                <span class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700/80 text-[11px]">${inv.plataforma || 'Broker'}</span>
               </td>
-              <td class="p-2.5 text-center"><button onclick="eliminarInversion(${inv.id})" class="text-rose-400">✕</button></td>
+              <td class="p-2.5 text-right font-mono text-slate-400 text-xs">${formatoCLP(cap)}</td>
+              <td class="p-2.5 text-right font-mono font-semibold text-sky-400 text-xs">${formatoCLP(act)}</td>
+              <td class="p-2.5 text-right text-purple-400 font-semibold text-xs">${rentEst.toFixed(1)}%</td>
+              <td class="p-2.5 text-right font-semibold text-xs ${ret >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                ${ret >= 0 ? '+' : ''}${formatoCLP(ret)} <span class="text-[10px] opacity-80">(${retPct}%)</span>
+              </td>
+              <td class="p-2.5 text-center">
+                <button onclick="eliminarInversion(${inv.id})" class="text-rose-400 hover:text-rose-200 text-xs px-2 py-1 bg-rose-950/40 rounded border border-rose-800/50 cursor-pointer" title="Eliminar este activo">✕</button>
+              </td>
             </tr>
           `;
         }).join('');
@@ -2806,12 +2843,17 @@
 
       const gananciaTotal = totalValorActual - totalCapital;
       const rentabilidadTotalPct = totalCapital > 0 ? ((gananciaTotal / totalCapital) * 100).toFixed(1) : 0;
-      const tasaPonderada = totalValorActual > 0 ? (rendimientoPromedioPonderado / totalValorActual) : 8.0;
+      const baseParaPonderar = totalValorActual > 0 ? totalValorActual : totalCapital;
+      const tasaPonderada = baseParaPonderar > 0 ? (rendimientoPromedioPonderado / baseParaPonderar) : 8.0;
       const proyeccion10 = totalValorActual * Math.pow(1 + (tasaPonderada / 100), 10);
 
       document.getElementById('kpi-inv-capital').textContent = formatoCLP(totalCapital);
       document.getElementById('kpi-inv-valor-actual').textContent = formatoCLP(totalValorActual);
       document.getElementById('kpi-inv-num').textContent = `${datosPersonal.inversiones.length} activos`;
+      
+      const badgeActivos = document.getElementById('badge-total-activos');
+      if (badgeActivos) badgeActivos.textContent = `${datosPersonal.inversiones.length} Activos`;
+
       document.getElementById('kpi-inv-ganancia').textContent = `${gananciaTotal >= 0 ? '+' : ''}${formatoCLP(gananciaTotal)}`;
       document.getElementById('kpi-inv-rentabilidad').textContent = `${gananciaTotal >= 0 ? '+' : ''}${rentabilidadTotalPct}% de retorno`;
       document.getElementById('kpi-inv-proyeccion-10').textContent = formatoCLP(Math.round(proyeccion10));
@@ -3121,7 +3163,7 @@
       s = s.replace(/[$€£CLP\s]/gi, '').trim();
       if (!s) return null;
 
-      // Decimal estándar con punto: -2500.00, 160000.00, 56.00
+      // Decimal estándar con punto: -2500.00, 160000.00, 56.00, -940.00
       if (/^-?\d+\.\d{1,2}$/.test(s)) {
         return parseFloat(s);
       }
@@ -3175,50 +3217,177 @@
       return hoyFechaStr;
     }
 
-    function construirDescripcionYDestino(row, montoNum) {
-      let desc = '';
-      let destinoSugerido = montoNum < 0 ? 'gasto' : 'ingreso';
-      let catSugerida = 'Otros';
+    function extraerMovimientoDesdeFilaCartola(row, idx) {
+      if (!row || typeof row !== 'object') return null;
 
-      const tieneMpFields = ('TRANSACTION_TYPE' in row) || ('PAYMENT_METHOD_TYPE' in row) || ('SETTLEMENT_DATE' in row) || ('SOURCE_ID' in row) || ('BUSINESS_UNIT' in row);
-      
-      if (tieneMpFields) {
-        const parts = [];
-        const bu = (row['BUSINESS_UNIT'] || row['business_unit'] || '').trim();
-        const tt = (row['TRANSACTION_TYPE'] || row['transaction_type'] || '').trim();
-        const pm = (row['PAYMENT_METHOD_TYPE'] || row['payment_method_type'] || '').trim();
-        const src = (row['SOURCE_ID'] || row['source_id'] || '').trim();
-
-        if (bu) parts.push(bu);
-        else parts.push('Mercado Pago');
-
-        if (tt) {
-          if (tt === 'SETTLEMENT') parts.push('Liquidación');
-          else if (tt === 'CASHBACK') parts.push('Reintegro Cashback');
-          else parts.push(tt);
-        }
-        if (pm) {
-          if (pm === 'bank_transfer') parts.push('(Transferencia Bancaria)');
-          else if (pm === 'available_money') parts.push('(Dinero en Cuenta)');
-          else parts.push(`(${pm})`);
-        }
-        if (src) parts.push(`#${src}`);
-
-        desc = parts.join(' ');
-      } else {
-        for (let key in row) {
-          const k = key.toLowerCase();
-          if (!desc && (k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('concepto') || k.includes('movimiento') || k.includes('comercio') || k.includes('tipo') || k.includes('beneficiario') || k.includes('motivo'))) {
-            const val = String(row[key] || '').trim();
-            if (val) desc = val;
-          }
+      // Crear mapa normalizado en minúsculas y sin acentos
+      const cleanRow = {};
+      for (let k in row) {
+        if (k !== null && k !== undefined) {
+          const cleanKey = String(k).trim().toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9_]/g, '_');
+          cleanRow[cleanKey] = row[k];
         }
       }
 
-      if (!desc) desc = 'Movimiento Bancario';
-      const descLower = desc.toLowerCase();
+      // Detectar si es formato de reporte Mercado Pago
+      const esMercadoPago = ('real_amount' in cleanRow) ||
+        ('transaction_amount' in cleanRow) ||
+        ('source_id' in cleanRow) ||
+        ('transaction_type' in cleanRow) ||
+        ('payment_method_type' in cleanRow) ||
+        ('settlement_date' in cleanRow) ||
+        ('money_release_date' in cleanRow) ||
+        ('monto_neto_de_la_operacion' in cleanRow) ||
+        ('valor_de_la_compra' in cleanRow) ||
+        ('id_de_operacion_en_mercado_pago' in cleanRow) ||
+        ('tipo_de_medio_de_pago' in cleanRow) ||
+        ('tipo_de_operacion' in cleanRow) ||
+        ('canal_de_venta' in cleanRow);
 
-      if (montoNum < 0) {
+      let fechaRaw = null;
+      let montoNum = null;
+      let desc = '';
+      let destinoSugerido = 'gasto';
+      let catSugerida = 'Otros';
+
+      if (esMercadoPago) {
+        // Monto principal: preferir real_amount (monto neto real transferido/debitado), sino transaction_amount
+        const rawMonto = cleanRow['real_amount'] ??
+          cleanRow['monto_neto_de_la_operacion'] ??
+          cleanRow['monto_neto'] ??
+          cleanRow['transaction_amount'] ??
+          cleanRow['valor_de_la_compra'];
+
+        montoNum = parsearMontoUniversal(rawMonto);
+
+        // Fecha: preferir settlement_date o transaction_date o money_release_date
+        fechaRaw = cleanRow['settlement_date'] ??
+          cleanRow['fecha_de_aprobacion'] ??
+          cleanRow['transaction_date'] ??
+          cleanRow['fecha_de_origen'] ??
+          cleanRow['money_release_date'] ??
+          cleanRow['fecha_de_liberacion_del_cobro'];
+
+        // Construir detalle descriptivo
+        const srcId = String(cleanRow['source_id'] ?? cleanRow['id_de_operacion_en_mercado_pago'] ?? '').trim();
+        const payMethod = String(cleanRow['payment_method_type'] ?? cleanRow['tipo_de_medio_de_pago'] ?? '').trim();
+        const transType = String(cleanRow['transaction_type'] ?? cleanRow['tipo_de_operacion'] ?? '').trim().toUpperCase();
+        const busUnit = String(cleanRow['business_unit'] ?? cleanRow['canal_de_venta'] ?? '').trim();
+        const subUnit = String(cleanRow['sub_unit'] ?? cleanRow['plataforma_de_cobro'] ?? '').trim();
+        const issuer = String(cleanRow['issuer_name'] ?? cleanRow['nombre_del_emisor'] ?? '').trim();
+
+        if (transType === 'CASHBACK') {
+          desc = `Reintegro Cashback Mercado Pago${srcId ? ` #${srcId}` : ''}`;
+          destinoSugerido = 'ingreso';
+        } else if (payMethod === 'bank_transfer') {
+          if (montoNum !== null && montoNum > 0) {
+            desc = `Transferencia Bancaria Recibida${srcId ? ` #${srcId}` : ''}`;
+            destinoSugerido = 'ingreso';
+          } else {
+            desc = `Transferencia Bancaria Enviada${srcId ? ` #${srcId}` : ''}`;
+            destinoSugerido = 'gasto';
+          }
+        } else {
+          const parts = [];
+          if (busUnit) parts.push(busUnit);
+          if (subUnit && subUnit !== busUnit) parts.push(subUnit);
+          if (issuer) parts.push(issuer);
+
+          if (parts.length > 0) {
+            const extra = payMethod === 'available_money' ? ' (Dinero en Cuenta)' : (payMethod ? ` (${payMethod})` : '');
+            desc = `${parts.join(' - ')}${extra}${srcId ? ` #${srcId}` : ''}`;
+          } else {
+            const extra = payMethod === 'available_money' ? ' (Dinero en Cuenta)' : (payMethod ? ` (${payMethod})` : '');
+            desc = `${montoNum !== null && montoNum < 0 ? 'Pago / Compra Mercado Pago' : 'Liquidación Mercado Pago'}${extra}${srcId ? ` #${srcId}` : ''}`;
+          }
+          destinoSugerido = (montoNum !== null && montoNum < 0) ? 'gasto' : 'ingreso';
+        }
+
+      } else {
+        // Detección Bancaria General (Santander, Banco de Chile, BCI, Estado, Scotiabank, Tenpo, Mach, etc.)
+        let cargoRaw = null;
+        let abonoRaw = null;
+        let montoRaw = null;
+
+        for (let k in cleanRow) {
+          const val = cleanRow[k];
+          if (val === null || val === undefined || val === '') continue;
+
+          if (k.includes('impuesto') || k.includes('tax') || k.includes('fee') || k.includes('comision') || k.includes('iva') || k.includes('retencion') || k.includes('saldo_final') || k.includes('balance') || k.includes('saldo_contable') || k.includes('saldo_disponible')) {
+            continue;
+          }
+
+          if (!fechaRaw && (k.includes('fecha') || k.includes('date') || k.includes('fec') || k.includes('periodo'))) {
+            fechaRaw = val;
+          }
+
+          if (k.includes('cargo') || k.includes('debito') || k.includes('egreso') || k.includes('debit') || k.includes('withdrawal')) {
+            cargoRaw = val;
+          } else if (k.includes('abono') || k.includes('credito') || k.includes('ingreso') || k.includes('credit') || k.includes('deposit')) {
+            abonoRaw = val;
+          } else if (k.includes('monto') || k.includes('importe') || k.includes('amount') || k.includes('valor') || k.includes('neto') || k.includes('total')) {
+            montoRaw = val;
+          }
+
+          if (!desc && (k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('concepto') || k.includes('movimiento') || k.includes('comercio') || k.includes('beneficiario') || k.includes('motivo'))) {
+            desc = String(val).trim();
+          }
+        }
+
+        const parsedCargo = parsearMontoUniversal(cargoRaw);
+        const parsedAbono = parsearMontoUniversal(abonoRaw);
+
+        if (parsedCargo !== null && parsedCargo !== 0) {
+          montoNum = -Math.abs(parsedCargo);
+        } else if (parsedAbono !== null && parsedAbono !== 0) {
+          montoNum = Math.abs(parsedAbono);
+        } else if (montoRaw !== null) {
+          montoNum = parsearMontoUniversal(montoRaw);
+        }
+
+        if (!desc) desc = 'Movimiento Bancario';
+        destinoSugerido = (montoNum !== null && montoNum < 0) ? 'gasto' : 'ingreso';
+      }
+
+      if (montoNum === null || isNaN(montoNum) || montoNum === 0) {
+        return null;
+      }
+
+      const descLower = desc.toLowerCase();
+      let activoNombreSugerido = '';
+      let activoTipoSugerido = 'ETF';
+      let activoPlataformaSugerida = '';
+      let activoTasaSugerida = 8.0;
+
+      if (/fintual|racional|trii|buda|binance|crypto|larrain vial|banchile|santander corredores|inversion|vector|btg pactual|dap|deposito a plazo|etf|sp500|s&p 500|voo|qqq/i.test(descLower)) {
+        destinoSugerido = 'inversion';
+        if (/fintual/i.test(descLower)) {
+          activoNombreSugerido = 'Fintual Risky';
+          activoPlataformaSugerida = 'Fintual';
+          activoTipoSugerido = 'Fondo Mutuo';
+          activoTasaSugerida = 9.0;
+        } else if (/racional/i.test(descLower)) {
+          activoNombreSugerido = 'ETF VOO (S&P 500)';
+          activoPlataformaSugerida = 'Racional';
+          activoTipoSugerido = 'ETF';
+          activoTasaSugerida = 10.0;
+        } else if (/buda|binance|crypto|bitcoin/i.test(descLower)) {
+          activoNombreSugerido = 'Cripto / Bitcoin';
+          activoPlataformaSugerida = /buda/i.test(descLower) ? 'Buda.com' : 'Binance';
+          activoTipoSugerido = 'Cripto';
+          activoTasaSugerida = 12.0;
+        } else if (/dap|deposito a plazo/i.test(descLower)) {
+          activoNombreSugerido = 'Depósito a Plazo';
+          activoPlataformaSugerida = 'Banco';
+          activoTipoSugerido = 'DAP';
+          activoTasaSugerida = 6.0;
+        } else {
+          activoNombreSugerido = desc;
+          activoPlataformaSugerida = 'Broker de Inversión';
+        }
+      } else if (montoNum < 0) {
         destinoSugerido = 'gasto';
         if (/lider|jumbo|tottus|unimarc|santa isabel|supermercado|almacen|pedidosya|rappi|uber eats|mcdonald|burger|starbucks|cafe|restauran|pizza|sushi|comida|panaderia/i.test(descLower)) {
           catSugerida = 'Supermercado/Comida';
@@ -3232,14 +3401,38 @@
           catSugerida = 'Vivienda/Arriendo';
         }
       } else {
-        if (/fintual|racional|trii|buda|binance|crypto|larrain vial|banchile|santander corredores|inversion|deposito a plazo/i.test(descLower)) {
-          destinoSugerido = 'inversion';
-        } else {
-          destinoSugerido = 'ingreso';
-        }
+        destinoSugerido = 'ingreso';
       }
 
-      return { desc, destinoSugerido, catSugerida };
+      // Si hay activos ya existentes en el sistema y no se definió uno, tomar el primero como sugerencia
+      if (!activoNombreSugerido && datosPersonal.inversiones && datosPersonal.inversiones.length > 0) {
+        activoNombreSugerido = datosPersonal.inversiones[0].nombre;
+        activoTipoSugerido = datosPersonal.inversiones[0].tipo || 'ETF';
+        activoPlataformaSugerida = datosPersonal.inversiones[0].plataforma || '';
+        activoTasaSugerida = Number(datosPersonal.inversiones[0].rentabilidad_anual_estimada || 8);
+      } else if (!activoNombreSugerido) {
+        activoNombreSugerido = 'Fondo de Inversión / ETF';
+        activoPlataformaSugerida = 'Broker';
+      }
+
+      const fechaStr = extraerFechaUniversal(fechaRaw);
+      const montoFinal = Math.abs(montoNum);
+      const esGasto = montoNum < 0;
+
+      return {
+        idTemporal: idx,
+        fecha: fechaStr,
+        descripcion: desc,
+        monto: montoFinal,
+        esGasto: esGasto,
+        destinoFinanciero: destinoSugerido,
+        categoria: catSugerida,
+        activoNombre: activoNombreSugerido,
+        activoTipo: activoTipoSugerido,
+        activoPlataforma: activoPlataformaSugerida,
+        activoTasa: activoTasaSugerida,
+        seleccionado: true
+      };
     }
 
     // =========================================================
@@ -3276,9 +3469,31 @@
           header: true,
           skipEmptyLines: true,
           dynamicTyping: false,
+          transformHeader: function(h) { return h ? h.trim() : ''; },
           delimitersToGuess: [';', ',', '\t', '|'],
           complete: function(results) {
             if (results.data && results.data.length > 0) {
+              // Validar si el parser detectó incorrectamente una sola columna con delimitadores
+              const firstRow = results.data[0];
+              const keys = Object.keys(firstRow);
+              if (keys.length === 1 && (keys[0].includes(';') || keys[0].includes('\t') || keys[0].includes(','))) {
+                const forcedDelim = keys[0].includes(';') ? ';' : (keys[0].includes('\t') ? '\t' : ',');
+                Papa.parse(textContent, {
+                  header: true,
+                  delimiter: forcedDelim,
+                  skipEmptyLines: true,
+                  dynamicTyping: false,
+                  transformHeader: h => h ? h.trim() : '',
+                  complete: function(res2) {
+                    if (res2.data && res2.data.length > 0) {
+                      analizarDatosParaModalCartola(res2.data);
+                    } else {
+                      parsearComoBinarioCartola(file);
+                    }
+                  }
+                });
+                return;
+              }
               analizarDatosParaModalCartola(results.data);
             } else {
               parsearComoBinarioCartola(file);
@@ -3314,61 +3529,11 @@
       let totalIngresos = 0;
 
       data.forEach((row, idx) => {
-        let fechaRaw = null;
-        let cargoRaw = null;
-        let abonoRaw = null;
-        let montoGeneralRaw = null;
-
-        for (let key in row) {
-          const k = key.toLowerCase().trim();
-          const val = row[key];
-          if (val === null || val === undefined || val === '') continue;
-
-          if (!fechaRaw && (k.includes('fecha') || k.includes('date') || k.includes('fec') || k.includes('time') || k.includes('periodo'))) {
-            fechaRaw = val;
-          }
-
-          if (k.includes('cargo') || k.includes('debito') || k.includes('egreso') || k.includes('debit') || k.includes('withdrawal')) {
-            cargoRaw = val;
-          } else if (k.includes('abono') || k.includes('credito') || k.includes('ingreso') || k.includes('credit') || k.includes('deposit')) {
-            abonoRaw = val;
-          } else if (k.includes('amount') || k.includes('monto') || k.includes('importe') || k.includes('valor') || k.includes('total') || k.includes('saldo') || k.includes('neto')) {
-            montoGeneralRaw = val;
-          }
-        }
-
-        let montoNum = null;
-
-        const cargoParsed = parsearMontoUniversal(cargoRaw);
-        const abonoParsed = parsearMontoUniversal(abonoRaw);
-
-        if (cargoParsed !== null && cargoParsed !== 0) {
-          montoNum = -Math.abs(cargoParsed);
-        } else if (abonoParsed !== null && abonoParsed !== 0) {
-          montoNum = Math.abs(abonoParsed);
-        } else if (montoGeneralRaw !== null) {
-          montoNum = parsearMontoUniversal(montoGeneralRaw);
-        }
-
-        if (montoNum !== null && montoNum !== 0) {
-          const fechaStr = extraerFechaUniversal(fechaRaw);
-          const { desc, destinoSugerido, catSugerida } = construirDescripcionYDestino(row, montoNum);
-          const montoFinal = Math.abs(montoNum);
-          const esGasto = montoNum < 0;
-
-          if (destinoSugerido === 'gasto') totalGastos += montoFinal;
-          else totalIngresos += montoFinal;
-
-          bufferModalCartola.push({
-            idTemporal: idx,
-            fecha: fechaStr,
-            descripcion: desc,
-            monto: montoFinal,
-            esGasto: esGasto,
-            destinoFinanciero: destinoSugerido,
-            categoria: catSugerida,
-            seleccionado: true
-          });
+        const mov = extraerMovimientoDesdeFilaCartola(row, idx);
+        if (mov) {
+          if (mov.destinoFinanciero === 'gasto') totalGastos += mov.monto;
+          else totalIngresos += mov.monto;
+          bufferModalCartola.push(mov);
         }
       });
 
@@ -3379,62 +3544,141 @@
 
       abrirModalSubirCartola();
       document.getElementById('resumen-cartola-modal').classList.remove('hidden');
-      document.getElementById('rm-gastos').textContent = formatoCLP(totalGastos);
-      document.getElementById('rm-ingresos').textContent = formatoCLP(totalIngresos);
-      document.getElementById('rm-seleccionados').textContent = bufferModalCartola.length;
+      actualizarTotalesResumenModal();
       document.getElementById('btn-importar-modal-supabase').disabled = false;
 
       renderizarBufferModal();
     }
 
+    function actualizarTotalesResumenModal() {
+      let g = 0, ing = 0, inv = 0, seleccionados = 0;
+      bufferModalCartola.forEach(m => {
+        if (m.seleccionado) {
+          seleccionados++;
+          if (m.destinoFinanciero === 'gasto') g += m.monto;
+          else if (m.destinoFinanciero === 'ingreso') ing += m.monto;
+          else if (m.destinoFinanciero === 'inversion') inv += m.monto;
+        }
+      });
+      document.getElementById('rm-gastos').textContent = formatoCLP(g);
+      document.getElementById('rm-ingresos').textContent = formatoCLP(ing + inv);
+      document.getElementById('rm-seleccionados').textContent = seleccionados;
+    }
+
+    function obtenerOpcionesActivosDatalist() {
+      const nombresUnicos = Array.from(new Set((datosPersonal.inversiones || []).map(i => i.nombre).filter(Boolean)));
+      if (nombresUnicos.length === 0) {
+        return ['ETF VOO (S&P 500)', 'Fintual Risky', 'DAP Santander', 'Cripto / Bitcoin'];
+      }
+      return nombresUnicos;
+    }
+
     function renderizarBufferModal() {
       const tbody = document.getElementById('modal-cartola-preview-body');
-      tbody.innerHTML = bufferModalCartola.map(m => `
-        <tr class="hover:bg-slate-800/40">
-          <td class="p-2.5 text-center">
-            <input type="checkbox" ${m.seleccionado ? 'checked' : ''} onchange="toggleItemBufferModal(${m.idTemporal}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0">
-          </td>
-          <td class="p-2.5 text-slate-400 font-mono text-xs">${m.fecha}</td>
-          <td class="p-2.5 font-medium text-slate-200 text-xs">${m.descripcion}</td>
-          <td class="p-2.5">
-            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
-              <option value="gasto" ${m.destinoFinanciero==='gasto'?'selected':''}>💸 Gasto</option>
-              <option value="inversion" ${m.destinoFinanciero==='inversion'?'selected':''}>🚀 Inversión</option>
-              <option value="ingreso" ${m.destinoFinanciero==='ingreso'?'selected':''}>💵 Ingreso</option>
-            </select>
-          </td>
-          <td class="p-2.5">
-            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200" onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).categoria = this.value">
-              <option value="Otros" ${m.categoria==='Otros'?'selected':''}>Otros</option>
+      const listaActivos = obtenerOpcionesActivosDatalist();
+
+      tbody.innerHTML = bufferModalCartola.map(m => {
+        const esInv = m.destinoFinanciero === 'inversion';
+        const esGas = m.destinoFinanciero === 'gasto';
+        const esIng = m.destinoFinanciero === 'ingreso';
+
+        let campoClasificacion = '';
+        if (esInv) {
+          campoClasificacion = `
+            <div class="space-y-1">
+              <div class="flex items-center gap-1">
+                <span class="text-[10px] text-purple-400 font-bold">Activo:</span>
+                <input type="text" value="${m.activoNombre || 'Fondo / ETF'}" placeholder="Nombre del activo" 
+                  oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoNombre = this.value"
+                  class="bg-slate-900 border border-purple-800/80 rounded px-1.5 py-0.5 text-xs text-purple-200 w-full focus:outline-none focus:border-purple-400">
+              </div>
+              <div class="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Rent. Est:</span>
+                <input type="number" step="0.1" value="${m.activoTasa || 8.0}" 
+                  oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTasa = Number(this.value)"
+                  class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200 w-12 text-center">%
+                <select onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTipo = this.value" class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200">
+                  <option value="ETF" ${m.activoTipo==='ETF'?'selected':''}>ETF</option>
+                  <option value="Fondo Mutuo" ${m.activoTipo==='Fondo Mutuo'?'selected':''}>Fondo Mutuo</option>
+                  <option value="Acciones" ${m.activoTipo==='Acciones'?'selected':''}>Acciones</option>
+                  <option value="DAP" ${m.activoTipo==='DAP'?'selected':''}>DAP</option>
+                  <option value="Cripto" ${m.activoTipo==='Cripto'?'selected':''}>Cripto</option>
+                  <option value="Otros" ${m.activoTipo==='Otros'?'selected':''}>Otros</option>
+                </select>
+              </div>
+            </div>
+          `;
+        } else if (esGas) {
+          campoClasificacion = `
+            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200 w-full" onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).categoria = this.value">
+              <option value="Otros" ${m.categoria==='Otros'?'selected':''}>Otros Gastos</option>
               <option value="Supermercado/Comida" ${m.categoria==='Supermercado/Comida'?'selected':''}>Supermercado & Comida</option>
               <option value="Servicios Básicos" ${m.categoria==='Servicios Básicos'?'selected':''}>Servicios Básicos</option>
               <option value="Transporte/Auto" ${m.categoria==='Transporte/Auto'?'selected':''}>Transporte / Auto</option>
               <option value="Ocio/Personal" ${m.categoria==='Ocio/Personal'?'selected':''}>Ocio / Personal</option>
               <option value="Vivienda/Arriendo" ${m.categoria==='Vivienda/Arriendo'?'selected':''}>Vivienda / Arriendo</option>
             </select>
+          `;
+        } else {
+          campoClasificacion = `
+            <span class="text-[11px] text-emerald-400 font-medium bg-emerald-950/60 px-2 py-1 rounded border border-emerald-800/60 block text-center">
+              Ingreso / Abono a Cuenta
+            </span>
+          `;
+        }
+
+        return `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-2.5 text-center">
+            <input type="checkbox" ${m.seleccionado ? 'checked' : ''} onchange="toggleItemBufferModal(${m.idTemporal}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
           </td>
-          <td class="p-2.5 text-right font-semibold text-xs ${m.destinoFinanciero==='gasto'?'text-rose-400':(m.destinoFinanciero==='inversion'?'text-purple-400':'text-emerald-400')}">
-            ${m.destinoFinanciero==='gasto' ? '-' : '+'}${formatoCLP(m.monto)}
+          <td class="p-2.5 text-slate-400 font-mono text-xs">${m.fecha}</td>
+          <td class="p-2.5 font-medium text-slate-200 text-xs">${m.descripcion}</td>
+          <td class="p-2.5">
+            <select class="bg-slate-800 border border-slate-700 rounded p-1 text-xs text-slate-200 font-semibold cursor-pointer" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
+              <option value="gasto" ${esGas?'selected':''}>💸 Gasto</option>
+              <option value="inversion" ${esInv?'selected':''}>🚀 Inversión (Aporte)</option>
+              <option value="ingreso" ${esIng?'selected':''}>💵 Ingreso</option>
+            </select>
+          </td>
+          <td class="p-2.5 min-w-[200px]">
+            ${campoClasificacion}
+          </td>
+          <td class="p-2.5 text-right font-semibold text-xs ${esGas?'text-rose-400':(esInv?'text-purple-400':'text-emerald-400')}">
+            ${esGas ? '-' : '+'}${formatoCLP(m.monto)}
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
+
+      actualizarTotalesResumenModal();
     }
 
     function toggleItemBufferModal(id, checked) {
       const item = bufferModalCartola.find(m => m.idTemporal === id);
       if (item) item.seleccionado = checked;
-      document.getElementById('rm-seleccionados').textContent = bufferModalCartola.filter(m => m.seleccionado).length;
+      actualizarTotalesResumenModal();
     }
 
     function cambiarDestinoBufferModal(id, dest) {
       const item = bufferModalCartola.find(m => m.idTemporal === id);
-      if (item) item.destinoFinanciero = dest;
+      if (item) {
+        item.destinoFinanciero = dest;
+        if (dest === 'inversion') {
+          if (!item.activoNombre) {
+            const existentes = obtenerOpcionesActivosDatalist();
+            item.activoNombre = existentes[0] || 'Fondo / ETF';
+            item.activoTipo = 'ETF';
+            item.activoTasa = 8.0;
+          }
+        }
+      }
       renderizarBufferModal();
     }
 
     function toggleSeleccionarTodosModal(checked) {
       bufferModalCartola.forEach(m => m.seleccionado = checked);
-      document.getElementById('rm-seleccionados').textContent = checked ? bufferModalCartola.length : 0;
+      actualizarTotalesResumenModal();
       renderizarBufferModal();
     }
 
@@ -3448,7 +3692,7 @@
 
       const gastosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'gasto').map(m => ({
         fecha: m.fecha,
-        categoria: m.categoria,
+        categoria: m.categoria || 'Otros',
         descripcion: m.descripcion,
         monto: m.monto,
         tipo: 'variable'
@@ -3457,22 +3701,14 @@
       const ingresosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'ingreso').map(m => ({
         fecha: m.fecha,
         cliente_empresa: m.descripcion,
-        detalle_servicio: 'Ingreso Bancario',
+        detalle_servicio: 'Ingreso Bancario / Abono',
         monto_bruto: m.monto,
         retencion_porcentaje: 0,
         monto_liquido: m.monto,
         estado: 'pagada'
       }));
 
-      const inversionesParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'inversion').map(m => ({
-        fecha: m.fecha,
-        nombre: m.descripcion,
-        tipo: 'Fondo / ETF',
-        capital_invertido: m.monto,
-        valor_actual: m.monto,
-        rentabilidad_anual_estimada: 8.0,
-        plataforma: 'Broker / Cartola'
-      }));
+      const movimientosInversion = seleccionados.filter(m => m.destinoFinanciero === 'inversion');
 
       let errores = [];
 
@@ -3486,9 +3722,47 @@
         if (errI) errores.push('Ingresos: ' + errI.message);
       }
 
-      if (inversionesParaInsertar.length > 0) {
-        const { error: errInv } = await ejecutarConReintentos(() => db.from('inversiones').insert(inversionesParaInsertar), 4, 1000);
-        if (errInv) errores.push('Inversiones: ' + errInv.message);
+      // Manejo inteligente de Inversiones: Si el activo ya existe, se acumula el capital; si no, se crea uno nuevo
+      if (movimientosInversion.length > 0) {
+        for (const movInv of movimientosInversion) {
+          const nombreActivo = (movInv.activoNombre || movInv.descripcion || 'Fondo / ETF').trim();
+          const activoExistente = (datosPersonal.inversiones || []).find(inv => 
+            inv.nombre && inv.nombre.toLowerCase().trim() === nombreActivo.toLowerCase()
+          );
+
+          if (activoExistente && activoExistente.id) {
+            // Acumular capital invertido y valor actual
+            const nuevoCap = Number(activoExistente.capital_invertido || 0) + Number(movInv.monto);
+            const nuevoActual = Number(activoExistente.valor_actual || 0) + Number(movInv.monto);
+            const nuevaTasa = movInv.activoTasa || activoExistente.rentabilidad_anual_estimada || 8.0;
+
+            const { error: errUpdate } = await ejecutarConReintentos(() => 
+              db.from('inversiones').update({
+                capital_invertido: nuevoCap,
+                valor_actual: nuevoActual,
+                rentabilidad_anual_estimada: nuevaTasa,
+                fecha: movInv.fecha
+              }).eq('id', activoExistente.id)
+            , 4, 1000);
+
+            if (errUpdate) errores.push(`Inversión (${nombreActivo}): ` + errUpdate.message);
+          } else {
+            // Crear nuevo registro de activo
+            const { error: errInsert } = await ejecutarConReintentos(() => 
+              db.from('inversiones').insert([{
+                fecha: movInv.fecha,
+                nombre: nombreActivo,
+                tipo: movInv.activoTipo || 'ETF',
+                capital_invertido: movInv.monto,
+                valor_actual: movInv.monto,
+                rentabilidad_anual_estimada: movInv.activoTasa || 8.0,
+                plataforma: movInv.activoPlataforma || 'Broker / Cuenta Inversión'
+              }])
+            , 4, 1000);
+
+            if (errInsert) errores.push(`Inversión (${nombreActivo}): ` + errInsert.message);
+          }
+        }
       }
 
       btn.disabled = false;
@@ -3497,7 +3771,7 @@
       if (errores.length > 0) {
         mostrarToast("Aviso al insertar movimientos:\n" + errores.join('\n'), 'warning');
       } else {
-        mostrarToast(`¡Éxito! Se insertaron ${seleccionados.length} movimientos en la base de datos.`, 'success');
+        mostrarToast(`¡Éxito! Se procesaron e insertaron ${seleccionados.length} movimientos en tu base de datos.`, 'success');
         cerrarModalSubirCartola();
         await cargarTodo();
       }
@@ -3826,19 +4100,45 @@
 
     document.getElementById('form-inversion').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const { error } = await db.from('inversiones').insert([{
-        fecha: document.getElementById('inv-fecha').value,
-        nombre: document.getElementById('inv-nombre').value.trim(),
-        tipo: document.getElementById('inv-tipo').value,
-        capital_invertido: Number(document.getElementById('inv-capital').value),
-        valor_actual: Number(document.getElementById('inv-actual').value),
-        rentabilidad_anual_estimada: Number(document.getElementById('inv-tasa').value),
-        plataforma: document.getElementById('inv-plataforma').value.trim()
-      }]);
+      const nombre = document.getElementById('inv-nombre').value.trim();
+      const fecha = document.getElementById('inv-fecha').value;
+      const tipo = document.getElementById('inv-tipo').value;
+      const cap = Number(document.getElementById('inv-capital').value);
+      const act = Number(document.getElementById('inv-actual').value);
+      const tasa = Number(document.getElementById('inv-tasa').value);
+      const plat = document.getElementById('inv-plataforma').value.trim();
+
+      const activoExistente = (datosPersonal.inversiones || []).find(inv => 
+        inv.nombre && inv.nombre.toLowerCase().trim() === nombre.toLowerCase()
+      );
+
+      let error = null;
+      if (activoExistente && activoExistente.id) {
+        const res = await db.from('inversiones').update({
+          fecha: fecha,
+          tipo: tipo,
+          capital_invertido: cap,
+          valor_actual: act,
+          rentabilidad_anual_estimada: tasa,
+          plataforma: plat
+        }).eq('id', activoExistente.id);
+        error = res.error;
+      } else {
+        const res = await db.from('inversiones').insert([{
+          fecha: fecha,
+          nombre: nombre,
+          tipo: tipo,
+          capital_invertido: cap,
+          valor_actual: act,
+          rentabilidad_anual_estimada: tasa,
+          plataforma: plat
+        }]);
+        error = res.error;
+      }
 
       if (error) mostrarToast("Error: " + error.message, "error");
       else {
-        mostrarToast("¡Activo de inversión guardado!", "success");
+        mostrarToast(`¡Activo "${nombre}" guardado con éxito!`, "success");
         document.getElementById('inv-nombre').value = '';
         document.getElementById('inv-capital').value = '';
         document.getElementById('inv-actual').value = '';
@@ -4076,10 +4376,29 @@
       });
 
       document.getElementById('simulacion-texto').innerHTML = `
-        <div>📌 Tasa estimada promedio: <strong class="text-purple-400">8.0% anual</strong></div>
+        <div>📌 Tasa estimada promedio: <strong class="text-purple-400">${tasaPonderada.toFixed(1)}% anual</strong></div>
         <div>En 5 años tu cartera crecería a: <strong class="text-sky-400">${formatoCLP(dataProyeccion[4])}</strong></div>
         <div>En 10 años tu cartera alcanzaría: <strong class="text-emerald-400">${formatoCLP(dataProyeccion[6])}</strong></div>
       `;
+    }
+
+    async function eliminarInversion(id) {
+      const confirmado = await pedirConfirmacion({
+        titulo: 'Eliminar Activo de Inversión',
+        mensaje: '¿Deseas eliminar este activo/inversión de la base de datos?',
+        btnTexto: 'Sí, Eliminar'
+      });
+      if (!confirmado) return;
+
+      try {
+        const { error } = await db.from('inversiones').delete().eq('id', id);
+        if (error) throw error;
+        mostrarToast('Activo de inversión eliminado correctamente.', 'success');
+        await cargarTodo();
+      } catch (err) {
+        console.error('Error al eliminar inversión:', err);
+        mostrarToast('Error al eliminar inversión: ' + err.message, 'error');
+      }
     }
 
     function renderizarGraficosDrop() {
