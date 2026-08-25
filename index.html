@@ -4,54 +4,212 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Suite Financiera Empresarial & Personal</title>
+  <!-- Dynamic Favicon Support -->
+  <link id="app-favicon" rel="icon" type="image/x-icon" href="https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200">
+  <link id="app-favicon-png" rel="shortcut icon" href="https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200">
+  <!-- Google Fonts: Inter, Plus Jakarta Sans, Outfit, DM Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300..900&family=Plus+Jakarta+Sans:wght@300..800&display=swap" rel="stylesheet">
+  <!-- Google Material Symbols (Rounded) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['var(--app-font-sans, "Plus Jakarta Sans")', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            accent: {
+              DEFAULT: 'var(--accent-primary, #0ea5e9)',
+              hover: 'var(--accent-hover, #0284c7)',
+              light: 'var(--accent-light, #e0f2fe)',
+              subtle: 'var(--accent-subtle, rgba(14, 165, 233, 0.15))',
+              glow: 'var(--accent-glow, rgba(14, 165, 233, 0.35))'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+  
+  <style>
+    :root {
+      --app-font-sans: 'Plus Jakarta Sans', sans-serif;
+      --accent-primary: #0ea5e9;
+      --accent-hover: #0284c7;
+      --accent-subtle: rgba(14, 165, 233, 0.15);
+      --accent-glow: rgba(14, 165, 233, 0.35);
+      --card-bg: #0b1329;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --icon-color: #38bdf8;
+    }
+
+    body {
+      font-family: var(--app-font-sans);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Privacy Blur Mode */
+    .privacy-mode .privacy-blur {
+      filter: blur(7px) !important;
+      user-select: none !important;
+      pointer-events: none !important;
+      transition: filter 0.2s ease;
+    }
+    .privacy-mode .privacy-blur:hover {
+      filter: blur(2px) !important;
+    }
+
+    /* Material Symbols Rounded Custom Styling */
+    .sym {
+      font-family: 'Material Symbols Rounded';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'liga';
+      vertical-align: middle;
+      color: var(--icon-color, currentColor);
+    }
+    .sym-sm { font-size: 16px; }
+    .sym-lg { font-size: 24px; }
+    .sym-xl { font-size: 32px; }
+
+    /* Drag & Drop Nav styling */
+    .nav-tab-item.dragging {
+      opacity: 0.4;
+      transform: scale(0.96);
+    }
+    .nav-tab-item.drag-over {
+      border-bottom-color: var(--accent-primary) !important;
+      background-color: var(--accent-subtle);
+    }
+
+    /* Glassmorphism and Glow Effects */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 1);
+    }
+
+    /* Inline Editable Elements */
+    .editable-desc {
+      position: relative;
+      cursor: text;
+      padding: 2px 4px;
+      margin: -2px -4px;
+      border-radius: 6px;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+      min-width: 30px;
+      display: inline-block;
+    }
+    .editable-desc:hover {
+      background-color: rgba(56, 189, 248, 0.12);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
+    }
+    .editable-desc:focus {
+      background-color: rgba(15, 23, 42, 0.95) !important;
+      box-shadow: 0 0 0 2px var(--accent-primary, #0ea5e9) !important;
+      color: #ffffff !important;
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
   <div class="max-w-7xl mx-auto space-y-5">
 
     <!-- HEADER PRINCIPAL -->
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/90 backdrop-blur p-4 rounded-2xl border border-slate-800 gap-4">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 shadow-xl gap-4">
       <div class="flex items-center gap-3.5">
-        <div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
+        <div class="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700/80 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
           <img id="app-logo-img" src="https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200" alt="Logo" class="w-full h-full object-contain p-1">
         </div>
         <div>
-          <h1 id="header-titulo-principal" class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h1 id="header-titulo-principal" title="Haz clic para editar título" class="editable-desc text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
             Negocio
           </h1>
-          <p id="header-subtitulo-principal" class="text-slate-400 text-xs">Unit Economics, Dropi, Meta Ads y Utilidad Real</p>
+          <p id="header-subtitulo-principal" title="Haz clic para editar subtítulo" class="editable-desc text-slate-400 text-xs mt-0.5">Unit Economics, Dropi, Meta Ads y Utilidad Real</p>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
-        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
-          <button onclick="cambiarWorkspace('dropshipping')" id="btn-ws-drop" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition">
-            🛍️ <span id="label-ws-drop">Negocio</span>
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+        <!-- Switcher de Espacio de Trabajo -->
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 shadow-inner">
+          <button onclick="cambiarWorkspace('dropshipping')" id="btn-ws-drop" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white transition cursor-pointer">
+            <span class="sym sym-sm">storefront</span>
+            <span id="label-ws-drop">Negocio</span>
           </button>
-          <button onclick="cambiarWorkspace('personal')" id="btn-ws-pers" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
-            👤 <span id="label-ws-pers">Finanzas Personales</span>
+          <button onclick="cambiarWorkspace('personal')" id="btn-ws-pers" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
+            <span class="sym sym-sm">account_circle</span>
+            <span id="label-ws-pers">Finanzas Personales</span>
           </button>
         </div>
 
-        <div class="flex items-center bg-slate-800 rounded-xl px-2.5 py-1 border border-slate-700 gap-1.5 text-xs">
-          <select id="filtro-tipo" class="bg-transparent text-slate-300 focus:outline-none cursor-pointer" onchange="cambiarModoFiltro()">
+        <!-- Filtro Temporal -->
+        <div class="flex items-center bg-slate-800/90 rounded-xl px-2.5 py-1 border border-slate-700 gap-1.5 text-xs">
+          <span class="sym sym-sm text-slate-400">calendar_month</span>
+          <select id="filtro-tipo" class="bg-transparent text-slate-300 focus:outline-none cursor-pointer text-xs" onchange="cambiarModoFiltro()">
             <option value="semana">Esta Semana</option>
             <option value="mes" selected>Por Mes:</option>
             <option value="anio">Todo el Año</option>
             <option value="todo">Historial Completo</option>
           </select>
-          <input type="month" id="filtro-mes" class="bg-transparent text-slate-200 focus:outline-none cursor-pointer" onchange="cargarTodo()">
+          <input type="month" id="filtro-mes" class="bg-transparent text-slate-200 focus:outline-none cursor-pointer text-xs" onchange="cargarTodo()">
         </div>
+
+        <!-- BOTÓN MODO PRIVACIDAD (OJO) -->
+        <button id="btn-toggle-privacidad" onclick="toggleModoPrivacidad()" title="Modo Privacidad (Ocultar/Mostrar Cifras)" class="p-2 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition cursor-pointer flex items-center justify-center">
+          <span id="icono-privacidad" class="sym sym-sm">visibility</span>
+        </button>
 
         <!-- BOTÓN LOGIN / PERFIL USUARIO -->
         <button id="btn-auth-header-login" onclick="abrirModalAuth('login')" class="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold rounded-xl text-xs shadow-md shadow-sky-600/20 transition cursor-pointer">
-          <span>🔑</span>
+          <span class="sym sym-sm text-white">key</span>
           <span class="hidden sm:inline">Iniciar Sesión</span>
         </button>
 
@@ -64,12 +222,13 @@
             <span id="usuario-email" class="text-[9px] text-slate-400 leading-tight max-w-[120px] truncate">usuario@email.com</span>
           </div>
           <button onclick="confirmarCerrarSesion()" title="Cerrar Sesión" class="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-lg transition cursor-pointer text-xs">
-            <span>🚪</span>
+            <span class="sym sym-sm">logout</span>
           </button>
         </div>
 
-        <button onclick="abrirModalConfig()" title="Configuración" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition">
-          <span class="text-base">⚙️</span>
+        <!-- BOTÓN CONFIGURACIÓN GENERAL -->
+        <button onclick="abrirModalConfig()" title="Personalización & Configuración" class="p-2 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition cursor-pointer flex items-center justify-center">
+          <span class="sym sym-sm">tune</span>
         </button>
       </div>
     </header>
@@ -78,19 +237,47 @@
     <!-- ESPACIO 1: DROPSHIPPING & E-COMMERCE       -->
     <!-- ========================================== -->
     <div id="workspace-dropshipping" class="space-y-5">
-      <nav class="flex border-b border-slate-800 gap-2 text-xs md:text-sm font-medium">
-        <button onclick="cambiarTabDrop('dashboard')" id="tab-drop-dash-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-sky-500 text-sky-400 font-semibold transition">
-          📈 Dashboard & Métricas
-        </button>
-        <button onclick="cambiarTabDrop('pedidos')" id="tab-drop-ped-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          📦 Pedidos & Dropi
-        </button>
-        <button onclick="cambiarTabDrop('ads')" id="tab-drop-ads-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          📢 Meta Ads
-        </button>
-        <button onclick="cambiarTabDrop('costos')" id="tab-drop-cost-btn" class="tab-drop-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          ⚙️ Suscripciones & Fijos
-        </button>
+      <!-- Barra de Navegación Pestañas Dinámicas con Soporte Reordenar & 3 Puntos -->
+      <nav id="nav-tabs-drop" class="flex border-b border-slate-800 gap-1.5 text-xs md:text-sm font-medium overflow-x-auto pb-0.5">
+        <div data-tab-id="dashboard" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-sky-500 text-sky-400 font-semibold px-3 py-2.5 transition">
+          <button onclick="cambiarTabDrop('dashboard')" id="tab-drop-dash-btn" class="tab-drop-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">monitoring</span>
+            <span>Dashboard & Métricas</span>
+          </button>
+          <button onclick="abrirModalConfigTab('drop', 'dashboard')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
+        <div data-tab-id="pedidos" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabDrop('pedidos')" id="tab-drop-ped-btn" class="tab-drop-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">inventory_2</span>
+            <span>Pedidos & Dropi</span>
+          </button>
+          <button onclick="abrirModalConfigTab('drop', 'pedidos')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
+        <div data-tab-id="ads" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabDrop('ads')" id="tab-drop-ads-btn" class="tab-drop-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">campaign</span>
+            <span>Meta Ads</span>
+          </button>
+          <button onclick="abrirModalConfigTab('drop', 'ads')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
+        <div data-tab-id="costos" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabDrop('costos')" id="tab-drop-cost-btn" class="tab-drop-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">receipt_long</span>
+            <span>Suscripciones & Fijos</span>
+          </button>
+          <button onclick="abrirModalConfigTab('drop', 'costos')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
       </nav>
 
       <!-- Pestaña Principal de Dashboard de Negocio -->
@@ -183,7 +370,7 @@
                   <h3 class="text-sm font-bold text-white tracking-wide">Saldo Operativo en Tarjeta del Negocio</h3>
                   <span id="badge-tarjeta-negocio-nombre" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/80">Tarjeta Negocio</span>
                 </div>
-                <p class="text-xs text-slate-400 mt-0.5">Alimentado en tiempo real por inyecciones de capital, márgenes de pedidos entregados y pagos de costos.</p>
+                <p id="desc-tarjeta-negocio-widget" title="Haz clic para editar descripción" class="editable-desc text-xs text-slate-400 mt-0.5">Saldo real descontando Meta Ads, costos fijos, fletes de devoluciones y retiros de capital.</p>
               </div>
             </div>
             
@@ -201,29 +388,41 @@
           </div>
 
           <!-- Desglose Contable del Saldo de Negocio -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-slate-400 block">Saldo Disponible Neto</span>
-              <p id="widget-negocio-saldo-disponible" class="text-xl font-extrabold text-indigo-300 font-mono mt-0.5">$0</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-indigo-500/30 shadow-sm">
+              <span class="text-[10px] uppercase font-semibold text-indigo-300 block">Saldo Disponible Neto</span>
+              <p id="widget-negocio-saldo-disponible" class="text-lg md:text-xl font-extrabold text-indigo-200 font-mono mt-0.5">$0</p>
               <span id="widget-negocio-tarjeta-detalle" class="text-[10px] text-slate-500 block truncate">•••• 0000</span>
             </div>
 
             <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-emerald-400 block">Inyecciones Recibidas</span>
-              <p id="widget-negocio-total-inyecciones" class="text-base font-bold text-emerald-400 font-mono mt-0.5">+$0</p>
-              <span class="text-[10px] text-slate-500 block">Desde Inversión / Principal</span>
+              <span class="text-[10px] uppercase font-semibold text-emerald-400 block">Inyecciones Capital</span>
+              <p id="widget-negocio-total-inyecciones" class="text-sm md:text-base font-bold text-emerald-400 font-mono mt-0.5">+$0</p>
+              <span class="text-[10px] text-slate-500 block">Desde Principal/Inv.</span>
             </div>
 
             <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-sky-400 block">Márgenes Pedidos Entregados</span>
-              <p id="widget-negocio-margen-entregados" class="text-base font-bold text-sky-400 font-mono mt-0.5">+$0</p>
-              <span id="widget-negocio-num-entregados" class="text-[10px] text-slate-500 block">0 pedidos entregados</span>
+              <span class="text-[10px] uppercase font-semibold text-sky-400 block">Margen Entregados</span>
+              <p id="widget-negocio-margen-entregados" class="text-sm md:text-base font-bold text-sky-400 font-mono mt-0.5">+$0</p>
+              <span id="widget-negocio-num-entregados" class="text-[10px] text-slate-500 block truncate">0 pedidos</span>
             </div>
 
             <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-amber-400 block">Retiros Realizados</span>
-              <p id="widget-negocio-total-retiros" class="text-base font-bold text-amber-400 font-mono mt-0.5">-$0</p>
-              <span class="text-[10px] text-slate-500 block">Hacia Cuenta Principal</span>
+              <span class="text-[10px] uppercase font-semibold text-purple-400 block">Meta Ads / Pauta</span>
+              <p id="widget-negocio-total-ads" class="text-sm md:text-base font-bold text-purple-300 font-mono mt-0.5">-$0</p>
+              <span class="text-[10px] text-slate-500 block">Gasto publicidad</span>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase font-semibold text-pink-400 block">Costos Fijos / Software</span>
+              <p id="widget-negocio-total-fijos" class="text-sm md:text-base font-bold text-pink-300 font-mono mt-0.5">-$0</p>
+              <span class="text-[10px] text-slate-500 block">Apps & servicios</span>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase font-semibold text-rose-400 block">Fletes Devolución / Retiros</span>
+              <p id="widget-negocio-total-fletes-retiros" class="text-sm md:text-base font-bold text-rose-300 font-mono mt-0.5">-$0</p>
+              <span id="widget-negocio-detalle-fletes-retiros" class="text-[10px] text-slate-500 block truncate">Fletes fallidos + Retiros</span>
             </div>
           </div>
         </div>
@@ -673,22 +872,57 @@
     <!-- ESPACIO 2: HONORARIOS, PERSONAL & PATRIMONIO / INVERSIONES -->
     <!-- ========================================================= -->
     <div id="workspace-personal" class="space-y-5 hidden">
-      <nav class="flex border-b border-slate-800 gap-2 text-xs md:text-sm font-medium">
-        <button onclick="cambiarTabPers('dashboard')" id="tab-pers-dash-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-emerald-500 text-emerald-400 font-semibold transition">
-          📊 Dashboard Financiero Total
-        </button>
-        <button onclick="cambiarTabPers('tarjetas')" id="tab-pers-tarjetas-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
-          <span>💳</span> Tarjetas & Cuentas Bancarias
-        </button>
-        <button onclick="cambiarTabPers('auditoria_cartola')" id="tab-pers-cartola-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
-          <span>🏦</span> Auditoría de Cartola Bancaria
-        </button>
-        <button onclick="cambiarTabPers('ingresos_gastos')" id="tab-pers-ing-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          📄 Boletas & Honorarios SII
-        </button>
-        <button onclick="cambiarTabPers('inversiones')" id="tab-pers-inv-btn" class="tab-pers-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-          🚀 Inversiones & Patrimonio
-        </button>
+      <!-- Barra de Navegación Personal Dinámica con Soporte Reordenar & 3 Puntos -->
+      <nav id="nav-tabs-pers" class="flex border-b border-slate-800 gap-1.5 text-xs md:text-sm font-medium overflow-x-auto pb-0.5">
+        <div data-tab-id="dashboard" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-emerald-500 text-emerald-400 font-semibold px-3 py-2.5 transition">
+          <button onclick="cambiarTabPers('dashboard')" id="tab-pers-dash-btn" class="tab-pers-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">analytics</span>
+            <span>Dashboard Total</span>
+          </button>
+          <button onclick="abrirModalConfigTab('pers', 'dashboard')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
+        <div data-tab-id="tarjetas" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabPers('tarjetas')" id="tab-pers-tarjetas-btn" class="tab-pers-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">credit_card</span>
+            <span>Tarjetas & Cuentas</span>
+          </button>
+          <button onclick="abrirModalConfigTab('pers', 'tarjetas')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
+        <div data-tab-id="auditoria_cartola" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabPers('auditoria_cartola')" id="tab-pers-cartola-btn" class="tab-pers-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">account_balance</span>
+            <span>Auditoría de Cartola</span>
+          </button>
+          <button onclick="abrirModalConfigTab('pers', 'auditoria_cartola')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
+        <div data-tab-id="ingresos_gastos" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabPers('ingresos_gastos')" id="tab-pers-ing-btn" class="tab-pers-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">receipt</span>
+            <span>Boletas & Gastos</span>
+          </button>
+          <button onclick="abrirModalConfigTab('pers', 'ingresos_gastos')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
+        <div data-tab-id="inversiones" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabPers('inversiones')" id="tab-pers-inv-btn" class="tab-pers-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">trending_up</span>
+            <span>Inversiones & Patrimonio</span>
+          </button>
+          <button onclick="abrirModalConfigTab('pers', 'inversiones')" title="Personalizar pestaña" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
       </nav>
 
       <!-- KPIs Personal Consolidados (Desplegable) -->
@@ -852,7 +1086,7 @@
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
                 <span>🔄</span> Historial de Traspasos & Auditoría de Cuentas
               </h3>
-              <p class="text-xs text-slate-400 mt-0.5">Registro de inyecciones de capital, retiros de ganancias y aportes entre tarjetas.</p>
+              <p id="desc-traspasos-modulo" title="Haz clic para editar descripción" class="editable-desc text-xs text-slate-400 mt-0.5">Registro de inyecciones de capital, retiros de ganancias y aportes entre tarjetas.</p>
             </div>
 
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
@@ -1764,43 +1998,243 @@
     </div>
   </div>
 
-  <!-- MODAL CONFIGURACIÓN -->
-  <div id="modal-config" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h2 class="text-base font-bold text-white flex items-center gap-2"><span>⚙️</span> Configuración</h2>
-        <button onclick="cerrarModalConfig()" class="text-slate-400 hover:text-white text-lg">✕</button>
+  <!-- MODAL CONFIGURACIÓN & PERSONALIZACIÓN ULTRA-AVANZADA -->
+  <div id="modal-config" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-5 my-auto shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3.5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
+            <span class="sym sym-sm">tune</span>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white tracking-tight">Personalización & Configuración</h2>
+            <p class="text-[11px] text-slate-400">Temas visuales, tipografía, paleta de colores y módulos</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalConfig()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer">
+          <span class="sym sym-sm">close</span>
+        </button>
       </div>
-      <form id="form-config" class="space-y-3 text-xs">
-        <div class="space-y-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
-          <label class="text-slate-300 font-semibold block">Logo de la Empresa (Cargar desde tu PC)</label>
-          <input type="file" id="cfg-logo-file" accept="image/*" class="w-full text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white cursor-pointer" onchange="cargarLogoLocal(event)">
+
+      <!-- Pestañas internas del Modal de Configuración -->
+      <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+        <button type="button" id="tab-cfg-btn-apariencia" onclick="cambiarSeccionConfig('apariencia')" class="flex-1 py-1.5 rounded-lg bg-sky-600 text-white transition">
+          🎨 Estilo & Tema
+        </button>
+        <button type="button" id="tab-cfg-btn-pestanas" onclick="cambiarSeccionConfig('pestanas')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+          📑 Pestañas & Módulos
+        </button>
+        <button type="button" id="tab-cfg-btn-general" onclick="cambiarSeccionConfig('general')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+          ⚙️ Parámetros
+        </button>
+      </div>
+
+      <!-- SECCIÓN 1: APARIENCIA, TEMA, TIPOGRAFÍA & COLORES -->
+      <div id="seccion-cfg-apariencia" class="space-y-4 text-xs">
+        <!-- Temas Predefinidos -->
+        <div class="space-y-2">
+          <label class="text-slate-300 font-semibold flex items-center gap-1.5">
+            <span class="sym sym-sm text-sky-400">palette</span>
+            <span>Tema Ejecutivo</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button type="button" onclick="seleccionarTemaRapido('slate-dark')" class="btn-tema-preset p-2.5 rounded-xl border border-slate-700 bg-slate-950 text-left hover:border-sky-500 transition cursor-pointer flex flex-col gap-1">
+              <span class="font-bold text-white">Carbón Dark</span>
+              <span class="text-[10px] text-slate-400">Base Slate Clásica</span>
+            </button>
+            <button type="button" onclick="seleccionarTemaRapido('luxe-black')" class="btn-tema-preset p-2.5 rounded-xl border border-slate-800 bg-black text-left hover:border-sky-500 transition cursor-pointer flex flex-col gap-1">
+              <span class="font-bold text-slate-100">Dark Luxe</span>
+              <span class="text-[10px] text-slate-500">Negro Profundo OLED</span>
+            </button>
+            <button type="button" onclick="seleccionarTemaRapido('deep-navy')" class="btn-tema-preset p-2.5 rounded-xl border border-slate-800 bg-[#091428] text-left hover:border-sky-500 transition cursor-pointer flex flex-col gap-1">
+              <span class="font-bold text-sky-200">Deep Navy</span>
+              <span class="text-[10px] text-sky-400/70">Azul Noche Premium</span>
+            </button>
+            <button type="button" onclick="seleccionarTemaRapido('emerald-corp')" class="btn-tema-preset p-2.5 rounded-xl border border-slate-800 bg-[#071913] text-left hover:border-emerald-500 transition cursor-pointer flex flex-col gap-1">
+              <span class="font-bold text-emerald-200">Emerald Luxe</span>
+              <span class="text-[10px] text-emerald-400/70">Verde Financiero</span>
+            </button>
+          </div>
         </div>
-        <div class="grid grid-cols-2 gap-2">
+
+        <!-- Selector de Tipografía Web Moderna -->
+        <div class="space-y-2 bg-slate-950 p-3 rounded-2xl border border-slate-800">
+          <label class="text-slate-300 font-semibold flex items-center gap-1.5">
+            <span class="sym sym-sm text-indigo-400">font_download</span>
+            <span>Fuente Tipográfica del Sistema</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button type="button" onclick="seleccionarFuenteApp('Plus Jakarta Sans')" class="btn-font-preset p-2 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 hover:border-sky-500 transition font-sans text-xs">
+              Plus Jakarta Sans
+            </button>
+            <button type="button" onclick="seleccionarFuenteApp('Inter')" class="btn-font-preset p-2 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 hover:border-sky-500 transition font-sans text-xs">
+              Inter
+            </button>
+            <button type="button" onclick="seleccionarFuenteApp('Outfit')" class="btn-font-preset p-2 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 hover:border-sky-500 transition font-sans text-xs">
+              Outfit
+            </button>
+            <button type="button" onclick="seleccionarFuenteApp('DM Sans')" class="btn-font-preset p-2 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 hover:border-sky-500 transition font-sans text-xs">
+              DM Sans
+            </button>
+          </div>
+        </div>
+
+        <!-- Paleta de Color de Acento e Iconos Personalizables -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950 p-3.5 rounded-2xl border border-slate-800">
           <div>
-            <label class="text-slate-300 font-semibold">Workspace 1</label>
-            <input type="text" id="cfg-ws-drop" value="Negocio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <label class="text-slate-300 font-semibold block mb-1.5 flex items-center gap-1">
+              <span>Color de Acento & Botones</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="color" id="cfg-color-acento" value="#0ea5e9" class="w-8 h-8 rounded-lg border-0 bg-transparent cursor-pointer" onchange="actualizarColorAcento(this.value)">
+              <span id="cfg-color-acento-hex" class="font-mono text-slate-400 text-xs">#0ea5e9</span>
+            </div>
           </div>
           <div>
-            <label class="text-slate-300 font-semibold">Workspace 2</label>
-            <input type="text" id="cfg-ws-pers" value="Finanzas Personales" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <label class="text-slate-300 font-semibold block mb-1.5 flex items-center gap-1">
+              <span>Color de Iconos Google Symbols</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="color" id="cfg-color-iconos" value="#38bdf8" class="w-8 h-8 rounded-lg border-0 bg-transparent cursor-pointer" onchange="actualizarColorIconos(this.value)">
+              <span id="cfg-color-iconos-hex" class="font-mono text-slate-400 text-xs">#38bdf8</span>
+            </div>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-2">
+      </div>
+
+      <!-- SECCIÓN 2: ORDEN DE PESTAÑAS Y ACTIVACIÓN DE MÓDULOS -->
+      <div id="seccion-cfg-pestanas" class="space-y-4 text-xs hidden">
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
+          <span class="text-slate-300 font-semibold block">Reordenar o Desactivar Pestañas del Negocio</span>
+          <div id="lista-pestanas-drop-config" class="space-y-1.5">
+            <!-- Items generados dinámicamente con toggles -->
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
+          <span class="text-slate-300 font-semibold block">Reordenar o Desactivar Pestañas Personales</span>
+          <div id="lista-pestanas-pers-config" class="space-y-1.5">
+            <!-- Items generados dinámicamente con toggles -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: PARÁMETROS GENERALES, FAVICON & TEXTOS -->
+      <form id="form-config" class="space-y-3.5 text-xs hidden">
+        <!-- Logo & Favicon -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950 p-3 rounded-2xl border border-slate-800">
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-300 font-semibold block">Logo de la Empresa</label>
+              <span id="cfg-logo-status" class="text-[10px] text-sky-400">Activo</span>
+            </div>
+            <input type="file" id="cfg-logo-file" accept="image/*" class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-sky-600 file:text-white cursor-pointer" onchange="cargarLogoLocal(event)">
+          </div>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-300 font-semibold block">Favicon (Pestaña Navegador)</label>
+              <span id="cfg-favicon-status" class="text-[10px] text-emerald-400">Activo</span>
+            </div>
+            <input type="file" id="cfg-favicon-file" accept="image/*" class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer" onchange="cargarFaviconLocal(event)">
+          </div>
+        </div>
+
+        <!-- Títulos y Descripciones Editables -->
+        <div class="space-y-2.5 bg-slate-950 p-3 rounded-2xl border border-slate-800">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+              <span class="sym sym-sm text-sky-400">edit_note</span>
+              <span>Títulos y Descripciones del Sistema</span>
+            </span>
+            <span class="text-[10px] text-slate-500">Editables aquí o haciendo clic en el texto</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-slate-400 text-[11px] block">Nombre Workspace Negocio</label>
+              <input type="text" id="cfg-ws-drop" value="Negocio" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1 focus:border-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="text-slate-400 text-[11px] block">Subtítulo / Bajada Negocio</label>
+              <input type="text" id="cfg-sub-drop" value="Unit Economics, Dropi, Meta Ads y Utilidad Real" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1 focus:border-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="text-slate-400 text-[11px] block">Nombre Workspace Personal</label>
+              <input type="text" id="cfg-ws-pers" value="Finanzas Personales" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1 focus:border-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="text-slate-400 text-[11px] block">Subtítulo / Bajada Personal</label>
+              <input type="text" id="cfg-sub-pers" value="Boletas de Honorarios, Gastos Personales e Inversiones" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1 focus:border-sky-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <div>
+              <label class="text-slate-400 text-[11px] block">Descripción Módulo Saldo Tarjeta</label>
+              <input type="text" id="cfg-desc-tarjeta-negocio" value="Saldo real descontando Meta Ads, costos fijos, fletes de devoluciones y retiros de capital." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1 focus:border-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="text-slate-400 text-[11px] block">Descripción Módulo Traspasos</label>
+              <input type="text" id="cfg-desc-traspasos" value="Registro de inyecciones de capital, retiros de ganancias y aportes entre tarjetas." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1 focus:border-sky-500 focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Parámetros Financieros -->
+        <div class="grid grid-cols-2 gap-2.5 bg-slate-950 p-3 rounded-2xl border border-slate-800">
           <div>
             <label class="text-slate-300 font-semibold">Retención SII Defecto (%)</label>
-            <input type="number" step="0.01" id="cfg-ret-sii" value="15.25" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <input type="number" step="0.01" id="cfg-ret-sii" value="15.25" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1">
           </div>
           <div>
             <label class="text-slate-300 font-semibold">Rendimiento Inv. Anual (%)</label>
-            <input type="number" step="0.1" id="cfg-tasa-inv" value="8.0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-100 mt-1">
+            <input type="number" step="0.1" id="cfg-tasa-inv" value="8.0" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-slate-100 mt-1">
           </div>
         </div>
-        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
-          <button type="button" onclick="cerrarModalConfig()" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl transition">Guardar</button>
+
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="submit" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl transition cursor-pointer shadow-lg shadow-sky-600/20 flex items-center justify-center gap-1.5">
+            <span class="sym sym-sm">save</span>
+            <span>Guardar Parámetros & Textos</span>
+          </button>
         </div>
       </form>
+
+      <div class="flex justify-between items-center pt-3 border-t border-slate-800 text-xs">
+        <button type="button" onclick="restablecerTemaDefecto()" class="text-slate-400 hover:text-rose-400 transition cursor-pointer">
+          Restablecer Valores
+        </button>
+        <button type="button" onclick="cerrarModalConfig()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl transition cursor-pointer">
+          Listo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PERSONALIZACIÓN ESPECÍFICA DE PESTAÑA / MÓDULOS (Triggered por 3-dots) -->
+  <div id="modal-config-tab" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="sym sym-sm text-sky-400">dashboard_customize</span>
+          <h3 id="modal-tab-cfg-titulo" class="text-sm font-bold text-white">Módulos de la Pestaña</h3>
+        </div>
+        <button onclick="cerrarModalConfigTab()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+          <span class="sym sym-sm">close</span>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400">Activa o desactiva secciones dentro de esta pestaña para reducir la saturación de datos y dejar solo lo esencial:</p>
+
+      <div id="modal-tab-modulos-lista" class="space-y-2 text-xs">
+        <!-- Renderizado dinámico de módulos con toggle switches -->
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-800">
+        <button onclick="guardarYcerrarModalConfigTab()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl text-xs transition cursor-pointer">
+          Aplicar Cambios
+        </button>
+      </div>
     </div>
   </div>
 
@@ -2439,23 +2873,510 @@
     }
 
     // ==========================================
-    // CONFIGURACIÓN & LOGO LOCAL
+    // SISTEMA DE TEMAS, FUENTES & PRIVACIDAD
+    // ==========================================
+    let modoPrivacidadActivo = localStorage.getItem('cfg_modo_privacidad') === 'true';
+
+    function toggleModoPrivacidad() {
+      modoPrivacidadActivo = !modoPrivacidadActivo;
+      localStorage.setItem('cfg_modo_privacidad', modoPrivacidadActivo);
+      aplicarModoPrivacidad();
+      mostrarToast(modoPrivacidadActivo ? 'Modo Privacidad activado (Cifras ocultas)' : 'Modo Privacidad desactivado', 'info');
+    }
+
+    function aplicarModoPrivacidad() {
+      const cuerpo = document.body;
+      const icono = document.getElementById('icono-privacidad');
+      const btn = document.getElementById('btn-toggle-privacidad');
+
+      // Buscar todos los elementos con cifras numéricas o KPIs
+      const selectors = [
+        '[id^="kpi-"]',
+        '.kpi-valor',
+        '.monto-cifra',
+        '#tabla-ventas td:nth-child(6)',
+        '#tabla-ventas td:nth-child(7)',
+        '#tabla-ventas td:nth-child(8)',
+        '#tabla-honorarios td:nth-child(4)',
+        '#tabla-honorarios td:nth-child(5)',
+        '#tabla-honorarios td:nth-child(6)',
+        '#tabla-gastos td:nth-child(4)',
+        '#tabla-inversiones td:nth-child(4)',
+        '#tabla-inversiones td:nth-child(5)',
+        '#tabla-inversiones td:nth-child(6)',
+        '#tabla-ads td:nth-child(3)',
+        '#tabla-costos td:nth-child(3)',
+        '#tabla-costos td:nth-child(4)',
+        '.tarjeta-saldo-valor'
+      ];
+
+      document.querySelectorAll(selectors.join(', ')).forEach(el => {
+        if (modoPrivacidadActivo) {
+          el.classList.add('privacy-blur');
+        } else {
+          el.classList.remove('privacy-blur');
+        }
+      });
+
+      if (modoPrivacidadActivo) {
+        cuerpo.classList.add('privacy-mode');
+        if (icono) icono.textContent = 'visibility_off';
+        if (btn) {
+          btn.classList.add('bg-indigo-900/60', 'text-indigo-300', 'border-indigo-500/60');
+          btn.classList.remove('bg-slate-800/90', 'text-slate-300');
+        }
+      } else {
+        cuerpo.classList.remove('privacy-mode');
+        if (icono) icono.textContent = 'visibility';
+        if (btn) {
+          btn.classList.remove('bg-indigo-900/60', 'text-indigo-300', 'border-indigo-500/60');
+          btn.classList.add('bg-slate-800/90', 'text-slate-300');
+        }
+      }
+    }
+
+    const TEMAS_DISPONIBLES = {
+      'slate-dark': {
+        nombre: 'Carbón Dark',
+        bgBody: '#020617', // slate-950
+        cardBg: '#0f172a',
+        cardBorder: 'rgba(255,255,255,0.08)',
+        accent: '#0ea5e9',
+        icons: '#38bdf8'
+      },
+      'luxe-black': {
+        nombre: 'Dark Luxe',
+        bgBody: '#000000',
+        cardBg: '#09090b',
+        cardBorder: 'rgba(255,255,255,0.12)',
+        accent: '#f8fafc',
+        icons: '#e2e8f0'
+      },
+      'deep-navy': {
+        nombre: 'Deep Navy',
+        bgBody: '#050c1a',
+        cardBg: '#0b192e',
+        cardBorder: 'rgba(56, 189, 248, 0.15)',
+        accent: '#38bdf8',
+        icons: '#7dd3fc'
+      },
+      'emerald-corp': {
+        nombre: 'Emerald Luxe',
+        bgBody: '#03120e',
+        cardBg: '#07241c',
+        cardBorder: 'rgba(16, 185, 129, 0.2)',
+        accent: '#10b981',
+        icons: '#34d399'
+      }
+    };
+
+    function seleccionarTemaRapido(temaId) {
+      const tema = TEMAS_DISPONIBLES[temaId];
+      if (!tema) return;
+      localStorage.setItem('cfg_tema_id', temaId);
+      localStorage.setItem('cfg_color_acento', tema.accent);
+      localStorage.setItem('cfg_color_iconos', tema.icons);
+      
+      const acentoInput = document.getElementById('cfg-color-acento');
+      const iconosInput = document.getElementById('cfg-color-iconos');
+      if (acentoInput) acentoInput.value = tema.accent;
+      if (iconosInput) iconosInput.value = tema.icons;
+
+      aplicarEstiloVisual();
+      mostrarToast(`Tema "${tema.nombre}" aplicado`, 'success');
+    }
+
+    function seleccionarFuenteApp(fuenteNombre) {
+      localStorage.setItem('cfg_fuente_app', fuenteNombre);
+      document.documentElement.style.setProperty('--app-font-sans', `"${fuenteNombre}", sans-serif`);
+      document.body.style.fontFamily = `"${fuenteNombre}", sans-serif`;
+      mostrarToast(`Tipografía cambiada a ${fuenteNombre}`, 'info');
+    }
+
+    function actualizarColorAcento(color) {
+      localStorage.setItem('cfg_color_acento', color);
+      document.documentElement.style.setProperty('--accent-primary', color);
+      const hexSpan = document.getElementById('cfg-color-acento-hex');
+      if (hexSpan) hexSpan.textContent = color;
+    }
+
+    function actualizarColorIconos(color) {
+      localStorage.setItem('cfg_color_iconos', color);
+      document.documentElement.style.setProperty('--icon-color', color);
+      const hexSpan = document.getElementById('cfg-color-iconos-hex');
+      if (hexSpan) hexSpan.textContent = color;
+    }
+
+    function restablecerTemaDefecto() {
+      localStorage.removeItem('cfg_tema_id');
+      localStorage.removeItem('cfg_fuente_app');
+      localStorage.removeItem('cfg_color_acento');
+      localStorage.removeItem('cfg_color_iconos');
+      localStorage.removeItem('cfg_tabs_drop_order');
+      localStorage.removeItem('cfg_tabs_pers_order');
+      localStorage.removeItem('cfg_tab_modulos_ocultos');
+      aplicarEstiloVisual();
+      renderizarListasPestanasEnConfig();
+      mostrarToast('Estilo visual y pestañas restablecidas', 'info');
+    }
+
+    function aplicarEstiloVisual() {
+      const temaId = localStorage.getItem('cfg_tema_id') || 'slate-dark';
+      const tema = TEMAS_DISPONIBLES[temaId] || TEMAS_DISPONIBLES['slate-dark'];
+      const fuente = localStorage.getItem('cfg_fuente_app') || 'Plus Jakarta Sans';
+      const acento = localStorage.getItem('cfg_color_acento') || tema.accent;
+      const iconos = localStorage.getItem('cfg_color_iconos') || tema.icons;
+
+      document.body.style.backgroundColor = tema.bgBody;
+      document.documentElement.style.setProperty('--app-font-sans', `"${fuente}", sans-serif`);
+      document.documentElement.style.setProperty('--accent-primary', acento);
+      document.documentElement.style.setProperty('--icon-color', iconos);
+      document.body.style.fontFamily = `"${fuente}", sans-serif`;
+
+      const acentoInput = document.getElementById('cfg-color-acento');
+      const iconosInput = document.getElementById('cfg-color-iconos');
+      const hexAcento = document.getElementById('cfg-color-acento-hex');
+      const hexIconos = document.getElementById('cfg-color-iconos-hex');
+
+      if (acentoInput) acentoInput.value = acento;
+      if (iconosInput) iconosInput.value = iconos;
+      if (hexAcento) hexAcento.textContent = acento;
+      if (hexIconos) hexIconos.textContent = iconos;
+
+      aplicarModoPrivacidad();
+    }
+
+    // ==========================================
+    // PERSONALIZACIÓN DE MÓDULOS POR PESTAÑA (3-DOTS)
+    // ==========================================
+    let tabConfigActual = { ws: 'drop', tab: 'dashboard' };
+
+    const MODULOS_POR_TAB = {
+      'drop-dashboard': [
+        { id: 'mod-drop-kpis-top', nombre: 'Barra de KPIs Principales (Ventas, AOV, Dropi, Ads, Utilidad)', selector: '#tab-drop-dashboard > div.grid' },
+        { id: 'mod-drop-tarjeta-negocio', nombre: 'Widget Tarjeta Bancaria & Flujo del Negocio', selector: '#tab-drop-dashboard > div.bg-slate-900\\/80' },
+        { id: 'mod-drop-graficos', nombre: 'Gráficos de Evolución y Distribución', selector: '#tab-drop-dashboard > div.grid.grid-cols-1.lg\\:grid-cols-3' },
+        { id: 'mod-drop-resumen-pedidos', nombre: 'Resumen Operativo de Pedidos por Estado', selector: '#tab-drop-dashboard > div.bg-slate-900.p-4' }
+      ],
+      'drop-pedidos': [
+        { id: 'mod-drop-ped-header', nombre: 'Botones de Acción Rápida (Importar CSV, Eliminar Marcados)', selector: '#tab-drop-pedidos > div.flex.flex-col' },
+        { id: 'mod-drop-ped-dropzone', nombre: 'Zona Drag & Drop para Carga Directa de Planillas', selector: '#dropzone-pedidos-tab' },
+        { id: 'mod-drop-ped-form', nombre: 'Formulario de Registro Manual Unitario', selector: '#contenedor-form-pedido-manual' },
+        { id: 'mod-drop-ped-tabla', nombre: 'Listado y Filtros de Pedidos', selector: '#tab-drop-pedidos > div.bg-slate-900.rounded-2xl' }
+      ],
+      'drop-ads': [
+        { id: 'mod-drop-ads-form', nombre: 'Formulario de Registro de Gasto Diario', selector: '#tab-drop-ads > div:first-child' },
+        { id: 'mod-drop-ads-tabla', nombre: 'Tabla de Historial de Publicidad', selector: '#tab-drop-ads > div:last-child' }
+      ],
+      'drop-costos': [
+        { id: 'mod-drop-cost-form', nombre: 'Formulario de Configurar Suscripción', selector: '#tab-drop-costos > div:first-child' },
+        { id: 'mod-drop-cost-tabla', nombre: 'Tabla de Suscripciones Activas', selector: '#tab-drop-costos > div:last-child' }
+      ],
+      'pers-dashboard': [
+        { id: 'mod-pers-kpis-top', nombre: 'Resumen Financiero Personal (Ganado, Gastado, Invertido, Neto)', selector: '#contenedor-kpis-personal' },
+        { id: 'mod-pers-graficos', nombre: 'Gráficos de Flujo y Gastos por Categoría', selector: '#tab-pers-dashboard > div.grid.grid-cols-1.lg\\:grid-cols-3' }
+      ],
+      'pers-tarjetas': [
+        { id: 'mod-pers-tarj-kpis', nombre: 'KPIs de Liquidez & Saldos Totales', selector: '#contenedor-kpis-tarjetas' },
+        { id: 'mod-pers-tarj-grid', nombre: 'Listado y Visualización de Tarjetas Bancarias', selector: '#grid-tarjetas-cuentas' },
+        { id: 'mod-pers-tarj-traspasos', nombre: 'Historial de Traspasos & Movimientos Entre Cuentas', selector: '#tab-pers-tarjetas > div:last-child' }
+      ],
+      'pers-auditoria_cartola': [
+        { id: 'mod-pers-cart-uploader', nombre: 'Zona de Carga de Cartola PDF/Excel', selector: '#tab-pers-auditoria_cartola > div.bg-slate-900\\/90' },
+        { id: 'mod-pers-cart-tabla', nombre: 'Planilla Consolidada de Movimientos', selector: '#tab-pers-auditoria_cartola > div.bg-slate-900.rounded-2xl' }
+      ],
+      'pers-ingresos_gastos': [
+        { id: 'mod-pers-ing-form', nombre: 'Formulario de Registro Boletas SII / Ingreso Extra', selector: '#contenedor-form-honorarios' },
+        { id: 'mod-pers-ing-tabla', nombre: 'Historial de Boletas & Gastos', selector: '#tab-pers-ingresos_gastos > div.grid' }
+      ],
+      'pers-inversiones': [
+        { id: 'mod-pers-inv-form', nombre: 'Formulario de Registro Inversión / Aporte', selector: '#contenedor-form-inversion' },
+        { id: 'mod-pers-inv-grafico', nombre: 'Gráfico de Proyección de Crecimiento Compuesto', selector: '#tab-pers-inversiones > div.grid' }
+      ]
+    };
+
+    function abrirModalConfigTab(ws, tab) {
+      tabConfigActual = { ws, tab };
+      const clave = `${ws}-${tab}`;
+      const modulos = MODULOS_POR_TAB[clave] || [];
+      const tit = document.getElementById('modal-tab-cfg-titulo');
+      const lista = document.getElementById('modal-tab-modulos-lista');
+      const modal = document.getElementById('modal-config-tab');
+
+      if (tit) tit.textContent = `Personalizar Pestaña: ${tab.toUpperCase()}`;
+      if (lista) {
+        lista.innerHTML = '';
+        if (modulos.length === 0) {
+          lista.innerHTML = '<p class="text-slate-500 text-xs py-2">Esta pestaña no tiene submódulos configurables.</p>';
+        } else {
+          const ocultos = JSON.parse(localStorage.getItem('cfg_tab_modulos_ocultos') || '{}');
+          modulos.forEach(mod => {
+            const estaOculto = ocultos[mod.id] === true;
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between p-2.5 bg-slate-950 rounded-xl border border-slate-800';
+            div.innerHTML = `
+              <span class="text-slate-200 text-xs font-medium pr-3">${mod.nombre}</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" data-mod-id="${mod.id}" ${estaOculto ? '' : 'checked'} class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-600"></div>
+              </label>
+            `;
+            lista.appendChild(div);
+          });
+        }
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function cerrarModalConfigTab() {
+      const m = document.getElementById('modal-config-tab');
+      if (m) m.classList.add('hidden');
+    }
+
+    function guardarYcerrarModalConfigTab() {
+      const lista = document.getElementById('modal-tab-modulos-lista');
+      if (!lista) return;
+
+      const ocultos = JSON.parse(localStorage.getItem('cfg_tab_modulos_ocultos') || '{}');
+      lista.querySelectorAll('input[type="checkbox"]').forEach(input => {
+        const modId = input.dataset.modId;
+        if (modId) {
+          if (!input.checked) {
+            ocultos[modId] = true;
+          } else {
+            delete ocultos[modId];
+          }
+        }
+      });
+
+      localStorage.setItem('cfg_tab_modulos_ocultos', JSON.stringify(ocultos));
+      aplicarVisibilidadModulos();
+      cerrarModalConfigTab();
+      mostrarToast('Módulos actualizados para esta vista', 'success');
+    }
+
+    function aplicarVisibilidadModulos() {
+      const ocultos = JSON.parse(localStorage.getItem('cfg_tab_modulos_ocultos') || '{}');
+      Object.values(MODULOS_POR_TAB).flat().forEach(mod => {
+        const el = document.querySelector(mod.selector);
+        if (el) {
+          if (ocultos[mod.id] === true) {
+            el.classList.add('hidden');
+          } else {
+            // No quitar hidden si es un formulario plegable por defecto
+            if (mod.id !== 'mod-drop-ped-form' || el.classList.contains('desplegado-manual')) {
+              el.classList.remove('hidden');
+            }
+          }
+        }
+      });
+    }
+
+    // ==========================================
+    // REORDENAMIENTO DE PESTAÑAS (DRAG & DROP)
+    // ==========================================
+    function setupDragAndDrop() {
+      ['nav-tabs-drop', 'nav-tabs-pers'].forEach(navId => {
+        const nav = document.getElementById(navId);
+        if (!nav) return;
+
+        let dragItem = null;
+
+        nav.querySelectorAll('.nav-tab-item').forEach(item => {
+          item.addEventListener('dragstart', (e) => {
+            dragItem = item;
+            item.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+          });
+
+          item.addEventListener('dragend', () => {
+            item.classList.remove('dragging');
+            nav.querySelectorAll('.nav-tab-item').forEach(i => i.classList.remove('drag-over'));
+            guardarOrdenPestanas(navId);
+          });
+
+          item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            item.classList.add('drag-over');
+          });
+
+          item.addEventListener('dragleave', () => {
+            item.classList.remove('drag-over');
+          });
+
+          item.addEventListener('drop', (e) => {
+            e.preventDefault();
+            item.classList.remove('drag-over');
+            if (dragItem && dragItem !== item) {
+              const rect = item.getBoundingClientRect();
+              const mid = rect.left + rect.width / 2;
+              if (e.clientX < mid) {
+                nav.insertBefore(dragItem, item);
+              } else {
+                nav.insertBefore(dragItem, item.nextSibling);
+              }
+            }
+          });
+        });
+      });
+
+      aplicarOrdenPestanasGuardado();
+    }
+
+    function guardarOrdenPestanas(navId) {
+      const nav = document.getElementById(navId);
+      if (!nav) return;
+      const orden = Array.from(nav.querySelectorAll('.nav-tab-item')).map(el => el.dataset.tabId);
+      const clave = navId === 'nav-tabs-drop' ? 'cfg_tabs_drop_order' : 'cfg_tabs_pers_order';
+      localStorage.setItem(clave, JSON.stringify(orden));
+      mostrarToast('Nuevo orden de pestañas guardado', 'info');
+    }
+
+    function aplicarOrdenPestanasGuardado() {
+      ['nav-tabs-drop', 'nav-tabs-pers'].forEach(navId => {
+        const nav = document.getElementById(navId);
+        if (!nav) return;
+        const clave = navId === 'nav-tabs-drop' ? 'cfg_tabs_drop_order' : 'cfg_tabs_pers_order';
+        const ordenGuardado = JSON.parse(localStorage.getItem(clave) || '[]');
+        if (ordenGuardado && ordenGuardado.length > 0) {
+          ordenGuardado.forEach(tabId => {
+            const item = nav.querySelector(`.nav-tab-item[data-tab-id="${tabId}"]`);
+            if (item) nav.appendChild(item);
+          });
+        }
+      });
+    }
+
+    function cambiarSeccionConfig(seccion) {
+      const secApa = document.getElementById('seccion-cfg-apariencia');
+      const secPes = document.getElementById('seccion-cfg-pestanas');
+      const secGen = document.getElementById('form-config');
+
+      const btnApa = document.getElementById('tab-cfg-btn-apariencia');
+      const btnPes = document.getElementById('tab-cfg-btn-pestanas');
+      const btnGen = document.getElementById('tab-cfg-btn-general');
+
+      [secApa, secPes, secGen].forEach(s => s?.classList.add('hidden'));
+      [btnApa, btnPes, btnGen].forEach(b => {
+        b?.classList.remove('bg-sky-600', 'text-white');
+        b?.classList.add('text-slate-400');
+      });
+
+      if (seccion === 'apariencia') {
+        secApa?.classList.remove('hidden');
+        btnApa?.classList.add('bg-sky-600', 'text-white');
+      } else if (seccion === 'pestanas') {
+        secPes?.classList.remove('hidden');
+        btnPes?.classList.add('bg-sky-600', 'text-white');
+        renderizarListasPestanasEnConfig();
+      } else {
+        secGen?.classList.remove('hidden');
+        btnGen?.classList.add('bg-sky-600', 'text-white');
+      }
+    }
+
+    function renderizarListasPestanasEnConfig() {
+      const contDrop = document.getElementById('lista-pestanas-drop-config');
+      const contPers = document.getElementById('lista-pestanas-pers-config');
+
+      if (contDrop) {
+        contDrop.innerHTML = '';
+        const navDrop = document.getElementById('nav-tabs-drop');
+        navDrop?.querySelectorAll('.nav-tab-item').forEach(item => {
+          const tabId = item.dataset.tabId;
+          const texto = item.querySelector('button:first-child span:last-child')?.textContent || tabId;
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between p-2 bg-slate-900 rounded-xl border border-slate-800';
+          div.innerHTML = `
+            <span class="text-slate-200 text-xs font-semibold">${texto}</span>
+            <span class="text-[10px] text-slate-400 font-mono">Arrastra en la barra superior para reordenar</span>
+          `;
+          contDrop.appendChild(div);
+        });
+      }
+
+      if (contPers) {
+        contPers.innerHTML = '';
+        const navPers = document.getElementById('nav-tabs-pers');
+        navPers?.querySelectorAll('.nav-tab-item').forEach(item => {
+          const tabId = item.dataset.tabId;
+          const texto = item.querySelector('button:first-child span:last-child')?.textContent || tabId;
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between p-2 bg-slate-900 rounded-xl border border-slate-800';
+          div.innerHTML = `
+            <span class="text-slate-200 text-xs font-semibold">${texto}</span>
+            <span class="text-[10px] text-slate-400 font-mono">Arrastra en la barra superior para reordenar</span>
+          `;
+          contPers.appendChild(div);
+        });
+      }
+    }
+
+    // ==========================================
+    // CONFIGURACIÓN, LOGO, FAVICON & TEXTOS
     // ==========================================
     function aplicarConfiguraciones() {
       const cfgLogo = localStorage.getItem('cfg_logo_local') || 'https://drive.google.com/thumbnail?id=16-c8KgqNAyeCX6p9hX6Vzfse_efTXJVx&sz=w200';
+      const cfgFavicon = localStorage.getItem('cfg_favicon_local') || cfgLogo;
       const cfgWsDrop = localStorage.getItem('cfg_ws_drop') || 'Negocio';
       const cfgWsPers = localStorage.getItem('cfg_ws_pers') || 'Finanzas Personales';
+      const cfgSubDrop = localStorage.getItem('cfg_sub_drop') || 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
+      const cfgSubPers = localStorage.getItem('cfg_sub_pers') || 'Boletas de Honorarios, Gastos Personales e Inversiones';
+      const cfgDescTarjetaNegocio = localStorage.getItem('cfg_desc_tarjeta_negocio') || 'Saldo real descontando Meta Ads, costos fijos, fletes de devoluciones y retiros de capital.';
+      const cfgDescTraspasos = localStorage.getItem('cfg_desc_traspasos') || 'Registro de inyecciones de capital, retiros de ganancias y aportes entre tarjetas.';
       const cfgRetSii = localStorage.getItem('cfg_ret_sii') || '15.25';
       const cfgTasaInv = localStorage.getItem('cfg_tasa_inv') || '8.0';
 
+      // Logo & Favicon
       const logoImg = document.getElementById('app-logo-img');
       if (logoImg) logoImg.src = cfgLogo;
+      actualizarFaviconEnDOM(cfgFavicon);
 
+      // Labels Workspace
       const lblWsDrop = document.getElementById('label-ws-drop');
       if (lblWsDrop) lblWsDrop.textContent = cfgWsDrop;
 
       const lblWsPers = document.getElementById('label-ws-pers');
       if (lblWsPers) lblWsPers.textContent = cfgWsPers;
+
+      // Header dinámico según workspace activo
+      const tit = document.getElementById('header-titulo-principal');
+      const sub = document.getElementById('header-subtitulo-principal');
+      if (workspaceActivo === 'dropshipping') {
+        if (tit) tit.textContent = cfgWsDrop;
+        if (sub) sub.textContent = cfgSubDrop;
+      } else {
+        if (tit) tit.textContent = cfgWsPers;
+        if (sub) sub.textContent = cfgSubPers;
+      }
+
+      // Descripciones de Módulos
+      const descTarjetaWidget = document.getElementById('desc-tarjeta-negocio-widget');
+      if (descTarjetaWidget) descTarjetaWidget.textContent = cfgDescTarjetaNegocio;
+
+      const descTraspasosMod = document.getElementById('desc-traspasos-modulo');
+      if (descTraspasosMod) descTraspasosMod.textContent = cfgDescTraspasos;
+
+      // Inputs de parámetros en Modal Config
+      const cfgWsDropInput = document.getElementById('cfg-ws-drop');
+      if (cfgWsDropInput) cfgWsDropInput.value = cfgWsDrop;
+
+      const cfgWsPersInput = document.getElementById('cfg-ws-pers');
+      if (cfgWsPersInput) cfgWsPersInput.value = cfgWsPers;
+
+      const cfgSubDropInput = document.getElementById('cfg-sub-drop');
+      if (cfgSubDropInput) cfgSubDropInput.value = cfgSubDrop;
+
+      const cfgSubPersInput = document.getElementById('cfg-sub-pers');
+      if (cfgSubPersInput) cfgSubPersInput.value = cfgSubPers;
+
+      const cfgDescTarjetaInput = document.getElementById('cfg-desc-tarjeta-negocio');
+      if (cfgDescTarjetaInput) cfgDescTarjetaInput.value = cfgDescTarjetaNegocio;
+
+      const cfgDescTraspasosInput = document.getElementById('cfg-desc-traspasos');
+      if (cfgDescTraspasosInput) cfgDescTraspasosInput.value = cfgDescTraspasos;
 
       const hRetTasa = document.getElementById('h-ret-tasa');
       if (hRetTasa) hRetTasa.value = cfgRetSii;
@@ -2463,17 +3384,31 @@
       const invTasa = document.getElementById('inv-tasa');
       if (invTasa) invTasa.value = cfgTasaInv;
 
-      const cfgWsDropInput = document.getElementById('cfg-ws-drop');
-      if (cfgWsDropInput) cfgWsDropInput.value = cfgWsDrop;
-
-      const cfgWsPersInput = document.getElementById('cfg-ws-pers');
-      if (cfgWsPersInput) cfgWsPersInput.value = cfgWsPers;
-
       const cfgRetSiiInput = document.getElementById('cfg-ret-sii');
       if (cfgRetSiiInput) cfgRetSiiInput.value = cfgRetSii;
 
       const cfgTasaInvInput = document.getElementById('cfg-tasa-inv');
       if (cfgTasaInvInput) cfgTasaInvInput.value = cfgTasaInv;
+
+      // Setup de edición inline
+      habilitarEdicionInlineDescripciones();
+
+      aplicarEstiloVisual();
+      aplicarVisibilidadModulos();
+    }
+
+    function actualizarFaviconEnDOM(url) {
+      if (!url) return;
+      let fav = document.getElementById('app-favicon');
+      let favPng = document.getElementById('app-favicon-png');
+      if (!fav) {
+        fav = document.createElement('link');
+        fav.id = 'app-favicon';
+        fav.rel = 'icon';
+        document.head.appendChild(fav);
+      }
+      fav.href = url;
+      if (favPng) favPng.href = url;
     }
 
     function cargarLogoLocal(event) {
@@ -2485,8 +3420,112 @@
         localStorage.setItem('cfg_logo_local', base64Image);
         const logoImg = document.getElementById('app-logo-img');
         if (logoImg) logoImg.src = base64Image;
+        const statusSpan = document.getElementById('cfg-logo-status');
+        if (statusSpan) statusSpan.textContent = '¡Cargado!';
+        mostrarToast('Logo de la empresa actualizado', 'success');
       };
       reader.readAsDataURL(file);
+    }
+
+    function cargarFaviconLocal(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Favicon = e.target.result;
+        localStorage.setItem('cfg_favicon_local', base64Favicon);
+        actualizarFaviconEnDOM(base64Favicon);
+        const statusSpan = document.getElementById('cfg-favicon-status');
+        if (statusSpan) statusSpan.textContent = '¡Cargado!';
+        mostrarToast('Favicon del sistema actualizado con éxito', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function habilitarEdicionInlineDescripciones() {
+      // Header Título
+      const tit = document.getElementById('header-titulo-principal');
+      if (tit && !tit.dataset.inlineEnabled) {
+        tit.dataset.inlineEnabled = 'true';
+        tit.setAttribute('contenteditable', 'true');
+        tit.addEventListener('blur', () => {
+          const val = tit.textContent.trim();
+          if (workspaceActivo === 'dropshipping') {
+            localStorage.setItem('cfg_ws_drop', val || 'Negocio');
+            const lbl = document.getElementById('label-ws-drop');
+            if (lbl) lbl.textContent = val || 'Negocio';
+            const inDrop = document.getElementById('cfg-ws-drop');
+            if (inDrop) inDrop.value = val || 'Negocio';
+          } else {
+            localStorage.setItem('cfg_ws_pers', val || 'Finanzas Personales');
+            const lbl = document.getElementById('label-ws-pers');
+            if (lbl) lbl.textContent = val || 'Finanzas Personales';
+            const inPers = document.getElementById('cfg-ws-pers');
+            if (inPers) inPers.value = val || 'Finanzas Personales';
+          }
+          mostrarToast('Título guardado', 'info');
+        });
+        tit.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); tit.blur(); }
+        });
+      }
+
+      // Header Subtítulo
+      const sub = document.getElementById('header-subtitulo-principal');
+      if (sub && !sub.dataset.inlineEnabled) {
+        sub.dataset.inlineEnabled = 'true';
+        sub.setAttribute('contenteditable', 'true');
+        sub.addEventListener('blur', () => {
+          const val = sub.textContent.trim();
+          if (workspaceActivo === 'dropshipping') {
+            localStorage.setItem('cfg_sub_drop', val);
+            const inSub = document.getElementById('cfg-sub-drop');
+            if (inSub) inSub.value = val;
+          } else {
+            localStorage.setItem('cfg_sub_pers', val);
+            const inSub = document.getElementById('cfg-sub-pers');
+            if (inSub) inSub.value = val;
+          }
+          mostrarToast('Subtítulo guardado', 'info');
+        });
+        sub.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); sub.blur(); }
+        });
+      }
+
+      // Descripción Módulo Saldo Tarjeta
+      const descTarjeta = document.getElementById('desc-tarjeta-negocio-widget');
+      if (descTarjeta && !descTarjeta.dataset.inlineEnabled) {
+        descTarjeta.dataset.inlineEnabled = 'true';
+        descTarjeta.setAttribute('contenteditable', 'true');
+        descTarjeta.addEventListener('blur', () => {
+          const val = descTarjeta.textContent.trim();
+          localStorage.setItem('cfg_desc_tarjeta_negocio', val);
+          const inDesc = document.getElementById('cfg-desc-tarjeta-negocio');
+          if (inDesc) inDesc.value = val;
+          mostrarToast('Descripción de tarjeta actualizada', 'info');
+        });
+        descTarjeta.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); descTarjeta.blur(); }
+        });
+      }
+
+      // Descripción Módulo Traspasos
+      const descTraspasos = document.getElementById('desc-traspasos-modulo');
+      if (descTraspasos && !descTraspasos.dataset.inlineEnabled) {
+        descTraspasos.dataset.inlineEnabled = 'true';
+        descTraspasos.setAttribute('contenteditable', 'true');
+        descTraspasos.addEventListener('blur', () => {
+          const val = descTraspasos.textContent.trim();
+          localStorage.setItem('cfg_desc_traspasos', val);
+          const inDesc = document.getElementById('cfg-desc-traspasos');
+          if (inDesc) inDesc.value = val;
+          mostrarToast('Descripción de traspasos actualizada', 'info');
+        });
+        descTraspasos.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); descTraspasos.blur(); }
+        });
+      }
     }
 
     function abrirModalConfig() {
@@ -2500,13 +3539,27 @@
 
     document.getElementById('form-config')?.addEventListener('submit', (e) => {
       e.preventDefault();
-      localStorage.setItem('cfg_ws_drop', document.getElementById('cfg-ws-drop').value.trim());
-      localStorage.setItem('cfg_ws_pers', document.getElementById('cfg-ws-pers').value.trim());
-      localStorage.setItem('cfg_ret_sii', document.getElementById('cfg-ret-sii').value);
-      localStorage.setItem('cfg_tasa_inv', document.getElementById('cfg-tasa-inv').value);
+      const wsDrop = document.getElementById('cfg-ws-drop')?.value.trim() || 'Negocio';
+      const wsPers = document.getElementById('cfg-ws-pers')?.value.trim() || 'Finanzas Personales';
+      const subDrop = document.getElementById('cfg-sub-drop')?.value.trim() || 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
+      const subPers = document.getElementById('cfg-sub-pers')?.value.trim() || 'Boletas de Honorarios, Gastos Personales e Inversiones';
+      const descTarjeta = document.getElementById('cfg-desc-tarjeta-negocio')?.value.trim() || 'Saldo real descontando Meta Ads, costos fijos, fletes de devoluciones y retiros de capital.';
+      const descTraspasos = document.getElementById('cfg-desc-traspasos')?.value.trim() || 'Registro de inyecciones de capital, retiros de ganancias y aportes entre tarjetas.';
+      const retSii = document.getElementById('cfg-ret-sii')?.value || '15.25';
+      const tasaInv = document.getElementById('cfg-tasa-inv')?.value || '8.0';
+
+      localStorage.setItem('cfg_ws_drop', wsDrop);
+      localStorage.setItem('cfg_ws_pers', wsPers);
+      localStorage.setItem('cfg_sub_drop', subDrop);
+      localStorage.setItem('cfg_sub_pers', subPers);
+      localStorage.setItem('cfg_desc_tarjeta_negocio', descTarjeta);
+      localStorage.setItem('cfg_desc_traspasos', descTraspasos);
+      localStorage.setItem('cfg_ret_sii', retSii);
+      localStorage.setItem('cfg_tasa_inv', tasaInv);
+
       aplicarConfiguraciones();
       cerrarModalConfig();
-      mostrarToast('¡Configuración guardada!', 'success');
+      mostrarToast('¡Parámetros y descripciones guardadas!', 'success');
     });
 
     // ==========================================
@@ -2529,7 +3582,7 @@
         if (wsPers) wsPers.classList.add('hidden');
         if (btnCsv) btnCsv.classList.remove('hidden');
         if (tit) tit.textContent = localStorage.getItem('cfg_ws_drop') || 'Negocio';
-        if (sub) sub.textContent = 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
+        if (sub) sub.textContent = localStorage.getItem('cfg_sub_drop') || 'Unit Economics, Dropi, Meta Ads y Utilidad Real';
         setTimeout(renderizarGraficosDrop, 60);
       } else {
         if (btnPers) btnPers.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition';
@@ -2538,7 +3591,7 @@
         if (wsPers) wsPers.classList.remove('hidden');
         if (btnCsv) btnCsv.classList.add('hidden');
         if (tit) tit.textContent = localStorage.getItem('cfg_ws_pers') || 'Finanzas Personales';
-        if (sub) sub.textContent = 'Boletas de Honorarios, Gastos Personales e Inversiones';
+        if (sub) sub.textContent = localStorage.getItem('cfg_sub_pers') || 'Boletas de Honorarios, Gastos Personales e Inversiones';
         setTimeout(renderizarGraficosPersonal, 60);
       }
     }
@@ -3281,6 +4334,9 @@
 
       // Actualizar Simulador
       actualizarSimuladorEscalamiento();
+
+      // Refrescar widget de saldo de tarjeta de negocio en Dropshipping
+      renderizarWidgetTarjetaNegocio();
 
       setTimeout(renderizarGraficosDrop, 60);
     }
@@ -6665,7 +7721,18 @@
 
     function calcularSaldosTarjeta(tarjetaId) {
       const tarjeta = tarjetasUsuario.find(t => t.id == tarjetaId);
-      if (!tarjeta) return { saldoBase: 0, traspasosEntrantes: 0, traspasosSalientes: 0, margenEntregados: 0, pedidosEntregadosCount: 0, saldoFinal: 0 };
+      if (!tarjeta) return { 
+        saldoBase: 0, 
+        traspasosEntrantes: 0, 
+        traspasosSalientes: 0, 
+        margenEntregados: 0, 
+        pedidosEntregadosCount: 0,
+        totalAds: 0,
+        totalFijos: 0,
+        totalFletesDevolucion: 0,
+        pedidosDevueltosCount: 0,
+        saldoFinal: 0 
+      };
 
       const saldoBase = Number(tarjeta.saldo_inicial || 0);
       let traspasosEntrantes = 0;
@@ -6679,8 +7746,13 @@
 
       let margenEntregados = 0;
       let pedidosEntregadosCount = 0;
+      let totalAds = 0;
+      let totalFijos = 0;
+      let totalFletesDevolucion = 0;
+      let pedidosDevueltosCount = 0;
 
       if (tarjeta.tipo === 'negocio') {
+        // 1. Margen de pedidos efectivamente entregados
         (datosDrop.ventas || []).forEach(v => {
           const est = (v.estado || '').trim().toLowerCase();
           if (est === 'entregado') {
@@ -6691,11 +7763,29 @@
             const margen = ing - prod - env - dropi;
             margenEntregados += margen;
             pedidosEntregadosCount++;
+          } else if (['devuelto', 'cancelado', 'incidencia', 'sin respuesta'].includes(est)) {
+            // Flete perdido / no recuperado en pedidos que salieron a despacho pero no se entregaron
+            const fletePerdido = Number(v.costo_envio || 0);
+            if (fletePerdido > 0) {
+              totalFletesDevolucion += fletePerdido;
+              pedidosDevueltosCount++;
+            }
           }
         });
+
+        // 2. Gasto total en Publicidad (Meta Ads / TikTok Ads / etc.)
+        totalAds = (datosDrop.ads || []).reduce((acc, a) => acc + Number(a.gasto || 0), 0);
+
+        // 3. Costos fijos del negocio (Shopify, apps, software, etc.)
+        totalFijos = (datosDrop.costos || []).reduce((acc, c) => {
+          let f = Number(c.monto || 0);
+          if (c.frecuencia_dias === 90) f = f / 3;
+          else if (c.frecuencia_dias === 365) f = f / 12;
+          return acc + f;
+        }, 0);
       }
 
-      const saldoFinal = saldoBase + traspasosEntrantes - traspasosSalientes + margenEntregados;
+      const saldoFinal = saldoBase + traspasosEntrantes - traspasosSalientes + margenEntregados - totalAds - totalFijos - totalFletesDevolucion;
 
       return {
         saldoBase,
@@ -6703,6 +7793,10 @@
         traspasosSalientes,
         margenEntregados,
         pedidosEntregadosCount,
+        totalAds,
+        totalFijos,
+        totalFletesDevolucion,
+        pedidosDevueltosCount,
         saldoFinal
       };
     }
@@ -6841,9 +7935,15 @@
               
               <!-- Desglose según tipo de tarjeta -->
               ${tar.tipo === 'negocio' ? `
-                <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/80">
-                  <span>📦 Entregados (+${formatoCLP(info.margenEntregados)})</span>
-                  <span>Inyecciones (+${formatoCLP(info.traspasosEntrantes)})</span>
+                <div class="mt-2 pt-2 border-t border-white/10 flex flex-col gap-1 text-[10px] text-white/80">
+                  <div class="flex items-center justify-between">
+                    <span>📦 Entregados: <strong class="text-emerald-300">+${formatoCLP(info.margenEntregados)}</strong></span>
+                    <span>📥 Inyecciones: <strong class="text-sky-300">+${formatoCLP(info.traspasosEntrantes)}</strong></span>
+                  </div>
+                  <div class="flex items-center justify-between text-rose-200/90">
+                    <span>📣 Ads + Fijos: <strong>-${formatoCLP(info.totalAds + info.totalFijos)}</strong></span>
+                    <span>🔄 Fletes Fallidos: <strong>-${formatoCLP(info.totalFletesDevolucion)}</strong></span>
+                  </div>
                 </div>
               ` : (tar.tipo === 'inversion' && tasa > 0 ? `
                 <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/80">
@@ -6990,6 +8090,10 @@
       const elInyecciones = document.getElementById('widget-negocio-total-inyecciones') || document.getElementById('widget-negocio-inyecciones-total');
       const elMargen = document.getElementById('widget-negocio-margen-entregados');
       const elNumEntregados = document.getElementById('widget-negocio-num-entregados') || document.getElementById('widget-negocio-pedidos-entregados-count');
+      const elAds = document.getElementById('widget-negocio-total-ads');
+      const elFijos = document.getElementById('widget-negocio-total-fijos');
+      const elFletesRetiros = document.getElementById('widget-negocio-total-fletes-retiros');
+      const elDetalleFletesRetiros = document.getElementById('widget-negocio-detalle-fletes-retiros');
       const elRetiros = document.getElementById('widget-negocio-total-retiros') || document.getElementById('widget-negocio-retiros-total');
 
       if (!tarjetaNegocio) {
@@ -6998,7 +8102,10 @@
         if (elTarjetaDetalle) elTarjetaDetalle.textContent = 'Configura una tarjeta como Negocio';
         if (elInyecciones) elInyecciones.textContent = '+$0';
         if (elMargen) elMargen.textContent = '+$0';
-        if (elNumEntregados) elNumEntregados.textContent = '0 pedidos entregados';
+        if (elNumEntregados) elNumEntregados.textContent = '0 pedidos';
+        if (elAds) elAds.textContent = '-$0';
+        if (elFijos) elFijos.textContent = '-$0';
+        if (elFletesRetiros) elFletesRetiros.textContent = '-$0';
         if (elRetiros) elRetiros.textContent = '-$0';
         return;
       }
@@ -7018,7 +8125,11 @@
       if (elTarjetaDetalle) elTarjetaDetalle.textContent = `${tarjetaNegocio.banco} •••• ${tarjetaNegocio.digitos || '0000'} (${tarjetaNegocio.formato || 'Cuenta'})`;
       if (elInyecciones) elInyecciones.textContent = `+${formatoCLP(info.traspasosEntrantes)}`;
       if (elMargen) elMargen.textContent = `+${formatoCLP(info.margenEntregados)}`;
-      if (elNumEntregados) elNumEntregados.textContent = `${info.pedidosEntregadosCount} pedidos entregados`;
+      if (elNumEntregados) elNumEntregados.textContent = `${info.pedidosEntregadosCount} entregados`;
+      if (elAds) elAds.textContent = `-${formatoCLP(info.totalAds)}`;
+      if (elFijos) elFijos.textContent = `-${formatoCLP(info.totalFijos)}`;
+      if (elFletesRetiros) elFletesRetiros.textContent = `-${formatoCLP(info.totalFletesDevolucion + totalRetirosNegocio)}`;
+      if (elDetalleFletesRetiros) elDetalleFletesRetiros.textContent = `Fletes: ${formatoCLP(info.totalFletesDevolucion)} | Retiros: ${formatoCLP(totalRetirosNegocio)}`;
       if (elRetiros) elRetiros.textContent = `-${formatoCLP(totalRetirosNegocio)}`;
     }
 
@@ -7516,6 +8627,21 @@
     window.toggleDesplegableKpisPersonal = toggleDesplegableKpisPersonal;
     window.toggleDesplegableKpisTarjetas = toggleDesplegableKpisTarjetas;
     window.toggleDesplegableInversion = toggleDesplegableInversion;
+    window.toggleModoPrivacidad = toggleModoPrivacidad;
+    window.seleccionarTemaRapido = seleccionarTemaRapido;
+    window.seleccionarFuenteApp = seleccionarFuenteApp;
+    window.actualizarColorAcento = actualizarColorAcento;
+    window.actualizarColorIconos = actualizarColorIconos;
+    window.restablecerTemaDefecto = restablecerTemaDefecto;
+    window.abrirModalConfigTab = abrirModalConfigTab;
+    window.cerrarModalConfigTab = cerrarModalConfigTab;
+    window.guardarYcerrarModalConfigTab = guardarYcerrarModalConfigTab;
+    window.cambiarSeccionConfig = cambiarSeccionConfig;
+    window.abrirModalConfig = abrirModalConfig;
+    window.cerrarModalConfig = cerrarModalConfig;
+    window.cargarLogoLocal = cargarLogoLocal;
+    window.cargarFaviconLocal = cargarFaviconLocal;
+    window.actualizarFaviconEnDOM = actualizarFaviconEnDOM;
 
     // Inicialización general
     inicializarAuth();
