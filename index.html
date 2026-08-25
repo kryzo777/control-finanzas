@@ -4145,15 +4145,23 @@
         destinoSugerido = 'ingreso';
       }
 
-      // Si hay activos ya existentes en el sistema y no se definió uno, tomar el primero como sugerencia
-      if (!activoNombreSugerido && datosPersonal.inversiones && datosPersonal.inversiones.length > 0) {
-        activoNombreSugerido = datosPersonal.inversiones[0].nombre;
-        activoTipoSugerido = datosPersonal.inversiones[0].tipo || 'ETF';
-        activoPlataformaSugerida = datosPersonal.inversiones[0].plataforma || '';
-        activoTasaSugerida = Number(datosPersonal.inversiones[0].rentabilidad_anual_estimada || 8);
-      } else if (!activoNombreSugerido) {
-        activoNombreSugerido = 'Fondo de Inversión / ETF';
-        activoPlataformaSugerida = 'Broker';
+      // Si el destino sugerido es inversión o si no se definió activo, buscar entre vehículos disponibles
+      const vehiculosDisp = obtenerVehiculosInversionDisponibles();
+      let vehiculoSugerido = null;
+
+      if (destinoSugerido === 'inversion' || !activoNombreSugerido) {
+        if (vehiculosDisp.length > 0) {
+          const descLow = desc.toLowerCase();
+          const match = vehiculosDisp.find(v => v.nombre && descLow.includes(v.nombre.toLowerCase()) || (v.plataforma && descLow.includes(v.plataforma.toLowerCase())));
+          vehiculoSugerido = match || vehiculosDisp[0];
+          activoNombreSugerido = vehiculoSugerido.nombre;
+          activoTipoSugerido = vehiculoSugerido.tipo || 'ETF';
+          activoPlataformaSugerida = vehiculoSugerido.plataforma || '';
+          activoTasaSugerida = Number(vehiculoSugerido.tasa || 8.0);
+        } else {
+          activoNombreSugerido = 'ETF VOO (S&P 500)';
+          activoPlataformaSugerida = 'Racional / Vanguard';
+        }
       }
 
       const fechaStr = extraerFechaUniversal(fechaRaw);
@@ -4168,10 +4176,12 @@
         esGasto: esGasto,
         destinoFinanciero: destinoSugerido,
         categoria: catSugerida,
+        activoId: vehiculoSugerido ? (vehiculoSugerido.invRealId || null) : null,
         activoNombre: activoNombreSugerido,
         activoTipo: activoTipoSugerido,
         activoPlataforma: activoPlataformaSugerida,
         activoTasa: activoTasaSugerida,
+        esNuevoActivo: false,
         seleccionado: true
       };
     }
@@ -4406,17 +4416,79 @@
       document.getElementById('rm-seleccionados').textContent = seleccionados;
     }
 
-    function obtenerOpcionesActivosDatalist() {
-      const nombresUnicos = Array.from(new Set((datosPersonal.inversiones || []).map(i => i.nombre).filter(Boolean)));
-      if (nombresUnicos.length === 0) {
-        return ['ETF VOO (S&P 500)', 'Fintual Risky', 'DAP Santander', 'Cripto / Bitcoin'];
-      }
-      return nombresUnicos;
+    function obtenerVehiculosInversionDisponibles() {
+      const lista = [];
+      const nombresVistos = new Set();
+
+      // 1. Activos de la cartera de inversiones (datosPersonal.inversiones)
+      (datosPersonal.inversiones || []).forEach(inv => {
+        if (inv && inv.nombre) {
+          const key = inv.nombre.toLowerCase().trim();
+          if (!nombresVistos.has(key)) {
+            nombresVistos.add(key);
+            lista.push({
+              id: `inv_${inv.id}`,
+              invRealId: inv.id,
+              nombre: inv.nombre,
+              tipo: inv.tipo || 'ETF',
+              plataforma: inv.plataforma || 'Broker / Inversión',
+              tasa: Number(inv.rentabilidad_anual_estimada || 8.0),
+              esExistente: true,
+              grupo: '💼 Mis Activos en Cartera'
+            });
+          }
+        }
+      });
+
+      // 2. Cuentas o Tarjetas de Inversión creadas (tarjetasUsuario)
+      (tarjetasUsuario || []).forEach(t => {
+        if (t && (t.tipo === 'inversion' || (t.formato && t.formato.toLowerCase().includes('invers')) || (t.banco && /racional|fintual|buda|broker|inversion|crypto|banchile|vector/i.test(t.banco)))) {
+          const key = (t.nombre || t.banco).toLowerCase().trim();
+          if (!nombresVistos.has(key)) {
+            nombresVistos.add(key);
+            lista.push({
+              id: `tarjeta_${t.id}`,
+              tarjetaId: t.id,
+              nombre: t.nombre,
+              tipo: 'Fondo Mutuo / Inversión',
+              plataforma: t.banco || 'Broker / Cuenta Inversión',
+              tasa: Number(t.tasa_anual_interes || 8.0),
+              esExistente: true,
+              grupo: '🏦 Mis Cuentas de Inversión'
+            });
+          }
+        }
+      });
+
+      // 3. Instrumentos / Plataformas habituales para facilitar registro rápido
+      const presets = [
+        { nombre: 'Fintual Risky (Fondos Mutuos)', tipo: 'Fondo Mutuo', plataforma: 'Fintual', tasa: 9.5 },
+        { nombre: 'Racional / ETF VOO (S&P 500)', tipo: 'ETF', plataforma: 'Racional / Vanguard', tasa: 10.0 },
+        { nombre: 'DAP (Depósito a Plazo)', tipo: 'DAP', plataforma: 'Banco', tasa: 5.5 },
+        { nombre: 'Cripto / Bitcoin (Buda / Exchange)', tipo: 'Cripto', plataforma: 'Buda / Exchange', tasa: 12.0 },
+        { nombre: 'Acciones Chile / Renta Variable', tipo: 'Acciones', plataforma: 'Banchile / Renta4', tasa: 8.5 }
+      ];
+
+      presets.forEach(p => {
+        const key = p.nombre.toLowerCase().trim();
+        if (!nombresVistos.has(key)) {
+          lista.push({
+            id: `preset_${p.nombre}`,
+            nombre: p.nombre,
+            tipo: p.tipo,
+            plataforma: p.plataforma,
+            tasa: p.tasa,
+            esExistente: false,
+            grupo: '🚀 Vehículos & Activos Sugeridos'
+          });
+        }
+      });
+
+      return lista;
     }
 
     function renderizarBufferModal() {
       const tbody = document.getElementById('modal-cartola-preview-body');
-      const listaActivos = obtenerOpcionesActivosDatalist();
 
       tbody.innerHTML = bufferModalCartola.map(m => {
         const esInv = m.destinoFinanciero === 'inversion';
@@ -4425,29 +4497,40 @@
 
         let campoClasificacion = '';
         if (esInv) {
-          const activosExistentes = (datosPersonal.inversiones || []);
-          const tieneExistentes = activosExistentes.length > 0;
+          const vehiculos = obtenerVehiculosInversionDisponibles();
           
-          let optionsHtml = '';
-          if (tieneExistentes) {
-            optionsHtml = activosExistentes.map(inv => {
-              const isSelected = (!m.esNuevoActivo && (m.activoNombre === inv.nombre || m.activoId === inv.id));
-              return `<option value="existente:${inv.id}" ${isSelected ? 'selected' : ''}>📈 ${inv.nombre} (${inv.plataforma || 'Broker'} - ${Number(inv.rentabilidad_anual_estimada || 8)}%)</option>`;
-            }).join('');
-            optionsHtml += `<option value="nuevo" ${m.esNuevoActivo ? 'selected' : ''}>✨ + Crear Nuevo Activo...</option>`;
-          }
+          // Agrupar vehículos por categoría
+          const grupos = {};
+          vehiculos.forEach(v => {
+            if (!grupos[v.grupo]) grupos[v.grupo] = [];
+            grupos[v.grupo].push(v);
+          });
 
-          if (tieneExistentes && !m.esNuevoActivo) {
+          let optgroupsHtml = '';
+          for (const [grupoNom, listaV] of Object.entries(grupos)) {
+            optgroupsHtml += `<optgroup label="${grupoNom}">`;
+            listaV.forEach(v => {
+              const isSelected = (!m.esNuevoActivo && (
+                (m.activoId && (String(m.activoId) === String(v.invRealId) || String(m.activoId) === String(v.id))) ||
+                (m.activoNombre && m.activoNombre.toLowerCase().trim() === v.nombre.toLowerCase().trim())
+              ));
+              optgroupsHtml += `<option value="${v.id}" ${isSelected ? 'selected' : ''}>📈 ${v.nombre} (${v.plataforma} • ${v.tasa}%)</option>`;
+            });
+            optgroupsHtml += `</optgroup>`;
+          }
+          optgroupsHtml += `<option value="nuevo" ${m.esNuevoActivo ? 'selected' : ''} class="font-bold text-amber-300">✨ + Crear Nuevo Vehículo / Activo...</option>`;
+
+          if (!m.esNuevoActivo) {
             campoClasificacion = `
               <div class="space-y-1.5 py-1">
                 <div class="flex items-center gap-1.5">
-                  <span class="text-[10px] text-purple-400 font-bold uppercase shrink-0">Activo:</span>
-                  <select class="bg-slate-900 border border-purple-800/90 rounded px-2 py-1 text-xs text-purple-200 font-medium w-full focus:outline-none focus:border-purple-400 cursor-pointer"
+                  <span class="text-[10px] text-purple-400 font-bold uppercase shrink-0">Vehículo:</span>
+                  <select class="bg-slate-900 border border-purple-800 rounded-lg px-2 py-1.5 text-xs text-purple-200 font-medium w-full focus:outline-none focus:border-purple-400 cursor-pointer shadow-inner"
                     onchange="seleccionarOpcionActivoBufferModal(${m.idTemporal}, this.value)">
-                    ${optionsHtml}
+                    ${optgroupsHtml}
                   </select>
                 </div>
-                <div class="flex items-center justify-between text-[10px] text-slate-400 bg-purple-950/30 px-2 py-1 rounded border border-purple-900/40">
+                <div class="flex items-center justify-between text-[10px] text-slate-400 bg-purple-950/40 px-2.5 py-1 rounded-lg border border-purple-900/50">
                   <span class="truncate">Tipo: <strong class="text-purple-300">${m.activoTipo || 'ETF'}</strong> • Broker: <strong class="text-purple-300">${m.activoPlataforma || 'Broker'}</strong></span>
                   <div class="flex items-center gap-1 shrink-0 ml-1">
                     <span>Rent:</span>
@@ -4460,20 +4543,18 @@
             `;
           } else {
             campoClasificacion = `
-              <div class="space-y-1.5 py-1 bg-purple-950/20 p-2 rounded-lg border border-purple-900/50">
-                ${tieneExistentes ? `
-                  <div class="flex justify-between items-center pb-1 mb-1 border-b border-purple-900/40">
-                    <span class="text-[10px] font-bold text-purple-300">Nuevo Activo a Crear</span>
-                    <button type="button" onclick="cancelarNuevoActivoBufferModal(${m.idTemporal})" class="text-[10px] text-purple-400 hover:text-purple-200 underline cursor-pointer">Elegir Existente</button>
-                  </div>
-                ` : ''}
-                <div>
-                  <input type="text" value="${m.activoNombre || ''}" placeholder="Nombre del activo (ej: ETF VOO, Fintual, DAP...)" 
-                    oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoNombre = this.value"
-                    class="bg-slate-900 border border-purple-800/80 rounded px-2 py-1 text-xs text-purple-200 w-full focus:outline-none focus:border-purple-400 placeholder:text-purple-400/40">
+              <div class="space-y-1.5 py-1.5 bg-purple-950/30 p-2.5 rounded-xl border border-purple-900/60">
+                <div class="flex justify-between items-center pb-1 mb-1 border-b border-purple-900/40">
+                  <span class="text-[10px] font-bold text-amber-300 flex items-center gap-1">✨ Nuevo Activo / Vehículo</span>
+                  <button type="button" onclick="cancelarNuevoActivoBufferModal(${m.idTemporal})" class="text-[10px] text-purple-400 hover:text-purple-200 underline cursor-pointer font-medium">↩ Elegir Activo Creado</button>
                 </div>
-                <div class="grid grid-cols-3 gap-1 text-[10px]">
-                  <select onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTipo = this.value" class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200">
+                <div>
+                  <input type="text" value="${m.activoNombre || ''}" placeholder="Nombre del activo (ej: Fintual, ETF VOO, DAP...)" 
+                    oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoNombre = this.value"
+                    class="bg-slate-900 border border-purple-800 rounded-lg px-2 py-1 text-xs text-purple-200 w-full focus:outline-none focus:border-purple-400 placeholder:text-purple-400/40">
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+                  <select onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTipo = this.value" class="bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-[10px] text-slate-200 cursor-pointer">
                     <option value="ETF" ${m.activoTipo==='ETF'?'selected':''}>ETF</option>
                     <option value="Fondo Mutuo" ${m.activoTipo==='Fondo Mutuo'?'selected':''}>Fondo Mutuo</option>
                     <option value="Acciones" ${m.activoTipo==='Acciones'?'selected':''}>Acciones</option>
@@ -4483,11 +4564,11 @@
                   </select>
                   <input type="text" value="${m.activoPlataforma || ''}" placeholder="Broker / Banco"
                     oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoPlataforma = this.value"
-                    class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-slate-200 placeholder:text-slate-500">
+                    class="bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-[10px] text-slate-200 placeholder:text-slate-500">
                   <div class="flex items-center gap-0.5">
                     <input type="number" step="0.1" value="${m.activoTasa || 8.0}" placeholder="8.0"
                       oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTasa = Number(this.value)"
-                      class="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-[10px] text-purple-300 w-full text-center">%
+                      class="bg-slate-900 border border-slate-700 rounded px-1 py-1 text-[10px] text-purple-300 w-full text-center">%
                   </div>
                 </div>
               </div>
@@ -4550,16 +4631,16 @@
         item.activoTipo = 'ETF';
         item.activoPlataforma = '';
         item.activoTasa = 8.0;
-      } else if (val.startsWith('existente:')) {
+      } else {
         item.esNuevoActivo = false;
-        const invId = val.split(':')[1];
-        const inv = (datosPersonal.inversiones || []).find(i => String(i.id) === String(invId));
-        if (inv) {
-          item.activoId = inv.id;
-          item.activoNombre = inv.nombre;
-          item.activoTipo = inv.tipo || 'ETF';
-          item.activoPlataforma = inv.plataforma || '';
-          item.activoTasa = Number(inv.rentabilidad_anual_estimada || 8.0);
+        const vehiculos = obtenerVehiculosInversionDisponibles();
+        const v = vehiculos.find(x => String(x.id) === String(val) || (x.invRealId && String(x.invRealId) === String(val)));
+        if (v) {
+          item.activoId = v.invRealId || null;
+          item.activoNombre = v.nombre;
+          item.activoTipo = v.tipo || 'ETF';
+          item.activoPlataforma = v.plataforma || '';
+          item.activoTasa = Number(v.tasa || 8.0);
         }
       }
       renderizarBufferModal();
@@ -4569,13 +4650,14 @@
       const item = bufferModalCartola.find(x => x.idTemporal === idTemporal);
       if (!item) return;
       item.esNuevoActivo = false;
-      const primerInv = (datosPersonal.inversiones || [])[0];
-      if (primerInv) {
-        item.activoId = primerInv.id;
-        item.activoNombre = primerInv.nombre;
-        item.activoTipo = primerInv.tipo || 'ETF';
-        item.activoPlataforma = primerInv.plataforma || '';
-        item.activoTasa = Number(primerInv.rentabilidad_anual_estimada || 8.0);
+      const vehiculos = obtenerVehiculosInversionDisponibles();
+      if (vehiculos.length > 0) {
+        const v = vehiculos[0];
+        item.activoId = v.invRealId || null;
+        item.activoNombre = v.nombre;
+        item.activoTipo = v.tipo || 'ETF';
+        item.activoPlataforma = v.plataforma || '';
+        item.activoTasa = Number(v.tasa || 8.0);
       }
       renderizarBufferModal();
     }
@@ -4591,17 +4673,17 @@
       if (item) {
         item.destinoFinanciero = dest;
         if (dest === 'inversion') {
-          const activosExistentes = (datosPersonal.inversiones || []);
-          if (activosExistentes.length > 0) {
-            // Check if one matches description
-            const match = activosExistentes.find(i => item.descripcion && i.nombre && item.descripcion.toLowerCase().includes(i.nombre.toLowerCase()));
-            const activo = match || activosExistentes[0];
+          const vehiculos = obtenerVehiculosInversionDisponibles();
+          if (vehiculos.length > 0) {
+            const descLow = (item.descripcion || '').toLowerCase();
+            const match = vehiculos.find(v => (v.nombre && descLow.includes(v.nombre.toLowerCase())) || (v.plataforma && descLow.includes(v.plataforma.toLowerCase())));
+            const v = match || vehiculos[0];
             item.esNuevoActivo = false;
-            item.activoId = activo.id;
-            item.activoNombre = activo.nombre;
-            item.activoTipo = activo.tipo || 'ETF';
-            item.activoPlataforma = activo.plataforma || '';
-            item.activoTasa = Number(activo.rentabilidad_anual_estimada || 8.0);
+            item.activoId = v.invRealId || null;
+            item.activoNombre = v.nombre;
+            item.activoTipo = v.tipo || 'ETF';
+            item.activoPlataforma = v.plataforma || '';
+            item.activoTasa = Number(v.tasa || 8.0);
           } else {
             item.esNuevoActivo = true;
             item.activoId = null;
@@ -4669,7 +4751,7 @@
           
           let activoExistente = null;
           if (movInv.activoId) {
-            activoExistente = (datosPersonal.inversiones || []).find(inv => inv.id === movInv.activoId);
+            activoExistente = (datosPersonal.inversiones || []).find(inv => String(inv.id) === String(movInv.activoId));
           }
           if (!activoExistente && !movInv.esNuevoActivo) {
             activoExistente = (datosPersonal.inversiones || []).find(inv => 
