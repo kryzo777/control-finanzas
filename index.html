@@ -358,71 +358,130 @@
           </div>
         </div>
 
-        <!-- WIDGET INTEGRADO: SALDO DISPONIBLE EN TARJETA DE NEGOCIO & MOVIMIENTOS DE CAPITAL -->
-        <div id="seccion-tarjeta-negocio-widget" class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 p-4 md:p-5 rounded-2xl border border-indigo-900/60 shadow-xl space-y-4">
+        <!-- WIDGET INTEGRADO: CUENTA CENTRALIZADA DE NEGOCIO (BANCO + DROPI WALLET) & RECUPERACIÓN DE INVERSIÓN -->
+        <div id="seccion-tarjeta-negocio-widget" class="bg-gradient-to-r from-slate-900 via-indigo-950/50 to-slate-900 p-4 md:p-5 rounded-2xl border border-indigo-800/60 shadow-2xl space-y-4">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-xl text-indigo-400">
-                💳
+              <div class="w-11 h-11 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-2xl text-indigo-300 shadow-inner">
+                🏦
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <h3 class="text-sm font-bold text-white tracking-wide">Saldo Operativo en Tarjeta del Negocio</h3>
-                  <span id="badge-tarjeta-negocio-nombre" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/80">Tarjeta Negocio</span>
+                  <h3 class="text-sm font-bold text-white tracking-wide">Cuenta Centralizada del Negocio</h3>
+                  <span id="badge-tarjeta-negocio-nombre" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/80">Banco + Wallet Dropi</span>
                 </div>
-                <p id="desc-tarjeta-negocio-widget" title="Haz clic para editar descripción" class="editable-desc text-xs text-slate-400 mt-0.5">Saldo real descontando Meta Ads, costos fijos, fletes de devoluciones y retiros de capital.</p>
+                <p id="desc-tarjeta-negocio-widget" title="Haz clic para editar descripción" class="editable-desc text-xs text-slate-400 mt-0.5">Balance unificado: Banco Real + Billetera Dropi, descontando Meta Ads, costos fijos y fletes en tiempo real.</p>
               </div>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-              <button onclick="abrirModalTraspasoNegocioInyeccion()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
+              <button onclick="abrirModalTraspasoNegocioInyeccion()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3 py-2 rounded-xl transition shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
                 <span>➕ Inyectar Capital</span>
               </button>
-              <button onclick="abrirModalTraspasoNegocioRetiro()" class="bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-lg shadow-amber-600/20 cursor-pointer flex items-center gap-1.5">
-                <span>💸 Retirar Ganancias / Sueldo</span>
+              <button onclick="abrirModalTraspasoNegocioRetiro()" class="bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs px-3 py-2 rounded-xl transition shadow-lg shadow-amber-600/20 cursor-pointer flex items-center gap-1.5">
+                <span>💸 Retirar Utilidades</span>
+              </button>
+              <button onclick="abrirModalCuadreRapidoNegocio()" class="bg-indigo-950 hover:bg-indigo-900 text-indigo-200 border border-indigo-800/80 font-semibold text-xs px-3 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5" title="Cuadrar saldo con tu banco real">
+                <span>🎯 Cuadre Rápido</span>
               </button>
               <button onclick="irATabTarjetasDesdeNegocio()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs px-3 py-2 rounded-xl transition cursor-pointer flex items-center gap-1">
-                <span>⚙️ Ver Cuentas</span>
+                <span>⚙️ Cuentas</span>
               </button>
             </div>
           </div>
 
-          <!-- Desglose Contable del Saldo de Negocio -->
+          <!-- Desglose Contable del Saldo de Negocio Centralizado -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
-            <div class="bg-slate-950/80 p-3 rounded-xl border border-indigo-500/30 shadow-sm">
-              <span class="text-[10px] uppercase font-semibold text-indigo-300 block">Saldo Disponible Neto</span>
-              <p id="widget-negocio-saldo-disponible" class="text-lg md:text-xl font-extrabold text-indigo-200 font-mono mt-0.5">$0</p>
-              <span id="widget-negocio-tarjeta-detalle" class="text-[10px] text-slate-500 block truncate">•••• 0000</span>
+            <!-- 1. Saldo Total Centralizado -->
+            <div class="bg-gradient-to-br from-indigo-950/90 to-slate-950 p-3 rounded-xl border border-indigo-500/50 shadow-md">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-indigo-300">Saldo Total Central</span>
+                <span class="text-[10px] text-indigo-400">Total</span>
+              </div>
+              <p id="widget-negocio-saldo-disponible" class="text-lg md:text-xl font-extrabold text-white font-mono mt-0.5">$0</p>
+              <span id="widget-negocio-tarjeta-detalle" class="text-[10px] text-indigo-300/80 block truncate">Banco + Dropi</span>
             </div>
 
-            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-emerald-400 block">Inyecciones Capital</span>
+            <!-- 2. Saldo en Banco Real -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-semibold text-sky-400">🏛️ Saldo en Banco</span>
+                <span class="text-[9px] text-slate-500">Real</span>
+              </div>
+              <p id="widget-negocio-saldo-banco" class="text-sm md:text-base font-bold text-sky-300 font-mono mt-0.5">$0</p>
+              <span class="text-[10px] text-slate-500 block truncate">Para Ads y fijos</span>
+            </div>
+
+            <!-- 3. Saldo en Wallet Dropi -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-semibold text-teal-400">📦 Wallet Dropi</span>
+                <span id="widget-negocio-num-entregados" class="text-[9px] text-teal-400/80">0 ent.</span>
+              </div>
+              <p id="widget-negocio-margen-entregados" class="text-sm md:text-base font-bold text-teal-300 font-mono mt-0.5">+$0</p>
+              <span id="widget-negocio-wallet-detalle" class="text-[10px] text-slate-500 block truncate">Margen - fletes</span>
+            </div>
+
+            <!-- 4. Meta Ads + Costos Fijos -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-semibold text-purple-400">📣 Ads + Fijos</span>
+                <span class="text-[9px] text-purple-400/80">Gastos</span>
+              </div>
+              <p id="widget-negocio-total-gastos-operativos" class="text-sm md:text-base font-bold text-purple-300 font-mono mt-0.5">-$0</p>
+              <span id="widget-negocio-gastos-detalle" class="text-[10px] text-slate-500 block truncate">Meta: $0 | Fijos: $0</span>
+            </div>
+
+            <!-- 5. Inyecciones de Capital -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-semibold text-emerald-400">📥 Inyecciones</span>
+                <span class="text-[9px] text-emerald-400/80">Bolsillo</span>
+              </div>
               <p id="widget-negocio-total-inyecciones" class="text-sm md:text-base font-bold text-emerald-400 font-mono mt-0.5">+$0</p>
-              <span class="text-[10px] text-slate-500 block">Desde Principal/Inv.</span>
+              <span class="text-[10px] text-slate-500 block truncate">Aportes personales</span>
             </div>
 
-            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-sky-400 block">Margen Entregados</span>
-              <p id="widget-negocio-margen-entregados" class="text-sm md:text-base font-bold text-sky-400 font-mono mt-0.5">+$0</p>
-              <span id="widget-negocio-num-entregados" class="text-[10px] text-slate-500 block truncate">0 pedidos</span>
+            <!-- 6. Retiros de Utilidades -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-semibold text-amber-400">💵 Retiros</span>
+                <span class="text-[9px] text-amber-400/80">Sueldo</span>
+              </div>
+              <p id="widget-negocio-total-retiros" class="text-sm md:text-base font-bold text-amber-300 font-mono mt-0.5">-$0</p>
+              <span class="text-[10px] text-slate-500 block truncate">Ganancia a personal</span>
+            </div>
+          </div>
+
+          <!-- TERMÓMETRO EJECUTIVO: RECUPERACIÓN DE INVERSIÓN PERSONAL / CAMINO A NÚMEROS VERDES -->
+          <div id="panel-recuperacion-inversion" class="bg-slate-950/90 p-3.5 rounded-xl border border-indigo-900/50 space-y-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🎯</span>
+                <div>
+                  <span class="text-xs font-bold text-slate-200">Recuperación de Inversión de Bolsillo</span>
+                  <span class="text-[11px] text-slate-400 ml-1.5">(Capital propio invertido vs Retiros de ganancia)</span>
+                </div>
+              </div>
+              <div id="badge-estado-numeros-verdes" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 self-start sm:self-auto">
+                Calculando recuperación...
+              </div>
             </div>
 
-            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-purple-400 block">Meta Ads / Pauta</span>
-              <p id="widget-negocio-total-ads" class="text-sm md:text-base font-bold text-purple-300 font-mono mt-0.5">-$0</p>
-              <span class="text-[10px] text-slate-500 block">Gasto publicidad</span>
+            <!-- Barra de Progreso de Amortización -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span id="txt-progreso-invertido-vs-retirado" class="text-slate-400 text-[11px]">Invertido de bolsillo: $0 | Retirado: $0</span>
+                <span id="txt-progreso-pct-recuperado" class="font-mono font-bold text-indigo-300 text-xs">0% Recuperado</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
+                <div id="barra-progreso-recuperacion" class="bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400 h-2.5 rounded-full transition-all duration-700" style="width: 0%"></div>
+              </div>
             </div>
 
-            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-pink-400 block">Costos Fijos / Software</span>
-              <p id="widget-negocio-total-fijos" class="text-sm md:text-base font-bold text-pink-300 font-mono mt-0.5">-$0</p>
-              <span class="text-[10px] text-slate-500 block">Apps & servicios</span>
-            </div>
-
-            <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-              <span class="text-[10px] uppercase font-semibold text-rose-400 block">Fletes Devolución / Retiros</span>
-              <p id="widget-negocio-total-fletes-retiros" class="text-sm md:text-base font-bold text-rose-300 font-mono mt-0.5">-$0</p>
-              <span id="widget-negocio-detalle-fletes-retiros" class="text-[10px] text-slate-500 block truncate">Fletes fallidos + Retiros</span>
+            <!-- Diagnóstico y Metas para llegar a Números Verdes -->
+            <div id="mensaje-meta-numeros-verdes" class="text-xs text-slate-300 pt-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 border-t border-slate-800/80">
+              <span class="text-slate-400 text-[11px]">Cargando metas de ventas...</span>
             </div>
           </div>
         </div>
@@ -1929,6 +1988,68 @@
           <button type="button" onclick="cerrarModalTraspaso()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
           <button type="submit" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl transition shadow-lg shadow-sky-600/20 cursor-pointer">
             ⚡ Confirmar Traspaso
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CUADRE RÁPIDO Y AJUSTE DE SALDO DE NEGOCIO -->
+  <div id="modal-cuadre-negocio" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-slate-900 border border-indigo-700/80 rounded-3xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl my-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-lg text-indigo-300">
+            🎯
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white">Cuadre Rápido de Cuenta de Negocio</h2>
+            <p class="text-xs text-slate-400">Ajusta tu saldo bancario real para que cuadre al 100% con tu cuenta física.</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalCuadreRapidoNegocio()" class="text-slate-400 hover:text-white text-lg p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer">✕</button>
+      </div>
+
+      <!-- Resumen del Estado Actual -->
+      <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
+        <div class="flex items-center justify-between text-slate-300">
+          <span class="font-semibold">Cuenta Bancaria Vinculada:</span>
+          <span id="cuadre-modal-nombre-tarjeta" class="font-mono text-indigo-300 font-bold">Banco Santander Negocio</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
+          <div>
+            <span class="text-[10px] text-slate-500 block uppercase">Saldo Base / Inicial Actual:</span>
+            <span id="cuadre-modal-saldo-base-actual" class="font-bold text-slate-200 font-mono text-xs">$0</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-500 block uppercase">Saldo Banco Calculado:</span>
+            <span id="cuadre-modal-saldo-banco-calculado" class="font-bold text-sky-400 font-mono text-xs">$0</span>
+          </div>
+        </div>
+      </div>
+
+      <form id="form-cuadre-negocio" onsubmit="guardarCuadreRapidoNegocio(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="text-slate-300 font-semibold block mb-1">
+            <span>¿Cuánto dinero tienes exactamente AHORA en tu cuenta bancaria real? ($ CLP)</span>
+          </label>
+          <input type="number" id="cuadre-saldo-real-banco" min="0" required placeholder="Ej: 850000" class="w-full bg-slate-950 border border-indigo-500/70 rounded-xl p-3 text-emerald-400 font-mono font-extrabold text-base focus:outline-none focus:border-indigo-400 transition" oninput="actualizarDiferenciaCuadre()">
+          <span class="text-[11px] text-slate-400 mt-1 block">
+            El sistema recalibrará automáticamente el saldo inicial de tu tarjeta para que tu saldo en banco cuadre con exactitud considerando tus Ads y costos ingresados.
+          </span>
+        </div>
+
+        <div id="cuadre-diferencia-box" class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-800/60 hidden">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-indigo-200 font-medium">Ajuste / Diferencia a calibrar:</span>
+            <span id="cuadre-diferencia-monto" class="font-bold font-mono text-indigo-300">$0</span>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalCuadreRapidoNegocio()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition shadow-lg shadow-indigo-600/30 cursor-pointer flex items-center gap-1.5">
+            <span>✅ Calibrar y Cuadrar Saldo</span>
           </button>
         </div>
       </form>
@@ -7731,6 +7852,8 @@
         totalFijos: 0,
         totalFletesDevolucion: 0,
         pedidosDevueltosCount: 0,
+        saldoBancoReal: 0,
+        saldoWalletDropi: 0,
         saldoFinal: 0 
       };
 
@@ -7750,9 +7873,12 @@
       let totalFijos = 0;
       let totalFletesDevolucion = 0;
       let pedidosDevueltosCount = 0;
+      let saldoBancoReal = saldoBase + traspasosEntrantes - traspasosSalientes;
+      let saldoWalletDropi = 0;
+      let saldoFinal = saldoBancoReal;
 
       if (tarjeta.tipo === 'negocio') {
-        // 1. Margen de pedidos efectivamente entregados
+        // 1. Margen de pedidos efectivamente entregados (acreditados a Wallet Dropi)
         (datosDrop.ventas || []).forEach(v => {
           const est = (v.estado || '').trim().toLowerCase();
           if (est === 'entregado') {
@@ -7764,7 +7890,7 @@
             margenEntregados += margen;
             pedidosEntregadosCount++;
           } else if (['devuelto', 'cancelado', 'incidencia', 'sin respuesta'].includes(est)) {
-            // Flete perdido / no recuperado en pedidos que salieron a despacho pero no se entregaron
+            // Flete perdido / descontado directamente de la Wallet por Dropi
             const fletePerdido = Number(v.costo_envio || 0);
             if (fletePerdido > 0) {
               totalFletesDevolucion += fletePerdido;
@@ -7773,19 +7899,24 @@
           }
         });
 
-        // 2. Gasto total en Publicidad (Meta Ads / TikTok Ads / etc.)
+        // 2. Gasto en Publicidad (Meta Ads / TikTok Ads) descontado de cuenta bancaria
         totalAds = (datosDrop.ads || []).reduce((acc, a) => acc + Number(a.gasto || 0), 0);
 
-        // 3. Costos fijos del negocio (Shopify, apps, software, etc.)
+        // 3. Costos fijos del negocio (Shopify, suscripciones, etc.) descontados de cuenta bancaria
         totalFijos = (datosDrop.costos || []).reduce((acc, c) => {
           let f = Number(c.monto || 0);
           if (c.frecuencia_dias === 90) f = f / 3;
           else if (c.frecuencia_dias === 365) f = f / 12;
           return acc + f;
         }, 0);
-      }
 
-      const saldoFinal = saldoBase + traspasosEntrantes - traspasosSalientes + margenEntregados - totalAds - totalFijos - totalFletesDevolucion;
+        // Saldo real en cuenta bancaria física (descontando Ads, Costos Fijos y Retiros personales)
+        saldoBancoReal = saldoBase + traspasosEntrantes - traspasosSalientes - totalAds - totalFijos;
+        // Saldo neto disponible en Wallet Dropi
+        saldoWalletDropi = margenEntregados - totalFletesDevolucion;
+        // Saldo Total Centralizado del Negocio (Banco Real + Wallet Dropi)
+        saldoFinal = saldoBancoReal + saldoWalletDropi;
+      }
 
       return {
         saldoBase,
@@ -7797,6 +7928,8 @@
         totalFijos,
         totalFletesDevolucion,
         pedidosDevueltosCount,
+        saldoBancoReal,
+        saldoWalletDropi,
         saldoFinal
       };
     }
@@ -8085,52 +8218,203 @@
       const tarjetaNegocio = tarjetasNegocio[0] || null;
 
       const elBadgeNombre = document.getElementById('badge-tarjeta-negocio-nombre');
-      const elSaldoDisp = document.getElementById('widget-negocio-saldo-disponible');
-      const elTarjetaDetalle = document.getElementById('widget-negocio-tarjeta-detalle');
+      const elSaldoTotal = document.getElementById('widget-negocio-saldo-disponible');
+      const elSaldoBanco = document.getElementById('widget-negocio-saldo-banco');
+      const elMargenWallet = document.getElementById('widget-negocio-margen-entregados');
+      const elNumEntregados = document.getElementById('widget-negocio-num-entregados');
+      const elWalletDetalle = document.getElementById('widget-negocio-wallet-detalle');
+      const elGastosOperativos = document.getElementById('widget-negocio-total-gastos-operativos');
+      const elGastosDetalle = document.getElementById('widget-negocio-gastos-detalle');
       const elInyecciones = document.getElementById('widget-negocio-total-inyecciones') || document.getElementById('widget-negocio-inyecciones-total');
-      const elMargen = document.getElementById('widget-negocio-margen-entregados');
-      const elNumEntregados = document.getElementById('widget-negocio-num-entregados') || document.getElementById('widget-negocio-pedidos-entregados-count');
-      const elAds = document.getElementById('widget-negocio-total-ads');
-      const elFijos = document.getElementById('widget-negocio-total-fijos');
-      const elFletesRetiros = document.getElementById('widget-negocio-total-fletes-retiros');
-      const elDetalleFletesRetiros = document.getElementById('widget-negocio-detalle-fletes-retiros');
       const elRetiros = document.getElementById('widget-negocio-total-retiros') || document.getElementById('widget-negocio-retiros-total');
+      const elTarjetaDetalle = document.getElementById('widget-negocio-tarjeta-detalle');
+
+      // Elementos del Termómetro Ejecutivo / Recuperación de Inversión
+      const elBadgeVerdes = document.getElementById('badge-estado-numeros-verdes');
+      const elTxtProgresoInvRet = document.getElementById('txt-progreso-invertido-vs-retirado');
+      const elTxtProgresoPct = document.getElementById('txt-progreso-pct-recuperado');
+      const elBarraProgreso = document.getElementById('barra-progreso-recuperacion');
+      const elMensajeMetas = document.getElementById('mensaje-meta-numeros-verdes');
 
       if (!tarjetaNegocio) {
-        if (elBadgeNombre) elBadgeNombre.textContent = 'Sin Tarjeta';
-        if (elSaldoDisp) elSaldoDisp.textContent = '$0';
-        if (elTarjetaDetalle) elTarjetaDetalle.textContent = 'Configura una tarjeta como Negocio';
+        if (elBadgeNombre) elBadgeNombre.textContent = 'Sin Tarjeta Configurada';
+        if (elSaldoTotal) elSaldoTotal.textContent = '$0';
+        if (elSaldoBanco) elSaldoBanco.textContent = '$0';
+        if (elMargenWallet) elMargenWallet.textContent = '$0';
+        if (elNumEntregados) elNumEntregados.textContent = '0 ent.';
+        if (elGastosOperativos) elGastosOperativos.textContent = '-$0';
         if (elInyecciones) elInyecciones.textContent = '+$0';
-        if (elMargen) elMargen.textContent = '+$0';
-        if (elNumEntregados) elNumEntregados.textContent = '0 pedidos';
-        if (elAds) elAds.textContent = '-$0';
-        if (elFijos) elFijos.textContent = '-$0';
-        if (elFletesRetiros) elFletesRetiros.textContent = '-$0';
         if (elRetiros) elRetiros.textContent = '-$0';
+        if (elTarjetaDetalle) elTarjetaDetalle.textContent = 'Configura una tarjeta como Negocio';
         return;
       }
 
       const info = calcularSaldosTarjeta(tarjetaNegocio.id);
 
-      // Calcular retiros específicos desde esta tarjeta hacia cuentas personales
-      let totalRetirosNegocio = 0;
-      (traspasosTarjetas || []).forEach(tr => {
-        if (tr.origen_id == tarjetaNegocio.id) {
-          totalRetirosNegocio += Number(tr.monto || 0);
-        }
-      });
+      if (elBadgeNombre) elBadgeNombre.textContent = `${tarjetaNegocio.banco} + Wallet`;
+      if (elSaldoTotal) elSaldoTotal.textContent = formatoCLP(info.saldoFinal);
+      if (elSaldoBanco) elSaldoBanco.textContent = formatoCLP(info.saldoBancoReal);
+      if (elMargenWallet) elMargenWallet.textContent = (info.saldoWalletDropi >= 0 ? '+' : '') + formatoCLP(info.saldoWalletDropi);
+      if (elNumEntregados) elNumEntregados.textContent = `${info.pedidosEntregadosCount} ent.`;
+      if (elWalletDetalle) elWalletDetalle.textContent = `Margen: ${formatoCLP(info.margenEntregados)} | Fletes: -${formatoCLP(info.totalFletesDevolucion)}`;
+      
+      const totalGastosOperativos = info.totalAds + info.totalFijos;
+      if (elGastosOperativos) elGastosOperativos.textContent = `-${formatoCLP(totalGastosOperativos)}`;
+      if (elGastosDetalle) elGastosDetalle.textContent = `Meta: ${formatoCLP(info.totalAds)} | Fijos: ${formatoCLP(info.totalFijos)}`;
 
-      if (elBadgeNombre) elBadgeNombre.textContent = tarjetaNegocio.nombre;
-      if (elSaldoDisp) elSaldoDisp.textContent = formatoCLP(info.saldoFinal);
-      if (elTarjetaDetalle) elTarjetaDetalle.textContent = `${tarjetaNegocio.banco} •••• ${tarjetaNegocio.digitos || '0000'} (${tarjetaNegocio.formato || 'Cuenta'})`;
       if (elInyecciones) elInyecciones.textContent = `+${formatoCLP(info.traspasosEntrantes)}`;
-      if (elMargen) elMargen.textContent = `+${formatoCLP(info.margenEntregados)}`;
-      if (elNumEntregados) elNumEntregados.textContent = `${info.pedidosEntregadosCount} entregados`;
-      if (elAds) elAds.textContent = `-${formatoCLP(info.totalAds)}`;
-      if (elFijos) elFijos.textContent = `-${formatoCLP(info.totalFijos)}`;
-      if (elFletesRetiros) elFletesRetiros.textContent = `-${formatoCLP(info.totalFletesDevolucion + totalRetirosNegocio)}`;
-      if (elDetalleFletesRetiros) elDetalleFletesRetiros.textContent = `Fletes: ${formatoCLP(info.totalFletesDevolucion)} | Retiros: ${formatoCLP(totalRetirosNegocio)}`;
-      if (elRetiros) elRetiros.textContent = `-${formatoCLP(totalRetirosNegocio)}`;
+      if (elRetiros) elRetiros.textContent = `-${formatoCLP(info.traspasosSalientes)}`;
+      if (elTarjetaDetalle) elTarjetaDetalle.textContent = `${tarjetaNegocio.banco} (•••• ${tarjetaNegocio.digitos || '0000'}) + Dropi`;
+
+      // CÁLCULO DEL TERMÓMETRO EJECUTIVO (Recuperación de Capital Propio / Aportes de Bolsillo)
+      const totalInyectadoBolsillo = info.traspasosEntrantes + (Number(tarjetaNegocio.saldo_inicial || 0) > 0 ? Number(tarjetaNegocio.saldo_inicial || 0) : 0);
+      const totalRetiradoGanancia = info.traspasosSalientes;
+      let pctRecuperacion = 0;
+
+      if (totalInyectadoBolsillo > 0) {
+        pctRecuperacion = Math.round((totalRetiradoGanancia / totalInyectadoBolsillo) * 100);
+      } else if (totalRetiradoGanancia > 0) {
+        pctRecuperacion = 100;
+      }
+
+      const faltaPorRecuperar = Math.max(0, totalInyectadoBolsillo - totalRetiradoGanancia);
+      const gananciaNetaBolsillo = Math.max(0, totalRetiradoGanancia - totalInyectadoBolsillo);
+
+      if (elTxtProgresoInvRet) {
+        elTxtProgresoInvRet.textContent = `Invertido de bolsillo: ${formatoCLP(totalInyectadoBolsillo)} | Retirado a personal: ${formatoCLP(totalRetiradoGanancia)}`;
+      }
+      if (elTxtProgresoPct) {
+        elTxtProgresoPct.textContent = `${Math.min(100, pctRecuperacion)}% Recuperado`;
+      }
+      if (elBarraProgreso) {
+        elBarraProgreso.style.width = `${Math.min(100, Math.max(0, pctRecuperacion))}%`;
+      }
+
+      if (elBadgeVerdes) {
+        if (totalInyectadoBolsillo === 0 && totalRetiradoGanancia === 0) {
+          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 self-start sm:self-auto';
+          elBadgeVerdes.textContent = '⚪ Sin inyecciones registradas';
+        } else if (totalRetiradoGanancia >= totalInyectadoBolsillo && totalInyectadoBolsillo > 0) {
+          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-600 shadow-sm self-start sm:self-auto';
+          elBadgeVerdes.textContent = `🟢 ¡En Números Verdes! (+${formatoCLP(gananciaNetaBolsillo)} ganancia neta)`;
+        } else if (pctRecuperacion >= 50) {
+          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-600 self-start sm:self-auto';
+          elBadgeVerdes.textContent = `🟡 ${pctRecuperacion}% Amortizado (Faltan ${formatoCLP(faltaPorRecuperar)})`;
+        } else {
+          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800 self-start sm:self-auto';
+          elBadgeVerdes.textContent = `🔴 En Fase de Inversión (${pctRecuperacion}% amortizado)`;
+        }
+      }
+
+      if (elMensajeMetas) {
+        if (totalRetiradoGanancia >= totalInyectadoBolsillo && totalInyectadoBolsillo > 0) {
+          elMensajeMetas.innerHTML = `
+            <span class="text-emerald-400 font-semibold flex items-center gap-1">
+              <span>🚀</span> <span>¡Has recuperado el 100% de tu capital de bolsillo! El negocio ahora se autofinancia y genera utilidades reales.</span>
+            </span>
+            <span class="text-slate-400 text-[11px] font-mono">Retirado: ${formatoCLP(totalRetiradoGanancia)}</span>
+          `;
+        } else if (totalInyectadoBolsillo > 0) {
+          const margenPromedioPorPedido = info.pedidosEntregadosCount > 0 ? (info.margenEntregados / info.pedidosEntregadosCount) : 12000;
+          const pedidosEstimadosFaltantes = Math.ceil(faltaPorRecuperar / (margenPromedioPorPedido > 0 ? margenPromedioPorPedido : 12000));
+          elMensajeMetas.innerHTML = `
+            <span class="text-slate-300 text-[11px]">
+              🎯 Te faltan <strong class="text-amber-400 font-mono">${formatoCLP(faltaPorRecuperar)}</strong> para recuperar tu inversión. Con tu margen promedio, necesitas aprox. <strong class="text-sky-300">${pedidosEstimadosFaltantes} pedidos entregados</strong> para alcanzar el punto de equilibrio total.
+            </span>
+            <span class="text-slate-400 text-[11px] font-mono whitespace-nowrap">Meta: 100% Retorno</span>
+          `;
+        } else {
+          elMensajeMetas.innerHTML = `
+            <span class="text-slate-400 text-[11px]">Inyecta capital de trabajo o registra retiros con los botones superiores para activar la proyección ejecutiva.</span>
+          `;
+        }
+      }
+    }
+
+    // ==========================================
+    // MODAL DE CUADRE RÁPIDO DE CUENTA DE NEGOCIO
+    // ==========================================
+    function abrirModalCuadreRapidoNegocio() {
+      const tarjetaNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
+      if (!tarjetaNegocio) {
+        mostrarToast('Debes tener al menos una tarjeta creada para calibrar saldos.', 'warning');
+        return;
+      }
+
+      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
+
+      const elNombre = document.getElementById('cuadre-modal-nombre-tarjeta');
+      const elSaldoBase = document.getElementById('cuadre-modal-saldo-base-actual');
+      const elSaldoBanco = document.getElementById('cuadre-modal-saldo-banco-calculado');
+      const inpReal = document.getElementById('cuadre-saldo-real-banco');
+      const diffBox = document.getElementById('cuadre-diferencia-box');
+
+      if (elNombre) elNombre.textContent = `${tarjetaNegocio.nombre} (${tarjetaNegocio.banco} •••• ${tarjetaNegocio.digitos || '0000'})`;
+      if (elSaldoBase) elSaldoBase.textContent = formatoCLP(Number(tarjetaNegocio.saldo_inicial || 0));
+      if (elSaldoBanco) elSaldoBanco.textContent = formatoCLP(info.saldoBancoReal);
+      if (inpReal) inpReal.value = info.saldoBancoReal >= 0 ? Math.round(info.saldoBancoReal) : '';
+      if (diffBox) diffBox.classList.add('hidden');
+
+      const modal = document.getElementById('modal-cuadre-negocio');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function cerrarModalCuadreRapidoNegocio() {
+      const modal = document.getElementById('modal-cuadre-negocio');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function actualizarDiferenciaCuadre() {
+      const tarjetaNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
+      if (!tarjetaNegocio) return;
+
+      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
+      const saldoRealIngresado = Number(document.getElementById('cuadre-saldo-real-banco')?.value || 0);
+      const diff = saldoRealIngresado - info.saldoBancoReal;
+
+      const diffBox = document.getElementById('cuadre-diferencia-box');
+      const diffMonto = document.getElementById('cuadre-diferencia-monto');
+
+      if (diffBox && diffMonto) {
+        diffBox.classList.remove('hidden');
+        if (diff === 0) {
+          diffMonto.textContent = '$0 (Saldo exactamente cuadrado)';
+          diffMonto.className = 'font-bold font-mono text-emerald-400';
+        } else if (diff > 0) {
+          diffMonto.textContent = `+${formatoCLP(diff)} (Se sumará como calibración de saldo base)`;
+          diffMonto.className = 'font-bold font-mono text-emerald-400';
+        } else {
+          diffMonto.textContent = `${formatoCLP(diff)} (Se restará como calibración de saldo base)`;
+          diffMonto.className = 'font-bold font-mono text-amber-400';
+        }
+      }
+    }
+
+    function guardarCuadreRapidoNegocio(e) {
+      if (e) e.preventDefault();
+
+      const tarjetaNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
+      if (!tarjetaNegocio) return;
+
+      const saldoRealBanco = Number(document.getElementById('cuadre-saldo-real-banco')?.value || 0);
+      if (isNaN(saldoRealBanco) || saldoRealBanco < 0) {
+        mostrarToast('Ingresa un monto válido para el saldo de tu cuenta bancaria.', 'warning');
+        return;
+      }
+
+      // FÓRMULA DE CALIBRACIÓN:
+      // saldoBancoReal = saldoBase + traspasosEntrantes - traspasosSalientes - totalAds - totalFijos
+      // Queremos que saldoBancoReal == saldoRealBanco
+      // Por tanto: nuevoSaldoBase = saldoRealBanco - traspasosEntrantes + traspasosSalientes + totalAds + totalFijos
+      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
+      const nuevoSaldoBase = Math.round(saldoRealBanco - info.traspasosEntrantes + info.traspasosSalientes + info.totalAds + info.totalFijos);
+
+      tarjetaNegocio.saldo_inicial = nuevoSaldoBase;
+      guardarTarjetasEnAlmacenamiento();
+
+      mostrarToast(`¡Cuenta de negocio cuadrada con éxito a ${formatoCLP(saldoRealBanco)}!`, 'success');
+      cerrarModalCuadreRapidoNegocio();
+      procesarModuloTarjetas();
     }
 
     // ==========================================
@@ -8639,6 +8923,12 @@
     window.cambiarSeccionConfig = cambiarSeccionConfig;
     window.abrirModalConfig = abrirModalConfig;
     window.cerrarModalConfig = cerrarModalConfig;
+    window.abrirModalCuadreRapidoNegocio = abrirModalCuadreRapidoNegocio;
+    window.cerrarModalCuadreRapidoNegocio = cerrarModalCuadreRapidoNegocio;
+    window.actualizarDiferenciaCuadre = actualizarDiferenciaCuadre;
+    window.guardarCuadreRapidoNegocio = guardarCuadreRapidoNegocio;
+    window.calcularSaldosTarjeta = calcularSaldosTarjeta;
+    window.renderizarWidgetTarjetaNegocio = renderizarWidgetTarjetaNegocio;
     window.cargarLogoLocal = cargarLogoLocal;
     window.cargarFaviconLocal = cargarFaviconLocal;
     window.actualizarFaviconEnDOM = actualizarFaviconEnDOM;
