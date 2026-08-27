@@ -1140,6 +1140,16 @@
           </button>
         </div>
 
+        <div data-tab-id="deudas" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
+          <button onclick="cambiarTabPers('deudas')" id="tab-pers-deudas-btn" class="tab-pers-btn flex items-center gap-1.5">
+            <span class="sym sym-sm">account_balance_wallet</span>
+            <span>Control de Deudas</span>
+          </button>
+          <button onclick="abrirModalConfigTab('pers', 'deudas')" title="Personalizar pestaÃ±a" class="ml-1.5 p-1 text-slate-500 hover:text-slate-200 rounded hover:bg-slate-800/60 opacity-0 group-hover:opacity-100 transition">
+            <span class="sym sym-sm">more_vert</span>
+          </button>
+        </div>
+
         <div data-tab-id="inversiones" draggable="true" class="nav-tab-item flex items-center group cursor-pointer border-b-2 border-transparent text-slate-400 hover:text-slate-200 px-3 py-2.5 transition">
           <button onclick="cambiarTabPers('inversiones')" id="tab-pers-inv-btn" class="tab-pers-btn flex items-center gap-1.5">
             <span class="sym sym-sm">trending_up</span>
@@ -1692,30 +1702,163 @@
         </div>
       </div>
 
+      <!-- TAB 5: CONTROL DE DEUDAS & OBLIGACIONES FINANCIERAS -->
+      <div id="tab-pers-deudas" class="tab-pers-content hidden space-y-5">
+        <!-- KPIs Deudas -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-slate-400 text-xs font-semibold uppercase">Deuda Total Vigente</span>
+            <p id="kpi-deudas-total-pendiente" class="text-xl font-bold text-rose-400 mt-1">$0</p>
+            <span id="kpi-deudas-conteo" class="text-[11px] text-slate-500">0 compromisos activos</span>
+          </div>
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-slate-400 text-xs font-semibold uppercase">Compromiso Mensual (Cuotas)</span>
+            <p id="kpi-deudas-cuota-mensual" class="text-xl font-bold text-amber-400 mt-1">$0/mes</p>
+            <span class="text-[11px] text-slate-500">Suma cuotas fijas</span>
+          </div>
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-slate-400 text-xs font-semibold uppercase">Total Pagado / Amortizado</span>
+            <p id="kpi-deudas-total-amortizado" class="text-xl font-bold text-emerald-400 mt-1">$0</p>
+            <span id="kpi-deudas-progreso-pct" class="text-[11px] font-semibold text-emerald-400">0% liberado</span>
+          </div>
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-slate-400 text-xs font-semibold uppercase">Cupo Tarjetas Disponible</span>
+            <p id="kpi-deudas-cupo-disponible" class="text-xl font-bold text-sky-400 mt-1">$0</p>
+            <span id="kpi-deudas-cupo-total-txt" class="text-[11px] text-slate-500">LÃ­neas de crÃ©dito</span>
+          </div>
+        </div>
+
+        <!-- Acciones RÃ¡pidas & Barra de Filtros -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800">
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+            <button onclick="filtrarCategoriaDeuda('todas')" id="btn-filtro-deuda-todas" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 text-white transition whitespace-nowrap cursor-pointer">
+              Todas
+            </button>
+            <button onclick="filtrarCategoriaDeuda('tarjeta_credito')" id="btn-filtro-deuda-tc" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition whitespace-nowrap cursor-pointer">
+              ğŸ’³ Tarjetas de CrÃ©dito
+            </button>
+            <button onclick="filtrarCategoriaDeuda('credito_consumo')" id="btn-filtro-deuda-consumo" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition whitespace-nowrap cursor-pointer">
+              ğŸ“Š CrÃ©ditos de Consumo / PrÃ©stamos
+            </button>
+            <button onclick="filtrarCategoriaDeuda('hipotecario_automotriz')" id="btn-filtro-deuda-hipo" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition whitespace-nowrap cursor-pointer">
+              ğŸ  Hipotecario / Automotriz
+            </button>
+            <button onclick="filtrarCategoriaDeuda('informal_proveedor')" id="btn-filtro-deuda-otros" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition whitespace-nowrap cursor-pointer">
+              ğŸ¤ Proveedores / Terceros
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="abrirModalImportarDeudas()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <span>ğŸ“¥</span> <span>Carga Masiva (Excel/CSV)</span>
+            </button>
+            <button onclick="abrirModalNuevaDeuda()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-rose-600/20">
+              <span>â•</span> <span>Nueva Deuda</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- GalerÃ­a de Tarjetas de Deudas Activas -->
+        <div id="contenedor-deudas-galeria" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado dinÃ¡mico -->
+        </div>
+
+        <!-- Historial de Pagos y Amortizaciones Registradas -->
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="p-3.5 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <h3 class="text-xs font-semibold uppercase text-slate-300">Historial de Pagos y Amortizaciones de Deudas</h3>
+              <p class="text-[10px] text-slate-500">Muestra los pagos descontados de tus tarjetas y su impacto en cada deuda</p>
+            </div>
+            <span id="badge-total-pagos-deudas" class="text-xs font-mono font-bold text-emerald-400">$0 Pagados</span>
+          </div>
+          <div class="overflow-x-auto max-h-80">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950 sticky top-0 text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="p-2.5">Fecha</th>
+                  <th class="p-2.5">Deuda / Compromiso</th>
+                  <th class="p-2.5">Tarjeta / Origen Fondos</th>
+                  <th class="p-2.5 text-center">NÂ° Cuota / Tipo</th>
+                  <th class="p-2.5 text-right">Monto Pagado</th>
+                  <th class="p-2.5">Glosa / Comprobante</th>
+                  <th class="p-2.5 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-pagos-deudas-cuerpo" class="divide-y divide-slate-800">
+                <tr><td colspan="7" class="p-6 text-center text-slate-500">No hay pagos de deudas registrados aÃºn.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
   <!-- MODAL PARA SUBIR NUEVA CARTOLA (XLSX / CSV) -->
   <div id="modal-subir-cartola" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[90vh] flex flex-col shadow-2xl">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-5 space-y-4 max-h-[92vh] flex flex-col shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
-          <h2 class="text-base font-bold text-white flex items-center gap-2"><span>ğŸ“¥</span> Importar Movimientos de Cartola Bancaria</h2>
-          <p class="text-xs text-slate-400">Previsualiza y selecciona quÃ© movimientos deseas ingresar a tu base de datos</p>
+          <h2 class="text-base font-bold text-white flex items-center gap-2"><span>ğŸ“¥</span> Importar Cartola Bancaria & Cuadre de Tarjeta</h2>
+          <p class="text-xs text-slate-400">Asigna los movimientos a una cuenta, clasifica gastos, inversiones, traspasos y deudas</p>
         </div>
         <button onclick="cerrarModalSubirCartola()" class="text-slate-400 hover:text-white text-lg">âœ•</button>
       </div>
 
-      <div id="dropzone-cartola-full" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/60 p-4 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1" onclick="document.getElementById('input-cartola-directa').click()">
-        <span class="text-2xl">ğŸ“</span>
+      <!-- Selector de Tarjeta / Cuenta de Origen de la Cartola -->
+      <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-300 block mb-1">ğŸ¦ Tarjeta / Cuenta correspondiente a esta Cartola:</label>
+            <select id="cartola-tarjeta-select" onchange="alCambiarTarjetaModalCartola()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-slate-100 font-semibold focus:outline-none focus:border-sky-500 cursor-pointer">
+              <!-- Opciones dinÃ¡micas de tarjetasUsuario -->
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-300 block mb-1">âš–ï¸ Cuadre de Saldo Final / Ajuste de Diferencia (Opcional):</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="cartola-saldo-cuadre-input" placeholder="Ej: Saldo final exacto de la cartola" oninput="alCambiarCuadreModalCartola()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500">
+              <button type="button" onclick="aplicarSaldoCalculadoComoCuadre()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-[11px] font-medium whitespace-nowrap cursor-pointer" title="Calibrar al saldo resultante">
+                Calibrar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Indicador de Saldo y ConciliaciÃ³n en Vivo -->
+        <div id="banner-conciliacion-tarjeta" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px] border-t border-slate-800/80">
+          <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+            <span class="text-slate-400 block text-[10px]">Saldo Actual en Tarjeta:</span>
+            <strong id="cartola-saldo-actual-txt" class="font-mono text-slate-200 text-xs">$0</strong>
+          </div>
+          <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+            <span class="text-slate-400 block text-[10px]">Neto Cartola (+ / -):</span>
+            <strong id="cartola-neto-movimientos-txt" class="font-mono text-sky-400 text-xs">$0</strong>
+          </div>
+          <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+            <span class="text-slate-400 block text-[10px]">Saldo Estimado Resultante:</span>
+            <strong id="cartola-saldo-resultante-txt" class="font-mono text-emerald-400 text-xs">$0</strong>
+          </div>
+          <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+            <span class="text-slate-400 block text-[10px]">Estado de Cuadre:</span>
+            <strong id="cartola-estado-cuadre-txt" class="text-emerald-400 text-[11px]">âœ“ Sincronizado</strong>
+          </div>
+        </div>
+      </div>
+
+      <div id="dropzone-cartola-full" class="border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950/60 p-3.5 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1" onclick="document.getElementById('input-cartola-directa').click()">
+        <span class="text-xl">ğŸ“</span>
         <span class="text-xs font-semibold text-sky-400">Arrastra tu archivo aquÃ­ (.xlsx, .xls o .csv) o haz clic para seleccionarlo</span>
         <input type="file" id="input-cartola-directa" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoCartolaDirecto(event)">
       </div>
 
-      <div id="resumen-cartola-modal" class="grid grid-cols-3 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs hidden">
-        <div><span class="text-slate-400">Gastos Detectados:</span> <strong id="rm-gastos" class="text-rose-400">$0</strong></div>
-        <div><span class="text-slate-400">Ingresos Detectados:</span> <strong id="rm-ingresos" class="text-emerald-400">$0</strong></div>
+      <div id="resumen-cartola-modal" class="grid grid-cols-4 gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs hidden">
+        <div><span class="text-slate-400">Gastos:</span> <strong id="rm-gastos" class="text-rose-400">$0</strong></div>
+        <div><span class="text-slate-400">Ingresos:</span> <strong id="rm-ingresos" class="text-emerald-400">$0</strong></div>
+        <div><span class="text-slate-400">InversiÃ³n / Deuda:</span> <strong id="rm-otros" class="text-purple-400">$0</strong></div>
         <div><span class="text-slate-400">Seleccionados:</span> <strong id="rm-seleccionados" class="text-sky-400">0</strong></div>
       </div>
 
@@ -1729,7 +1872,7 @@
               <th class="p-2.5">Fecha</th>
               <th class="p-2.5">Detalle Original</th>
               <th class="p-2.5">Destino / Tipo</th>
-              <th class="p-2.5">ClasificaciÃ³n / Activo Destino</th>
+              <th class="p-2.5">ClasificaciÃ³n / Cuenta / Activo</th>
               <th class="p-2.5 text-right">Monto ($)</th>
             </tr>
           </thead>
@@ -1740,10 +1883,197 @@
       </div>
 
       <div class="flex justify-between items-center pt-2 border-t border-slate-800">
-        <button onclick="cerrarModalSubirCartola()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white">Cancelar</button>
-        <button id="btn-importar-modal-supabase" onclick="guardarMovimientosModalEnSupabase()" disabled class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-xs transition">
+        <button onclick="cerrarModalSubirCartola()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white cursor-pointer">Cancelar</button>
+        <button id="btn-importar-modal-supabase" onclick="guardarMovimientosModalEnSupabase()" disabled class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-xs transition shadow-lg shadow-emerald-600/20 cursor-pointer">
           âš¡ Confirmar e Insertar en la Base de Datos
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CREAR / EDITAR DEUDA O COMPROMISO FINANCIERO -->
+  <div id="modal-deuda" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl my-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">ğŸ’³</span>
+          <div>
+            <h2 id="modal-deuda-titulo" class="text-base font-bold text-white">Registrar Deuda / ObligaciÃ³n</h2>
+            <p class="text-xs text-slate-400">Controla tarjetas de crÃ©dito, crÃ©ditos de consumo, hipotecarios o deudas con terceros.</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalDeuda()" class="text-slate-400 hover:text-white text-lg p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer">âœ•</button>
+      </div>
+
+      <form id="form-deuda" onsubmit="guardarDeuda(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="deuda-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Nombre / Identificador de la Deuda</label>
+            <input type="text" id="deuda-nombre" required placeholder="Ej: CMR Falabella, CrÃ©dito Auto Santander, CAE" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Tipo de ObligaciÃ³n / Deuda</label>
+            <select id="deuda-tipo" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-rose-500 transition cursor-pointer" onchange="alCambiarTipoDeudaModal(this.value)">
+              <option value="tarjeta_credito">ğŸ’³ Tarjeta de CrÃ©dito / LÃ­nea de CrÃ©dito</option>
+              <option value="credito_consumo">ğŸ“Š CrÃ©dito de Consumo / PrÃ©stamo Bancario</option>
+              <option value="hipotecario_automotriz">ğŸ  CrÃ©dito Hipotecario / Automotriz</option>
+              <option value="informal_proveedor">ğŸ¤ Deuda Informal / Proveedor / Tercero</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Entidad Financiera / Acreedor</label>
+            <input type="text" id="deuda-entidad" placeholder="Ej: Banco Santander, Scotiabank, CMR, Falabella, Juan PÃ©rez" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Tarjeta / Cuenta Vinculada (Para debitar cuotas)</label>
+            <select id="deuda-tarjeta-origen" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-rose-500 transition cursor-pointer">
+              <!-- Opciones dinÃ¡micas de tarjetasUsuario -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Monto Total Original ($)</label>
+            <input type="number" id="deuda-monto-total" min="1" required placeholder="Ej: 2500000" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 font-mono font-bold focus:outline-none focus:border-rose-500 transition" oninput="if(!document.getElementById('deuda-saldo-pendiente').value) document.getElementById('deuda-saldo-pendiente').value = this.value">
+          </div>
+
+          <div>
+            <label class="text-rose-400 font-semibold block mb-1">Saldo Deudor Pendiente ($)</label>
+            <input type="number" id="deuda-saldo-pendiente" min="0" required placeholder="Ej: 1800000" class="w-full bg-slate-950 border border-rose-900/80 rounded-xl p-2.5 text-rose-400 font-mono font-bold focus:outline-none focus:border-rose-500 transition">
+          </div>
+
+          <div>
+            <label class="text-amber-400 font-semibold block mb-1">Valor Cuota Mensual ($)</label>
+            <input type="number" id="deuda-cuota-mensual" min="0" placeholder="Ej: 85000" class="w-full bg-slate-950 border border-amber-900/80 rounded-xl p-2.5 text-amber-400 font-mono font-bold focus:outline-none focus:border-amber-500 transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">NÂ° Cuotas Pagadas / Totales</label>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="deuda-cuotas-pagadas" min="0" placeholder="Pagadas" class="w-1/2 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 font-mono text-center">
+              <span class="text-slate-500 font-bold">/</span>
+              <input type="number" id="deuda-cuotas-totales" min="1" placeholder="Totales" class="w-1/2 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 font-mono text-center">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">DÃ­a de Vencimiento Mensual</label>
+            <input type="number" id="deuda-dia-vencimiento" min="1" max="31" placeholder="Ej: 5 (cada mes)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 font-mono focus:outline-none focus:border-rose-500 transition">
+          </div>
+
+          <div id="contenedor-cupo-tarjeta">
+            <label class="text-sky-400 font-semibold block mb-1">Cupo Total LÃ­nea ($)</label>
+            <input type="number" id="deuda-cupo-total" placeholder="Ej: 3000000" class="w-full bg-slate-950 border border-sky-900/80 rounded-xl p-2.5 text-sky-400 font-mono font-bold focus:outline-none focus:border-sky-500 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Notas / PropÃ³sito de la Deuda</label>
+          <input type="text" id="deuda-notas" placeholder="Ej: Compra de laptop para el negocio, consolidaciÃ³n de pasivos..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalDeuda()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-xl transition shadow-lg shadow-rose-600/20 cursor-pointer">
+            ğŸ’¾ Guardar ObligaciÃ³n / Deuda
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL REGISTRAR PAGO / ABONO DE DEUDA -->
+  <div id="modal-pago-deuda" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-2xl my-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">ğŸ’¸</span>
+          <div>
+            <h2 class="text-base font-bold text-white">Registrar Pago / Abono de Cuota</h2>
+            <p class="text-xs text-slate-400">Descuenta el dinero de tu tarjeta y amortiza la deuda seleccionada.</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalPagoDeuda()" class="text-slate-400 hover:text-white text-lg p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer">âœ•</button>
+      </div>
+
+      <form id="form-pago-deuda" onsubmit="guardarPagoDeuda(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="pago-deuda-id-target">
+
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Deuda a Pagar / Amortizar</label>
+          <select id="pago-deuda-select" required onchange="alSeleccionarDeudaEnModalPago(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 font-semibold focus:outline-none focus:border-emerald-500 transition cursor-pointer">
+            <!-- DinÃ¡mico -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Tarjeta / Cuenta de Origen</label>
+            <select id="pago-deuda-tarjeta-origen" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500 transition cursor-pointer">
+              <!-- DinÃ¡mico de tarjetasUsuario -->
+            </select>
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">Fecha del Pago</label>
+            <input type="date" id="pago-deuda-fecha" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500 transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-emerald-400 font-semibold block mb-1">Monto a Pagar ($)</label>
+            <input type="number" id="pago-deuda-monto" min="1" required placeholder="Ej: 85000" class="w-full bg-slate-950 border border-emerald-900/80 rounded-xl p-2.5 text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500 transition">
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-semibold block mb-1">NÃºmero de Cuota (Opcional)</label>
+            <input type="number" id="pago-deuda-num-cuota" placeholder="Ej: 5" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 font-mono focus:outline-none focus:border-emerald-500 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Glosa / Comprobante</label>
+          <input type="text" id="pago-deuda-glosa" placeholder="Ej: Pago mensual cuota 5/12 vÃ­a transferencia" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalPagoDeuda()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition shadow-lg shadow-emerald-600/20 cursor-pointer">
+            âš¡ Confirmar Pago & Descontar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL IMPORTAR DEUDAS MASIVAS (CSV / XLSX) -->
+  <div id="modal-importar-deudas-masivas" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2"><span>ğŸ“¥</span> Importar Deudas Masivas (Excel / CSV)</h2>
+        <button onclick="cerrarModalImportarDeudas()" class="text-slate-400 hover:text-white text-lg">âœ•</button>
+      </div>
+      
+      <div id="dropzone-deudas-masivas" class="border-2 border-dashed border-slate-700 hover:border-rose-500 bg-slate-950/60 p-5 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-2" onclick="document.getElementById('input-deudas-masivas-file').click()">
+        <span class="text-3xl">ğŸ“Š</span>
+        <span class="text-xs font-semibold text-rose-400">Arrastra tu archivo Excel (.xlsx, .xls) o CSV con tu lista de deudas</span>
+        <span class="text-[11px] text-slate-500">Columnas esperadas: Nombre/Concepto, Entidad, Monto Total, Saldo Pendiente, Cuota Mensual</span>
+        <input type="file" id="input-deudas-masivas-file" accept=".csv, .xlsx, .xls" class="hidden" onchange="procesarArchivoDeudasMasivas(event)">
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+        <button type="button" onclick="cerrarModalImportarDeudas()" class="px-3.5 py-2 rounded-xl text-slate-400 hover:text-white text-xs">Cerrar</button>
       </div>
     </div>
   </div>
@@ -3936,7 +4266,8 @@
         btn.classList.remove('border-transparent', 'text-slate-400');
       }
       if (tab === 'dashboard') setTimeout(renderizarGraficosDrop, 60);
-      if (tab === 'inversiones_negocio') procesarModuloInversionesNegocio();
+      if (tab === 'inversiones_negocio') procesarModuloDeudas();
+      procesarModuloInversionesNegocio();
     }
 
     function cambiarTabPers(tab) {
@@ -3954,6 +4285,7 @@
       if (tab === 'ingresos_gastos') btnId = 'tab-pers-ing-btn';
       if (tab === 'auditoria_cartola') btnId = 'tab-pers-cartola-btn';
       if (tab === 'inversiones') btnId = 'tab-pers-inv-btn';
+      if (tab === 'deudas') btnId = 'tab-pers-deudas-btn';
 
       const btn = document.getElementById(btnId);
       if (btn) {
@@ -3965,6 +4297,7 @@
       if (tab === 'tarjetas') procesarModuloTarjetas();
       if (tab === 'auditoria_cartola') renderizarPlanillaConsolidada();
       if (tab === 'inversiones') setTimeout(renderizarGraficoInversiones, 60);
+      if (tab === 'deudas') procesarModuloDeudas();
     }
 
     function cambiarSubTabIngreso(tipo) {
@@ -5308,7 +5641,6 @@
       let catSugerida = 'Otros';
 
       if (esMercadoPago) {
-        // Monto principal: preferir real_amount (monto neto real transferido/debitado), sino transaction_amount / monto_neto
         const rawMonto = cleanRow['real_amount'] ??
           cleanRow['monto_neto_de_la_operacion'] ??
           cleanRow['monto_neto_acreditado'] ??
@@ -5320,10 +5652,8 @@
           cleanRow['importe_total'] ??
           cleanRow['monto'] ??
           cleanRow['importe'];
-
         montoNum = parsearMontoUniversal(rawMonto);
 
-        // Fecha: preferir settlement_date, fecha_de_pago, transaction_date, etc.
         fechaRaw = cleanRow['settlement_date'] ??
           cleanRow['fecha_de_pago'] ??
           cleanRow['fecha_pago'] ??
@@ -5353,7 +5683,6 @@
           cleanRow['fecha'] ??
           cleanRow['date'];
 
-        // Si no se encontrÃ³ por nombres directos, buscar cualquier clave con fecha
         if (!fechaRaw) {
           for (let k in cleanRow) {
             const val = cleanRow[k];
@@ -5366,7 +5695,6 @@
           }
         }
 
-        // Construir detalle descriptivo
         const srcId = String(cleanRow['source_id'] ?? cleanRow['id_de_operacion_en_mercado_pago'] ?? cleanRow['id_de_la_operacion'] ?? cleanRow['id_de_operacion'] ?? cleanRow['id_operacion'] ?? '').trim();
         const payMethod = String(cleanRow['payment_method_type'] ?? cleanRow['tipo_de_medio_de_pago'] ?? cleanRow['medio_de_pago'] ?? '').trim();
         const transType = String(cleanRow['transaction_type'] ?? cleanRow['tipo_de_operacion'] ?? cleanRow['operacion'] ?? '').trim().toUpperCase();
@@ -5398,7 +5726,6 @@
           if (subUnit && subUnit !== busUnit) parts.push(subUnit);
           if (issuer) parts.push(issuer);
           if (motivo && !parts.includes(motivo)) parts.push(motivo);
-
           if (parts.length > 0) {
             const extra = payMethod === 'available_money' ? ' (Dinero en Cuenta)' : (payMethod ? ` (${payMethod})` : '');
             desc = `${parts.join(' - ')}${extra}${srcId ? ` #${srcId}` : ''}`;
@@ -5408,25 +5735,20 @@
           }
           destinoSugerido = (montoNum !== null && montoNum < 0) ? 'gasto' : 'ingreso';
         }
-
       } else {
-        // DetecciÃ³n Bancaria General (Santander, Banco de Chile, BCI, Estado, Scotiabank, Tenpo, Mach, etc.)
+        // DetecciÃ³n Bancaria General (Santander, Banco de Chile, BCI, Estado, Scotiabank, Tenpo, Mach, ItaÃº, etc.)
         let cargoRaw = null;
         let abonoRaw = null;
         let montoRaw = null;
-
         for (let k in cleanRow) {
           const val = cleanRow[k];
           if (val === null || val === undefined || val === '') continue;
-
           if (k.includes('impuesto') || k.includes('tax') || k.includes('fee') || k.includes('comision') || k.includes('iva') || k.includes('retencion') || k.includes('saldo_final') || k.includes('balance') || k.includes('saldo_contable') || k.includes('saldo_disponible')) {
             continue;
           }
-
           if (!fechaRaw && (k.includes('fecha') || k.includes('date') || k.includes('fec') || k.includes('periodo') || k.includes('pago'))) {
             fechaRaw = val;
           }
-
           if (k.includes('cargo') || k.includes('debito') || k.includes('egreso') || k.includes('debit') || k.includes('withdrawal')) {
             cargoRaw = val;
           } else if (k.includes('abono') || k.includes('credito') || k.includes('ingreso') || k.includes('credit') || k.includes('deposit')) {
@@ -5434,15 +5756,12 @@
           } else if (k.includes('monto') || k.includes('importe') || k.includes('amount') || k.includes('valor') || k.includes('neto') || k.includes('total')) {
             montoRaw = val;
           }
-
           if (!desc && (k.includes('desc') || k.includes('detalle') || k.includes('glosa') || k.includes('concepto') || k.includes('movimiento') || k.includes('comercio') || k.includes('beneficiario') || k.includes('motivo') || k.includes('referencia'))) {
             desc = String(val).trim();
           }
         }
-
         const parsedCargo = parsearMontoUniversal(cargoRaw);
         const parsedAbono = parsearMontoUniversal(abonoRaw);
-
         if (parsedCargo !== null && parsedCargo !== 0) {
           montoNum = -Math.abs(parsedCargo);
         } else if (parsedAbono !== null && parsedAbono !== 0) {
@@ -5450,12 +5769,10 @@
         } else if (montoRaw !== null) {
           montoNum = parsearMontoUniversal(montoRaw);
         }
-
         if (!desc) desc = 'Movimiento Bancario';
         destinoSugerido = (montoNum !== null && montoNum < 0) ? 'gasto' : 'ingreso';
       }
 
-      // Si fechaRaw sigue siendo nula, buscar en las celdas del objeto original cualquier valor de fecha
       if (!fechaRaw) {
         for (let k in row) {
           const val = row[k];
@@ -5480,6 +5797,7 @@
       let activoPlataformaSugerida = '';
       let activoTasaSugerida = 8.0;
 
+      // 1. DetecciÃ³n Inteligente de InversiÃ³n
       if (/fintual|racional|trii|buda|binance|crypto|larrain vial|banchile|santander corredores|inversion|vector|btg pactual|dap|deposito a plazo|etf|sp500|s&p 500|voo|qqq/i.test(descLower)) {
         destinoSugerido = 'inversion';
         if (/fintual/i.test(descLower)) {
@@ -5506,14 +5824,27 @@
           activoNombreSugerido = desc;
           activoPlataformaSugerida = 'Broker de InversiÃ³n';
         }
-      } else if (montoNum < 0) {
+      }
+      // 2. DetecciÃ³n de Deudas & Cuotas
+      else if (/cmr|falabella|cencosud|ripley|lider bci|tarjeta falabella|pago tarjeta|cuota credito|cae|prestamo|credito consumo|santander consumer|bci nova|pago linea/i.test(descLower)) {
+        destinoSugerido = 'deuda';
+        catSugerida = 'Tarjeta de CrÃ©dito';
+      }
+      // 3. DetecciÃ³n de Traspasos entre cuentas
+      else if (/traspaso|transferencia entre cuentas|abono a cuenta propia|cargo traspaso/i.test(descLower)) {
+        destinoSugerido = 'traspaso';
+      }
+      // 4. Gastos Personales y CategorÃ­as de Gasto de Vida
+      else if (montoNum < 0) {
         destinoSugerido = 'gasto';
-        if (/lider|jumbo|tottus|unimarc|santa isabel|supermercado|almacen|pedidosya|rappi|uber eats|mcdonald|burger|starbucks|cafe|restauran|pizza|sushi|comida|panaderia/i.test(descLower)) {
+        if (/pedidosya|rappi|uber eats|mcdonald|burger|starbucks|cafe|restauran|pizza|sushi|comida|bistro|pub|bar|schop|pasteleria|trattoria|sanguch|schopdog|dunkin|juan valdez/i.test(descLower)) {
+          catSugerida = 'Restaurantes/Delivery';
+        } else if (/lider|jumbo|tottus|unimarc|santa isabel|supermercado|almacen|mayorista|verduleria|carniceria|panaderia/i.test(descLower)) {
           catSugerida = 'Supermercado/Comida';
-        } else if (/enel|cge|aguas|essbio|vtr|wom|entel|movistar|claro|autopista|tag|costanera|vespucio|gasco|lipigas|abastible|luz|agua|gas|internet|servicios/i.test(descLower)) {
-          catSugerida = 'Servicios BÃ¡sicos';
-        } else if (/uber|didi|cabify|copec|shell|petrobras|bencina|combustible|estacionamiento|peaje|metro|bip|auto|taller|mecanico|repuesto/i.test(descLower)) {
+        } else if (/uber|didi|cabify|copec|shell|petrobras|bencina|combustible|estacionamiento|peaje|autopista|tag|costanera|vespucio|metro|bip|auto|taller|mecanico|repuesto/i.test(descLower)) {
           catSugerida = 'Transporte/Auto';
+        } else if (/enel|cge|aguas|essbio|vtr|wom|entel|movistar|claro|gasco|lipigas|abastible|luz|agua|gas|internet|servicios/i.test(descLower)) {
+          catSugerida = 'Servicios BÃ¡sicos';
         } else if (/netflix|spotify|prime|disney|hbo|max|apple|google|youtube|steam|playstation|cine|cinehoyts|cinemark|gym|smartfit|farmacia|cruz verde|ahumada|salcobrand|dr simi|ocio/i.test(descLower)) {
           catSugerida = 'Ocio/Personal';
         } else if (/arriendo|gasto comun|ggcc|condominio|inmobiliaria|vivienda|departamento/i.test(descLower)) {
@@ -5523,14 +5854,11 @@
         destinoSugerido = 'ingreso';
       }
 
-      // Si el destino sugerido es inversiÃ³n o si no se definiÃ³ activo, buscar entre vehÃ­culos disponibles
       const vehiculosDisp = obtenerVehiculosInversionDisponibles();
       let vehiculoSugerido = null;
-
       if (destinoSugerido === 'inversion' || !activoNombreSugerido) {
         if (vehiculosDisp.length > 0) {
-          const descLow = desc.toLowerCase();
-          const match = vehiculosDisp.find(v => v.nombre && descLow.includes(v.nombre.toLowerCase()) || (v.plataforma && descLow.includes(v.plataforma.toLowerCase())));
+          const match = vehiculosDisp.find(v => v.nombre && descLower.includes(v.nombre.toLowerCase()) || (v.plataforma && descLower.includes(v.plataforma.toLowerCase())));
           vehiculoSugerido = match || vehiculosDisp[0];
           activoNombreSugerido = vehiculoSugerido.nombre;
           activoTipoSugerido = vehiculoSugerido.tipo || 'ETF';
@@ -5546,6 +5874,24 @@
       const montoFinal = Math.abs(montoNum);
       const esGasto = montoNum < 0;
 
+      // Buscar si corresponde a alguna tarjeta de destino para traspasos
+      let tarjetaDestinoIdSugerida = null;
+      const tarjetas = cargarTarjetasDeAlmacenamiento();
+      if (destinoSugerido === 'traspaso') {
+        const encontrada = tarjetas.find(t => descLower.includes((t.nombre || '').toLowerCase()) || descLower.includes((t.banco || '').toLowerCase()));
+        if (encontrada) tarjetaDestinoIdSugerida = encontrada.id;
+        else if (tarjetas.length > 1) tarjetaDestinoIdSugerida = tarjetas[1].id;
+      }
+
+      // Buscar si corresponde a alguna deuda existente
+      let deudaIdSugerida = null;
+      const deudas = cargarDeudasDeAlmacenamiento();
+      if (destinoSugerido === 'deuda') {
+        const encontrada = deudas.find(d => descLower.includes((d.nombre || '').toLowerCase()) || descLower.includes((d.entidad || '').toLowerCase()) || descLower.includes((d.categoria || '').toLowerCase()));
+        if (encontrada) deudaIdSugerida = encontrada.id;
+        else if (deudas.length > 0) deudaIdSugerida = deudas[0].id;
+      }
+
       return {
         idTemporal: idx,
         fecha: fechaStr,
@@ -5560,6 +5906,8 @@
         activoPlataforma: activoPlataformaSugerida,
         activoTasa: activoTasaSugerida,
         esNuevoActivo: false,
+        tarjetaDestinoId: tarjetaDestinoIdSugerida,
+        deudaId: deudaIdSugerida,
         seleccionado: true
       };
     }
@@ -5568,6 +5916,7 @@
     // MODAL DE CARGA DE NUEVAS CARTOLAS (XLSX / CSV)
     // =========================================================
     function abrirModalSubirCartola() {
+      poblarSelectTarjetasModalCartola();
       const m = document.getElementById('modal-subir-cartola');
       if (m) m.classList.remove('hidden');
     }
@@ -5578,13 +5927,46 @@
       bufferModalCartola = [];
     }
 
+    function poblarSelectTarjetasModalCartola() {
+      const select = document.getElementById('cartola-tarjeta-select');
+      if (!select) return;
+      cargarTarjetasDeAlmacenamiento();
+      if (!tarjetasUsuario || tarjetasUsuario.length === 0) {
+        select.innerHTML = '<option value="">Sin tarjetas registradas</option>';
+        return;
+      }
+      select.innerHTML = tarjetasUsuario.map(t => {
+        const info = calcularSaldosTarjeta(t.id);
+        const tipoLabel = t.tipo === 'negocio' ? 'ğŸ’¼ Negocio' : (t.tipo === 'inversion' ? 'ğŸ“ˆ InversiÃ³n' : 'ğŸ’³ Personal');
+        return `<option value="${t.id}">${tipoLabel}: ${t.nombre} (${t.banco} â€¢â€¢â€¢â€¢ ${t.digitos || '0000'}) - Saldo: ${formatoCLP(info.saldoFinal)}</option>`;
+      }).join('');
+    }
+
+    function alCambiarTarjetaModalCartola() {
+      actualizarTotalesResumenModal();
+    }
+
+    function alCambiarCuadreModalCartola() {
+      actualizarTotalesResumenModal();
+    }
+
+    function aplicarSaldoCalculadoComoCuadre() {
+      const elSaldoResultante = document.getElementById('cartola-saldo-resultante');
+      const inputCuadre = document.getElementById('cartola-saldo-cuadre-input');
+      if (!elSaldoResultante || !inputCuadre) return;
+      const valStr = elSaldoResultante.textContent.replace(/[^0-9\-]/g, '');
+      if (valStr) {
+        inputCuadre.value = valStr;
+        alCambiarCuadreModalCartola();
+      }
+    }
+
     function procesarArchivoCartolaDirecto(event) {
       const file = event.target.files && event.target.files[0];
       if (file) procesarArchivoCartolaGenerico(file);
     }
 
     function extraerFilasDesdeHojaExcel(sheet) {
-      // 1. Obtener matriz 2D de filas sin pÃ©rdida
       const matrix = XLSX.utils.sheet_to_json(sheet, {
         header: 1,
         defval: "",
@@ -5594,7 +5976,6 @@
 
       if (!matrix || matrix.length === 0) return [];
 
-      // Buscar la fila de encabezados en las primeras 25 filas
       let headerRowIndex = -1;
       const keywordsHeaders = [
         'source_id', 'real_amount', 'transaction_amount', 'settlement_date', 'transaction_type',
@@ -5624,13 +6005,11 @@
         }
       }
 
-      // Si se encontrÃ³ la fila de encabezados
       if (headerRowIndex !== -1) {
         const headers = matrix[headerRowIndex].map((h, i) => {
           const str = String(h || '').trim();
           return str || `col_${i}`;
         });
-
         const resultado = [];
         for (let r = headerRowIndex + 1; r < matrix.length; r++) {
           const row = matrix[r];
@@ -5646,7 +6025,6 @@
         return resultado;
       }
 
-      // Si no se detectÃ³ una fila especial, usar sheet_to_json estÃ¡ndar
       return XLSX.utils.sheet_to_json(sheet, { defval: "" });
     }
 
@@ -5668,11 +6046,9 @@
         let mejorConjuntoDatos = [];
         let maxMovimientosDetectados = 0;
 
-        // Probar todas las hojas del libro para encontrar la que contenga los movimientos
         for (const sheetName of workbook.SheetNames) {
           const sheet = workbook.Sheets[sheetName];
           if (!sheet) continue;
-
           const filasJson = extraerFilasDesdeHojaExcel(sheet);
           if (!filasJson || filasJson.length === 0) continue;
 
@@ -5702,7 +6078,6 @@
 
     async function procesarArchivoCartolaGenerico(file) {
       const fileName = file.name.toLowerCase();
-
       if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
         await parsearComoBinarioCartola(file);
         return;
@@ -5719,10 +6094,9 @@
           delimitersToGuess: [';', ',', '\t', '|'],
           complete: function(results) {
             if (results.data && results.data.length > 0) {
-              const firstRow = results.data[0];
-              const keys = Object.keys(firstRow);
-              if (keys.length === 1 && (keys[0].includes(';') || keys[0].includes('\t') || keys[0].includes(','))) {
-                const forcedDelim = keys[0].includes(';') ? ';' : (keys[0].includes('\t') ? '\t' : ',');
+              const headers = Object.keys(results.data[0]);
+              if (headers.length === 1 && headers[0].includes(';')) {
+                const forcedDelim = ';';
                 Papa.parse(textContent, {
                   header: true,
                   delimiter: forcedDelim,
@@ -5754,14 +6128,9 @@
 
     function analizarDatosParaModalCartola(data) {
       bufferModalCartola = [];
-      let totalGastos = 0;
-      let totalIngresos = 0;
-
       data.forEach((row, idx) => {
         const mov = extraerMovimientoDesdeFilaCartola(row, idx);
         if (mov) {
-          if (mov.destinoFinanciero === 'gasto') totalGastos += mov.monto;
-          else totalIngresos += mov.monto;
           bufferModalCartola.push(mov);
         }
       });
@@ -5773,32 +6142,91 @@
 
       abrirModalSubirCartola();
       document.getElementById('resumen-cartola-modal').classList.remove('hidden');
-      actualizarTotalesResumenModal();
       document.getElementById('btn-importar-modal-supabase').disabled = false;
-
+      actualizarTotalesResumenModal();
       renderizarBufferModal();
     }
 
     function actualizarTotalesResumenModal() {
-      let g = 0, ing = 0, inv = 0, seleccionados = 0;
+      let g = 0, ing = 0, inv = 0, trasp = 0, deu = 0, seleccionados = 0;
       bufferModalCartola.forEach(m => {
         if (m.seleccionado) {
           seleccionados++;
           if (m.destinoFinanciero === 'gasto') g += m.monto;
           else if (m.destinoFinanciero === 'ingreso') ing += m.monto;
           else if (m.destinoFinanciero === 'inversion') inv += m.monto;
+          else if (m.destinoFinanciero === 'traspaso') trasp += m.monto;
+          else if (m.destinoFinanciero === 'deuda') deu += m.monto;
         }
       });
-      document.getElementById('rm-gastos').textContent = formatoCLP(g);
-      document.getElementById('rm-ingresos').textContent = formatoCLP(ing + inv);
-      document.getElementById('rm-seleccionados').textContent = seleccionados;
+
+      const elGastos = document.getElementById('rm-gastos');
+      const elIngresos = document.getElementById('rm-ingresos');
+      const elSeleccionados = document.getElementById('rm-seleccionados');
+      if (elGastos) elGastos.textContent = formatoCLP(g + deu);
+      if (elIngresos) elIngresos.textContent = formatoCLP(ing);
+      if (elSeleccionados) elSeleccionados.textContent = seleccionados;
+
+      // Obtener tarjeta seleccionada
+      const selectTar = document.getElementById('cartola-tarjeta-select');
+      const tarId = selectTar ? selectTar.value : (tarjetasUsuario[0] ? tarjetasUsuario[0].id : null);
+      let saldoActualTarjeta = 0;
+      if (tarId) {
+        const info = calcularSaldosTarjeta(tarId);
+        saldoActualTarjeta = info.saldoFinal;
+      }
+
+      // Neto = Inflows (ingreso) - Outflows (gasto, inversion, deuda, traspasos)
+      const netoMovimientos = ing - g - inv - deu - trasp;
+      const saldoResultante = saldoActualTarjeta + netoMovimientos;
+
+      const elSaldoActual = document.getElementById('cartola-saldo-actual-tarjeta');
+      const elNeto = document.getElementById('cartola-neto-movimientos');
+      const elResultante = document.getElementById('cartola-saldo-resultante');
+      const badgeCuadre = document.getElementById('badge-cuadre-status');
+      const msgCuadre = document.getElementById('mensaje-diferencia-cuadre');
+      const inputCuadre = document.getElementById('cartola-saldo-cuadre-input');
+
+      if (elSaldoActual) elSaldoActual.textContent = formatoCLP(saldoActualTarjeta);
+      if (elNeto) {
+        elNeto.textContent = (netoMovimientos >= 0 ? '+' : '') + formatoCLP(netoMovimientos);
+        elNeto.className = 'font-bold ' + (netoMovimientos >= 0 ? 'text-emerald-400' : 'text-rose-400');
+      }
+      if (elResultante) elResultante.textContent = formatoCLP(saldoResultante);
+
+      if (inputCuadre && inputCuadre.value) {
+        const targetCuadre = Number(inputCuadre.value);
+        const dif = saldoResultante - targetCuadre;
+        if (Math.abs(dif) <= 5) {
+          if (badgeCuadre) {
+            badgeCuadre.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700';
+            badgeCuadre.textContent = 'âœ“ Cuadrado Exacto';
+          }
+          if (msgCuadre) msgCuadre.textContent = 'El saldo proyectado coincide perfectamente con tu saldo de cierre.';
+        } else {
+          if (badgeCuadre) {
+            badgeCuadre.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-900/60 text-amber-300 border border-amber-700';
+            badgeCuadre.textContent = 'Diferencia: ' + formatoCLP(dif);
+          }
+          if (msgCuadre) {
+            msgCuadre.textContent = dif > 0 
+              ? `Hay ${formatoCLP(dif)} mÃ¡s proyectados que en tu cartola real. Al confirmar se calibrarÃ¡ el saldo base.`
+              : `Faltan ${formatoCLP(Math.abs(dif))} para alcanzar el saldo de la cartola. Al confirmar se calibrarÃ¡ el saldo base.`;
+          }
+        }
+      } else {
+        if (badgeCuadre) {
+          badgeCuadre.className = 'text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+          badgeCuadre.textContent = 'Calculando';
+        }
+        if (msgCuadre) msgCuadre.textContent = 'Ingresa el saldo final que indica tu cartola si deseas ajustar automÃ¡ticamente pequeÃ±as diferencias.';
+      }
     }
 
     function obtenerVehiculosInversionDisponibles() {
       const lista = [];
       const nombresVistos = new Set();
 
-      // 1. Activos de la cartera de inversiones (datosPersonal.inversiones)
       (datosPersonal.inversiones || []).forEach(inv => {
         if (inv && inv.nombre) {
           const key = inv.nombre.toLowerCase().trim();
@@ -5818,7 +6246,6 @@
         }
       });
 
-      // 2. Cuentas o Tarjetas de InversiÃ³n creadas (tarjetasUsuario)
       (tarjetasUsuario || []).forEach(t => {
         if (t && (t.tipo === 'inversion' || (t.formato && t.formato.toLowerCase().includes('invers')) || (t.banco && /racional|fintual|buda|broker|inversion|crypto|banchile|vector/i.test(t.banco)))) {
           const key = (t.nombre || t.banco).toLowerCase().trim();
@@ -5838,7 +6265,6 @@
         }
       });
 
-      // 3. Instrumentos / Plataformas habituales para facilitar registro rÃ¡pido
       const presets = [
         { nombre: 'Fintual Risky (Fondos Mutuos)', tipo: 'Fondo Mutuo', plataforma: 'Fintual', tasa: 9.5 },
         { nombre: 'Racional / ETF VOO (S&P 500)', tipo: 'ETF', plataforma: 'Racional / Vanguard', tasa: 10.0 },
@@ -5867,17 +6293,22 @@
 
     function renderizarBufferModal() {
       const tbody = document.getElementById('modal-cartola-preview-body');
+      if (!tbody) return;
+
+      const tarjetas = cargarTarjetasDeAlmacenamiento();
+      const deudas = cargarDeudasDeAlmacenamiento();
 
       tbody.innerHTML = bufferModalCartola.map(m => {
         const esInv = m.destinoFinanciero === 'inversion';
         const esGas = m.destinoFinanciero === 'gasto';
         const esIng = m.destinoFinanciero === 'ingreso';
+        const esTrasp = m.destinoFinanciero === 'traspaso';
+        const esDeu = m.destinoFinanciero === 'deuda';
 
         let campoClasificacion = '';
+
         if (esInv) {
           const vehiculos = obtenerVehiculosInversionDisponibles();
-          
-          // Agrupar vehÃ­culos por categorÃ­a
           const grupos = {};
           vehiculos.forEach(v => {
             if (!grupos[v.grupo]) grupos[v.grupo] = [];
@@ -5900,67 +6331,62 @@
 
           if (!m.esNuevoActivo) {
             campoClasificacion = `
-              <div class="space-y-1.5 py-1">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-[10px] text-purple-400 font-bold uppercase shrink-0">VehÃ­culo:</span>
-                  <select class="bg-slate-900 border border-purple-800 rounded-lg px-2 py-1.5 text-xs text-purple-200 font-medium w-full focus:outline-none focus:border-purple-400 cursor-pointer shadow-inner"
-                    onchange="seleccionarOpcionActivoBufferModal(${m.idTemporal}, this.value)">
-                    ${optgroupsHtml}
-                  </select>
-                </div>
-                <div class="flex items-center justify-between text-[10px] text-slate-400 bg-purple-950/40 px-2.5 py-1 rounded-lg border border-purple-900/50">
-                  <span class="truncate">Tipo: <strong class="text-purple-300">${m.activoTipo || 'ETF'}</strong> â€¢ Broker: <strong class="text-purple-300">${m.activoPlataforma || 'Broker'}</strong></span>
-                  <div class="flex items-center gap-1 shrink-0 ml-1">
-                    <span>Rent:</span>
-                    <input type="number" step="0.1" value="${m.activoTasa || 8.0}" title="Rentabilidad Anual Estimada (%)"
-                      oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTasa = Number(this.value)"
-                      class="bg-slate-900 border border-purple-900/80 rounded px-1 py-0.5 text-[10px] text-purple-200 w-12 text-center">%
-                  </div>
+              <div class="space-y-1 py-1">
+                <select class="bg-slate-900 border border-purple-800 rounded-lg px-2 py-1 text-xs text-purple-200 font-medium w-full focus:outline-none focus:border-purple-400 cursor-pointer"
+                  onchange="seleccionarOpcionActivoBufferModal(${m.idTemporal}, this.value)">
+                  ${optgroupsHtml}
+                </select>
+                <div class="flex items-center justify-between text-[10px] text-slate-400 bg-purple-950/40 px-2 py-0.5 rounded border border-purple-900/50">
+                  <span class="truncate">${m.activoTipo || 'ETF'} â€¢ ${m.activoPlataforma || 'Broker'}</span>
+                  <span class="text-purple-300 font-bold ml-1">${m.activoTasa || 8}% anual</span>
                 </div>
               </div>
             `;
           } else {
             campoClasificacion = `
-              <div class="space-y-1.5 py-1.5 bg-purple-950/30 p-2.5 rounded-xl border border-purple-900/60">
-                <div class="flex justify-between items-center pb-1 mb-1 border-b border-purple-900/40">
-                  <span class="text-[10px] font-bold text-amber-300 flex items-center gap-1">âœ¨ Nuevo Activo / VehÃ­culo</span>
-                  <button type="button" onclick="cancelarNuevoActivoBufferModal(${m.idTemporal})" class="text-[10px] text-purple-400 hover:text-purple-200 underline cursor-pointer font-medium">â†© Elegir Activo Creado</button>
+              <div class="space-y-1 py-1 bg-purple-950/30 p-2 rounded-lg border border-purple-900/60">
+                <div class="flex justify-between items-center text-[10px]">
+                  <span class="text-amber-300 font-bold">âœ¨ Nuevo Activo</span>
+                  <button type="button" onclick="cancelarNuevoActivoBufferModal(${m.idTemporal})" class="text-purple-400 hover:text-purple-200 underline">Elegir Existente</button>
                 </div>
-                <div>
-                  <input type="text" value="${m.activoNombre || ''}" placeholder="Nombre del activo (ej: Fintual, ETF VOO, DAP...)" 
-                    oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoNombre = this.value"
-                    class="bg-slate-900 border border-purple-800 rounded-lg px-2 py-1 text-xs text-purple-200 w-full focus:outline-none focus:border-purple-400 placeholder:text-purple-400/40">
-                </div>
-                <div class="grid grid-cols-3 gap-1.5 text-[10px]">
-                  <select onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTipo = this.value" class="bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-[10px] text-slate-200 cursor-pointer">
-                    <option value="ETF" ${m.activoTipo==='ETF'?'selected':''}>ETF</option>
-                    <option value="Fondo Mutuo" ${m.activoTipo==='Fondo Mutuo'?'selected':''}>Fondo Mutuo</option>
-                    <option value="Acciones" ${m.activoTipo==='Acciones'?'selected':''}>Acciones</option>
-                    <option value="DAP" ${m.activoTipo==='DAP'?'selected':''}>DAP</option>
-                    <option value="Cripto" ${m.activoTipo==='Cripto'?'selected':''}>Cripto</option>
-                    <option value="Inmobiliario / Otros" ${m.activoTipo==='Inmobiliario / Otros'?'selected':''}>Otros</option>
-                  </select>
-                  <input type="text" value="${m.activoPlataforma || ''}" placeholder="Broker / Banco"
-                    oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoPlataforma = this.value"
-                    class="bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-[10px] text-slate-200 placeholder:text-slate-500">
-                  <div class="flex items-center gap-0.5">
-                    <input type="number" step="0.1" value="${m.activoTasa || 8.0}" placeholder="8.0"
-                      oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoTasa = Number(this.value)"
-                      class="bg-slate-900 border border-slate-700 rounded px-1 py-1 text-[10px] text-purple-300 w-full text-center">%
-                  </div>
-                </div>
+                <input type="text" value="${m.activoNombre || ''}" placeholder="Nombre del activo..." 
+                  oninput="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).activoNombre = this.value"
+                  class="bg-slate-900 border border-purple-800 rounded px-2 py-0.5 text-xs text-purple-200 w-full">
               </div>
             `;
           }
+        } else if (esTrasp) {
+          const optsTarjetas = tarjetas.map(t => `<option value="${t.id}" ${String(m.tarjetaDestinoId) === String(t.id) ? 'selected' : ''}>${t.nombre} (${t.banco})</option>`).join('');
+          campoClasificacion = `
+            <div class="space-y-1 py-1">
+              <span class="text-[10px] text-sky-400 font-bold uppercase">Cuenta Destino:</span>
+              <select class="bg-slate-900 border border-sky-800 rounded-lg px-2 py-1 text-xs text-sky-200 font-medium w-full focus:outline-none focus:border-sky-400 cursor-pointer"
+                onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).tarjetaDestinoId = this.value">
+                ${optsTarjetas || '<option value="">Sin cuentas creadas</option>'}
+              </select>
+            </div>
+          `;
+        } else if (esDeu) {
+          const optsDeudas = deudas.map(d => `<option value="${d.id}" ${String(m.deudaId) === String(d.id) ? 'selected' : ''}>${d.nombre} (${d.entidad} - Saldo: ${formatoCLP(d.saldo_pendiente)})</option>`).join('');
+          campoClasificacion = `
+            <div class="space-y-1 py-1">
+              <span class="text-[10px] text-rose-400 font-bold uppercase">Compromiso / Deuda:</span>
+              <select class="bg-slate-900 border border-rose-800 rounded-lg px-2 py-1 text-xs text-rose-200 font-medium w-full focus:outline-none focus:border-rose-400 cursor-pointer"
+                onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).deudaId = this.value">
+                ${optsDeudas || '<option value="">Sin deudas creadas</option>'}
+              </select>
+            </div>
+          `;
         } else if (esGas) {
           campoClasificacion = `
             <select class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200 w-full focus:outline-none focus:border-sky-500 cursor-pointer" onchange="bufferModalCartola.find(x=>x.idTemporal===${m.idTemporal}).categoria = this.value">
-              <option value="Otros" ${m.categoria==='Otros'?'selected':''}>Otros Gastos</option>
-              <option value="Supermercado/Comida" ${m.categoria==='Supermercado/Comida'?'selected':''}>Supermercado & Comida</option>
-              <option value="Servicios BÃ¡sicos" ${m.categoria==='Servicios BÃ¡sicos'?'selected':''}>Servicios BÃ¡sicos</option>
-              <option value="Transporte/Auto" ${m.categoria==='Transporte/Auto'?'selected':''}>Transporte / Auto</option>
-              <option value="Ocio/Personal" ${m.categoria==='Ocio/Personal'?'selected':''}>Ocio / Personal</option>
-              <option value="Vivienda/Arriendo" ${m.categoria==='Vivienda/Arriendo'?'selected':''}>Vivienda / Arriendo</option>
+              <option value="Supermercado/Comida" ${m.categoria==='Supermercado/Comida'?'selected':''}>ğŸ›’ Supermercado & Comida</option>
+              <option value="Restaurantes/Delivery" ${m.categoria==='Restaurantes/Delivery'?'selected':''}>ğŸ” Restaurantes & Delivery</option>
+              <option value="Transporte/Auto" ${m.categoria==='Transporte/Auto'?'selected':''}>ğŸš— Transporte / Bencina / Auto</option>
+              <option value="Servicios BÃ¡sicos" ${m.categoria==='Servicios BÃ¡sicos'?'selected':''}>ğŸ’¡ Servicios BÃ¡sicos</option>
+              <option value="Vivienda/Arriendo" ${m.categoria==='Vivienda/Arriendo'?'selected':''}>ğŸ  Vivienda / Arriendo</option>
+              <option value="Ocio/Personal" ${m.categoria==='Ocio/Personal'?'selected':''}>ğŸ® Ocio / Personal</option>
+              <option value="Otros" ${m.categoria==='Otros'?'selected':''}>ğŸ“¦ Otros Gastos</option>
             </select>
           `;
         } else {
@@ -5973,23 +6399,25 @@
 
         return `
         <tr class="hover:bg-slate-800/40 transition">
-          <td class="p-2.5 text-center">
+          <td class="p-2 text-center">
             <input type="checkbox" ${m.seleccionado ? 'checked' : ''} onchange="toggleItemBufferModal(${m.idTemporal}, this.checked)" class="rounded bg-slate-800 border-slate-700 text-sky-600 focus:ring-0 cursor-pointer">
           </td>
-          <td class="p-2.5 text-slate-400 font-mono text-xs">${m.fecha}</td>
-          <td class="p-2.5 font-medium text-slate-200 text-xs">${m.descripcion}</td>
-          <td class="p-2.5">
-            <select class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs font-semibold cursor-pointer ${esInv ? 'text-purple-300 border-purple-700' : (esGas ? 'text-rose-300' : 'text-emerald-300')}" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
+          <td class="p-2 text-slate-400 font-mono text-xs">${m.fecha}</td>
+          <td class="p-2 font-medium text-slate-200 text-xs max-w-[200px] truncate" title="${m.descripcion}">${m.descripcion}</td>
+          <td class="p-2">
+            <select class="bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs font-semibold cursor-pointer ${esInv ? 'text-purple-300 border-purple-700' : (esTrasp ? 'text-sky-300 border-sky-700' : (esDeu ? 'text-rose-300 border-rose-700' : (esGas ? 'text-amber-300' : 'text-emerald-300')))}" onchange="cambiarDestinoBufferModal(${m.idTemporal}, this.value)">
               <option value="gasto" ${esGas?'selected':''}>ğŸ’¸ Gasto</option>
               <option value="inversion" ${esInv?'selected':''}>ğŸš€ InversiÃ³n (Aporte)</option>
+              <option value="traspaso" ${esTrasp?'selected':''}>ğŸ”„ Traspaso Cuenta</option>
+              <option value="deuda" ${esDeu?'selected':''}>ğŸ’³ Pago Deuda</option>
               <option value="ingreso" ${esIng?'selected':''}>ğŸ’µ Ingreso</option>
             </select>
           </td>
-          <td class="p-2.5 min-w-[240px]">
+          <td class="p-2 min-w-[220px]">
             ${campoClasificacion}
           </td>
-          <td class="p-2.5 text-right font-semibold text-xs ${esGas?'text-rose-400':(esInv?'text-purple-400':'text-emerald-400')}">
-            ${esGas ? '-' : '+'}${formatoCLP(m.monto)}
+          <td class="p-2 text-right font-semibold text-xs ${(esGas || esDeu)?'text-rose-400':(esInv?'text-purple-400':(esTrasp?'text-sky-400':'text-emerald-400'))}">
+            ${(esGas || esDeu || esInv || esTrasp) ? '-' : '+'}${formatoCLP(m.monto)}
           </td>
         </tr>
       `;
@@ -6001,7 +6429,6 @@
     function seleccionarOpcionActivoBufferModal(idTemporal, val) {
       const item = bufferModalCartola.find(x => x.idTemporal === idTemporal);
       if (!item) return;
-
       if (val === 'nuevo') {
         item.esNuevoActivo = true;
         item.activoId = null;
@@ -6062,13 +6489,16 @@
             item.activoTipo = v.tipo || 'ETF';
             item.activoPlataforma = v.plataforma || '';
             item.activoTasa = Number(v.tasa || 8.0);
-          } else {
-            item.esNuevoActivo = true;
-            item.activoId = null;
-            item.activoNombre = item.activoNombre || item.descripcion || 'ETF VOO (S&P 500)';
-            item.activoTipo = item.activoTipo || 'ETF';
-            item.activoPlataforma = item.activoPlataforma || 'Racional';
-            item.activoTasa = item.activoTasa || 8.0;
+          }
+        } else if (dest === 'traspaso') {
+          const tarjetas = cargarTarjetasDeAlmacenamiento();
+          if (tarjetas.length > 1) {
+            item.tarjetaDestinoId = tarjetas[1].id;
+          }
+        } else if (dest === 'deuda') {
+          const deudas = cargarDeudasDeAlmacenamiento();
+          if (deudas.length > 0) {
+            item.deudaId = deudas[0].id;
           }
         }
       }
@@ -6087,12 +6517,16 @@
 
       const btn = document.getElementById('btn-importar-modal-supabase');
       btn.disabled = true;
-      btn.textContent = 'Insertando en Supabase...';
+      btn.textContent = 'Procesando e insertando...';
+
+      const selectTar = document.getElementById('cartola-tarjeta-select');
+      const tarjetaOrigenId = selectTar ? selectTar.value : (tarjetasUsuario[0] ? tarjetasUsuario[0].id : null);
+      const tarjetaOrigen = (tarjetasUsuario || []).find(t => String(t.id) === String(tarjetaOrigenId));
 
       const gastosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'gasto').map(m => ({
         fecha: m.fecha,
         categoria: m.categoria || 'Otros',
-        descripcion: m.descripcion,
+        descripcion: m.descripcion + (tarjetaOrigen ? ` [${tarjetaOrigen.nombre}]` : ''),
         monto: Math.abs(m.monto),
         tipo: 'variable'
       }));
@@ -6100,7 +6534,7 @@
       const ingresosParaInsertar = seleccionados.filter(m => m.destinoFinanciero === 'ingreso').map(m => ({
         fecha: m.fecha,
         cliente_empresa: m.descripcion,
-        detalle_servicio: 'Ingreso Bancario / Abono',
+        detalle_servicio: `Ingreso Bancario / Abono${tarjetaOrigen ? ` a ${tarjetaOrigen.nombre}` : ''}`,
         monto_bruto: Math.abs(m.monto),
         retencion_porcentaje: 0,
         monto_liquido: Math.abs(m.monto),
@@ -6108,20 +6542,24 @@
       }));
 
       const movimientosInversion = seleccionados.filter(m => m.destinoFinanciero === 'inversion');
+      const movimientosTraspaso = seleccionados.filter(m => m.destinoFinanciero === 'traspaso');
+      const movimientosDeuda = seleccionados.filter(m => m.destinoFinanciero === 'deuda');
 
       let errores = [];
 
+      // 1. Insertar Gastos en Supabase
       if (gastosParaInsertar.length > 0) {
         const { error: errG } = await ejecutarConReintentos(() => db.from('gastos_personales').insert(gastosParaInsertar), 4, 1000);
         if (errG) errores.push('Gastos: ' + errG.message);
       }
 
+      // 2. Insertar Ingresos en Supabase
       if (ingresosParaInsertar.length > 0) {
         const { error: errI } = await ejecutarConReintentos(() => db.from('honorarios').insert(ingresosParaInsertar), 4, 1000);
         if (errI) errores.push('Ingresos: ' + errI.message);
       }
 
-      // Manejo inteligente de Inversiones: Si el activo ya existe, se acumula el capital; si no, se crea uno nuevo
+      // 3. Procesar Inversiones y reflejar aporte
       if (movimientosInversion.length > 0) {
         for (const movInv of movimientosInversion) {
           const montoAporte = Math.abs(movInv.monto);
@@ -6138,7 +6576,6 @@
           }
 
           if (activoExistente && activoExistente.id) {
-            // Acumular capital invertido y valor actual
             const nuevoCap = Number(activoExistente.capital_invertido || 0) + montoAporte;
             const nuevoActual = Number(activoExistente.valor_actual || 0) + montoAporte;
             const nuevaTasa = movInv.activoTasa || activoExistente.rentabilidad_anual_estimada || 8.0;
@@ -6151,10 +6588,8 @@
                 fecha: movInv.fecha
               }).eq('id', activoExistente.id)
             , 4, 1000);
-
             if (errUpdate) errores.push(`InversiÃ³n (${nombreActivo}): ` + errUpdate.message);
           } else {
-            // Crear nuevo registro de activo
             const { error: errInsert } = await ejecutarConReintentos(() => 
               db.from('inversiones').insert([{
                 fecha: movInv.fecha,
@@ -6166,9 +6601,87 @@
                 plataforma: movInv.activoPlataforma || 'Broker / Cuenta InversiÃ³n'
               }])
             , 4, 1000);
-
             if (errInsert) errores.push(`InversiÃ³n (${nombreActivo}): ` + errInsert.message);
           }
+
+          // Crear traspaso a inversiÃ³n para descontar de la tarjeta origen
+          if (tarjetaOrigenId) {
+            traspasosTarjetas.push({
+              id: Date.now() + Math.floor(Math.random() * 1000),
+              fecha: movInv.fecha,
+              origen_id: tarjetaOrigenId,
+              origen_nombre: tarjetaOrigen ? tarjetaOrigen.nombre : 'Cuenta Origen',
+              destino_id: 'inversion',
+              destino_nombre: `Aporte InversiÃ³n: ${nombreActivo}`,
+              monto: montoAporte,
+              tipo_operacion: 'aporte_inversion',
+              glosa: `Aporte a ${nombreActivo} desde cartola bancaria`
+            });
+            guardarTraspasosEnAlmacenamiento();
+          }
+        }
+      }
+
+      // 4. Procesar Traspasos entre Tarjetas
+      if (movimientosTraspaso.length > 0) {
+        movimientosTraspaso.forEach(mt => {
+          const destTar = (tarjetasUsuario || []).find(t => String(t.id) === String(mt.tarjetaDestinoId));
+          traspasosTarjetas.push({
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            fecha: mt.fecha,
+            origen_id: tarjetaOrigenId,
+            origen_nombre: tarjetaOrigen ? tarjetaOrigen.nombre : 'Cuenta Origen',
+            destino_id: mt.tarjetaDestinoId,
+            destino_nombre: destTar ? destTar.nombre : 'Cuenta Destino',
+            monto: Math.abs(mt.monto),
+            tipo_operacion: 'traspaso_personal',
+            glosa: mt.descripcion || 'Traspaso importado de cartola'
+          });
+        });
+        guardarTraspasosEnAlmacenamiento();
+      }
+
+      // 5. Procesar Pagos de Deudas
+      if (movimientosDeuda.length > 0) {
+        const deudas = cargarDeudasDeAlmacenamiento();
+        movimientosDeuda.forEach(md => {
+          const montoPago = Math.abs(md.monto);
+          const deuda = deudas.find(d => String(d.id) === String(md.deudaId));
+          
+          pagosDeudasUsuario.push({
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            fecha: md.fecha,
+            deuda_id: md.deudaId,
+            deuda_nombre: deuda ? deuda.nombre : 'Compromiso Financiero',
+            tarjeta_origen_id: tarjetaOrigenId,
+            tarjeta_origen_nombre: tarjetaOrigen ? tarjetaOrigen.nombre : 'Tarjeta Bancaria',
+            monto: montoPago,
+            numero_cuota: deuda ? Math.min(deuda.cuotas_totales, (deuda.cuotas_pagadas || 0) + 1) : 1,
+            glosa: md.descripcion || 'Pago de cuota desde cartola'
+          });
+
+          if (deuda) {
+            deuda.saldo_pendiente = Math.max(0, Number(deuda.saldo_pendiente || 0) - montoPago);
+            deuda.cuotas_pagadas = Math.min(deuda.cuotas_totales, (deuda.cuotas_pagadas || 0) + 1);
+            if (deuda.saldo_pendiente === 0 || deuda.cuotas_pagadas >= deuda.cuotas_totales) {
+              deuda.estado = 'pagada';
+            }
+          }
+        });
+        guardarDeudasEnAlmacenamiento();
+        guardarPagosDeudasEnAlmacenamiento();
+      }
+
+      // 6. Cuadre / CalibraciÃ³n de Saldo en Tarjeta si se especificÃ³
+      const inputCuadre = document.getElementById('cartola-saldo-cuadre-input');
+      if (inputCuadre && inputCuadre.value && tarjetaOrigen) {
+        const saldoCierreDeseado = Number(inputCuadre.value);
+        // Calcular lo que darÃ­a el saldo final actual
+        const info = calcularSaldosTarjeta(tarjetaOrigen.id);
+        const diferencia = saldoCierreDeseado - info.saldoFinal;
+        if (Math.abs(diferencia) > 0) {
+          tarjetaOrigen.saldo_inicial = Number(tarjetaOrigen.saldo_inicial || 0) + diferencia;
+          guardarTarjetasEnAlmacenamiento();
         }
       }
 
@@ -6178,7 +6691,7 @@
       if (errores.length > 0) {
         mostrarToast("Aviso al insertar movimientos:\n" + errores.join('\n'), 'warning');
       } else {
-        mostrarToast(`Â¡Ã‰xito! Se procesaron e insertaron ${seleccionados.length} movimientos en tu base de datos.`, 'success');
+        mostrarToast(`Â¡Ã‰xito! Se procesaron e insertaron ${seleccionados.length} movimientos en tu base de datos y saldos de tarjeta.`, 'success');
         cerrarModalSubirCartola();
         await cargarTodo();
       }
@@ -9157,256 +9670,48 @@
       const selClasif = document.getElementById('traspaso-clasificacion') || document.getElementById('traspaso-tipo-operacion');
 
       const tOri = tarjetasUsuario.find(t => t.id == oriId);
-      const tDes = tarjetasUsuario.find(t => t.id == desId);
+  xœÌ=ËrÉqw~EAif¼˜@‚AX äÂK0]…cƒ4¦ƒÚíéu÷à!j"tõÅ
+[røâĞÆê¦ƒõÁá‹#Ä?Ù°>Á™õè®ª®êéH­pÀÌÔ#++++_õ"„ag9ÉwhF6H¤_Ó<È¾È¦AÊ’Ş9‹ÃvN66IŞc!ÙØ !ÍöÂÎÓ{÷ÿë÷ÉÑtDS–’œMÈ&É„¦Á½ÿ>&,ÎiÄF>HFGïÿ'†æÆg,ù;'íü eä§?xÀgF£í(ÈØy‡¼“ÅdA(ĞãMm 6­˜’!KZX‡Ñò&)‹‡lD-ò«_+s˜dy’µ::|R6Û»¢)%:”“àDµö´¨2#4Êè<Ì¬¶Y|IÓŒ%qknëEÑ¹­›M˜t11³èbf6¦‹lğ*á-Š™Õöt)[/+5•šĞ¾¦‘9Pò4È&A–œÀ,€yaĞèú”_äT¼æ“¦Z2œaîôF4ß(~ıôf/lfô’Ñ«®‚İMRœd]¨Ùê<5€eA&·ÇëÚ ¡!*šƒ‘‘³8ñ¢w[x~–ÑGV4ÃâsI„a§QaİìXˆ;Á¢,ì<5EÍµ€&>{9½Î·eq’“bf)5k)Šw
+Ú[5OwX6Y'Ş'é8È“íW‡m‰`Wyò1êÌNŸü¡áÄr÷OPÑÓ?œ®şqhâÓî&yûÇë©oû‡%=ı“_‚h; í¤û ,9–ãİ–hËbçÓx˜ÃLô–.¨#hÌ¼š‹´½fñ=H‹óK§•:ÏÅ¤7œ«Ëf­K¶^°ù¢–»ı1ÒÚ=ŸÑ´İ ^£),LsUEa€Uå´l6ù0YÒa[[¶ˆ¨OéerTŠ½êÔ"]A–§z¢É*Ë’OT=£"î&_›QZá•
+¦{jarGQzT
+4ä° 
+¨x1®šÄâ9¶È˜+É¿ÿ)RŒqÖ¤‰jaŠ8{ŒQŸbsİ¯V“ë·äšE–MÄ·³$
+²É6ÏÈ€<åÕÒ$£İGƒA‹¬Ë”,
+rÚ}In!-Æ:/Ôè¼C^Î•”uGIlvkëoÍë<Ï‡ë$ä5û$ånDs2I“!Í‚8L^‚©’ºĞÌy ÖĞSSDÌRmZÒ‚Ó©Ch¹	±CÏƒi”·–ÆŞö:$¥ù4Uá:Äò…¢,˜§7íyN‡A3Í‹.&e]8^$7/0õ(OŸZ¸üXÚêÇ×W…	¶úp!ƒa2ä67ò*MñÁvº‰jÈ :«ıÇ×«&&£(Ér//º
+²ŠBáy/OÙ¸ÍA´ZÅ¬³õ¾`^Èº_|(–ìô8	²¼İ:¢"áF\Á™i BŒ(<z­eÒº
+Ò˜Å£–ÖybI ÍŒØÈ™´QÂ6.¯Ù:^ğ	BnˆdTø<ƒßMIÈ0¼5Ndòë6VNBÁEÏ6`XkğÛ‹G)72e…Ë÷ßE,LÈ8¸IRÁ­’ÓM/ó?¦v×¸‘auiÂZ§×ÉhZpC®Úe-‡ËT=AŒÚ	Ö3R ë(#|šuT»Ø÷çÒÉá} ¤ãŒ´UæYÁí³Î©Nò‡Ş¦è£«Ş(PÌhtGJDÑ*Ïõ·Ê@O@1vRˆ±uS|êùL^—âATÖTäl•¬¢–šÊôÎzÓ8»`çyÛ@=,ÕŸíÆ[Ñ8Ò83hˆ{uEaƒßOÿü]LHÃîSgl=bX&ğyÿÇk–'÷OadÓ!X™>†4MÑKƒÈö)ñOÚX`%ªƒe‰9G3,Ò‡ŒæÇlL“iŞalş®mDfËäáZ)Á•y…ÿ¯`Â$W½Q¥ª•"‰d7ñ°´³hÄÆ€cih±Ğvƒó”›Bö0V'ª&àB=OKcË€ÿÏŒLˆhWû†,İ–éÈ€í’d9Ë¼0şü¿»]âç<íÉ¡~®±?h©,ø§Ñ%h6¦9Kß‡êbœ\2ÁX’—`.¥=cÎÏ–@¬‹ts^Î–zZ+gy|1 Ú:zÿ§e¢°U3cfz:÷K:TU¡·g¢¤G9
+÷Qh2“ÓH›ß¢0N7"f“Ò£†\yT¦Mı¬°c1Ø…TÃñ0IAµQ•œÈKÂ";æQY.±T«…Yò‹)Mo¸‘'éVµ[=—îù°ğ][0Ìn0¼hCŸƒú
+èH‰^J;h»u6êfßÜtƒ‡³,½¢«–SüÅ½¡ŒzDºğ0A!šH¥ˆŞR9Ÿ-w<æŸ"f^cë”w‰¥tÉ? ³Sc
+Pº‘ R½ôaç¨Â{sª(_7¥qHSöKøà,
+Šõq	K·  â%Ğt!}-âøzÔNõ~¤ß ´!ô´Y†b¤…;D vyĞg	²U4Œÿù¿~ÿ·ûS ößÿvç‹Wdg—l¼>~sğ
+¿îì~±³uD~
+iû‡oö÷È‹½×[¯·÷vß}˜æÑíé4,l+à§¯Ş>-]ò`” )ım?Œ@¼èÖ0Ÿ€VÌ”!/Øöóİ<9:>x³õr÷Dö
 
-      // Sugerir tipo de operaciÃ³n inteligente segÃºn combinaciÃ³n
-      if (tOri && tDes && selClasif) {
-        if (tDes.tipo === 'negocio' && (tOri.tipo === 'principal' || tOri.tipo === 'costos')) {
-          selClasif.value = 'principal_a_negocio';
-        } else if (tDes.tipo === 'negocio' && tOri.tipo === 'inversion') {
-          selClasif.value = 'inversion_a_negocio';
-        } else if (tOri.tipo === 'negocio' && (tDes.tipo === 'principal' || tDes.tipo === 'costos')) {
-          selClasif.value = 'negocio_a_principal';
-        } else if (tOri.tipo === 'negocio' && tDes.tipo === 'inversion') {
-          selClasif.value = 'negocio_a_inversion';
-        } else if (tDes.tipo === 'inversion') {
-          selClasif.value = 'principal_a_inversion';
-        } else {
-          selClasif.value = 'traspaso_general';
-        }
-      }
-
-      const txtOri = document.getElementById('preview-traspaso-origen-txt');
-      const saldoOri = document.getElementById('preview-traspaso-origen-saldo');
-      const txtDes = document.getElementById('preview-traspaso-destino-txt');
-      const saldoDes = document.getElementById('preview-traspaso-destino-saldo');
-
-      if (tOri) {
-        const infoOri = calcularSaldosTarjeta(tOri.id);
-        if (txtOri) txtOri.textContent = tOri.nombre;
-        if (saldoOri) saldoOri.textContent = `Disp: ${formatoCLP(infoOri.saldoFinal)}`;
-      }
-      if (tDes) {
-        const infoDes = calcularSaldosTarjeta(tDes.id);
-        if (txtDes) txtDes.textContent = tDes.nombre;
-        if (saldoDes) saldoDes.textContent = `Disp: ${formatoCLP(infoDes.saldoFinal)}`;
-      }
-
-      alCambiarMontoTraspaso();
-    }
-
-    function alCambiarMontoTraspaso() {
-      const oriId = (document.getElementById('traspaso-origen') || document.getElementById('traspaso-cuenta-origen'))?.value;
-      const desId = (document.getElementById('traspaso-destino') || document.getElementById('traspaso-cuenta-destino'))?.value;
-      const monto = Number((document.getElementById('traspaso-monto') || document.getElementById('traspaso-input-monto'))?.value || 0);
-
-      const infoOri = calcularSaldosTarjeta(oriId);
-      const infoDes = calcularSaldosTarjeta(desId);
-
-      const nuevoSaldoOri = infoOri.saldoFinal - monto;
-      const nuevoSaldoDes = infoDes.saldoFinal + monto;
-
-      const elOri = document.getElementById('preview-traspaso-origen-saldo') || document.getElementById('traspaso-preview-saldo-origen');
-      const elDes = document.getElementById('preview-traspaso-destino-saldo') || document.getElementById('traspaso-preview-saldo-destino');
-
-      if (elOri && oriId) {
-        elOri.textContent = `${formatoCLP(infoOri.saldoFinal)} â” ${formatoCLP(nuevoSaldoOri)}`;
-        elOri.className = `text-[10px] font-mono font-bold ${nuevoSaldoOri < 0 ? 'text-rose-400' : 'text-slate-300'}`;
-      }
-      if (elDes && desId) {
-        elDes.textContent = `${formatoCLP(infoDes.saldoFinal)} â” ${formatoCLP(nuevoSaldoDes)}`;
-        elDes.className = 'text-[10px] font-mono font-bold text-emerald-400';
-      }
-    }
-
-    let procesandoGuardarTraspaso = false;
-    function guardarTraspaso(e) {
-      if (e) e.preventDefault();
-      if (procesandoGuardarTraspaso) return;
-      procesandoGuardarTraspaso = true;
-
-      try {
-        const fecha = (document.getElementById('traspaso-fecha') || document.getElementById('traspaso-input-fecha'))?.value || hoyFechaStr;
-        const oriId = (document.getElementById('traspaso-origen') || document.getElementById('traspaso-cuenta-origen'))?.value;
-        const desId = (document.getElementById('traspaso-destino') || document.getElementById('traspaso-cuenta-destino'))?.value;
-        const tipoOperacion = (document.getElementById('traspaso-clasificacion') || document.getElementById('traspaso-tipo-operacion'))?.value || 'traspaso_general';
-        const monto = Number((document.getElementById('traspaso-monto') || document.getElementById('traspaso-input-monto'))?.value || 0);
-        const glosa = (document.getElementById('traspaso-glosa') || document.getElementById('traspaso-input-glosa'))?.value?.trim() || '';
-
-        if (!oriId || !desId) {
-          mostrarToast('Selecciona ambas cuentas para el traspaso.', 'warning');
-          return;
-        }
-
-        if (oriId == desId) {
-          mostrarToast('La cuenta de origen y destino deben ser distintas.', 'warning');
-          return;
-        }
-
-        if (isNaN(monto) || monto <= 0) {
-          mostrarToast('Ingresa un monto vÃ¡lido mayor a 0.', 'warning');
-          return;
-        }
-
-        const tOri = tarjetasUsuario.find(t => t.id == oriId);
-        const tDes = tarjetasUsuario.find(t => t.id == desId);
-
-        const nuevoTraspaso = {
-          id: Date.now(),
-          fecha,
-          origen_id: Number(oriId),
-          origen_nombre: `${tOri?.nombre || 'Origen'} (${tOri?.banco || ''})`,
-          destino_id: Number(desId),
-          destino_nombre: `${tDes?.nombre || 'Destino'} (${tDes?.banco || ''})`,
-          monto,
-          tipo_operacion: tipoOperacion,
-          glosa: glosa || 'Traspaso entre cuentas'
-        };
-
-        traspasosTarjetas.unshift(nuevoTraspaso);
-        guardarTraspasosEnAlmacenamiento();
-
-        mostrarToast(`Â¡Traspaso de ${formatoCLP(monto)} registrado con Ã©xito!`, 'success');
-        cerrarModalTraspaso();
-        procesarModuloTarjetas();
-      } finally {
-        setTimeout(() => { procesandoGuardarTraspaso = false; }, 350);
-      }
-    }
-    window.guardarTraspaso = guardarTraspaso;
-
-    async function eliminarTraspaso(id) {
-      const tr = traspasosTarjetas.find(t => t.id == id);
-      if (!tr) return;
-
-      const confirmado = await pedirConfirmacion({
-        titulo: `Â¿Eliminar Traspaso de ${formatoCLP(tr.monto)}?`,
-        mensaje: `Se revertirÃ¡ el movimiento entre "${tr.origen_nombre}" y "${tr.destino_nombre}".`,
-        btnTexto: 'SÃ­, Eliminar'
-      });
-
-      if (!confirmado) return;
-
-      traspasosTarjetas = traspasosTarjetas.filter(t => t.id != id);
-      guardarTraspasosEnAlmacenamiento();
-      mostrarToast('Traspaso eliminado y saldos recalculados.', 'success');
-      procesarModuloTarjetas();
-    }
-
-    function filtrarTraspasosPorTipo(tipo) {
-      filtroTraspasosTipo = tipo;
-      document.querySelectorAll('.btn-fc-traspaso').forEach(btn => {
-        btn.classList.remove('bg-sky-600', 'text-white', 'font-semibold');
-        btn.classList.add('text-slate-400');
-      });
-      const actBtn = document.getElementById(`btn-filtro-traspaso-${tipo}`);
-      if (actBtn) {
-        actBtn.classList.remove('text-slate-400');
-        actBtn.classList.add('bg-sky-600', 'text-white', 'font-semibold');
-      }
-      renderizarTablaTraspasos();
-    }
-
-    function irATabTarjetasDesdeNegocio() {
-      cambiarWorkspace('personal');
-      cambiarTabPers('tarjetas');
-    }
-    window.cerrarModalAuth = cerrarModalAuth;
-    window.cambiarModoAuth = cambiarModoAuth;
-    window.alternarVisibilidadPassword = alternarVisibilidadPassword;
-    window.loginConGoogle = loginConGoogle;
-    window.loginConPassword = loginConPassword;
-    window.registrarUsuario = registrarUsuario;
-    window.confirmarCerrarSesion = confirmarCerrarSesion;
-    window.pedirConfirmacion = pedirConfirmacion;
-    window.mostrarToast = mostrarToast;
-    window.toggleSeleccionConsolidado = toggleSeleccionConsolidado;
-    window.toggleSeleccionarTodosConsolidados = toggleSeleccionarTodosConsolidados;
-    window.filtrarPlanillaConsolidada = filtrarPlanillaConsolidada;
-    window.eliminarFilaConsolidadaIndividual = eliminarFilaConsolidadaIndividual;
-    window.eliminarMovimientosConsolidadosSeleccionados = eliminarMovimientosConsolidadosSeleccionados;
-    window.renderizarPlanillaConsolidada = renderizarPlanillaConsolidada;
-    window.abrirModalSubirCartola = abrirModalSubirCartola;
-    window.cerrarModalSubirCartola = cerrarModalSubirCartola;
-    window.procesarArchivoCartolaDirecto = procesarArchivoCartolaDirecto;
-    window.guardarMovimientosModalEnSupabase = guardarMovimientosModalEnSupabase;
-    window.alternarEstadoHonorario = alternarEstadoHonorario;
-    window.abrirModalEditarHonorario = abrirModalEditarHonorario;
-    window.cerrarModalEditarHonorario = cerrarModalEditarHonorario;
-    window.eliminarHonorario = eliminarHonorario;
-    window.eliminarGastoPersonal = eliminarGastoPersonal;
-    window.eliminarInversion = eliminarInversion;
-    window.eliminarVenta = eliminarVenta;
-    window.eliminarAds = eliminarAds;
-    window.eliminarCosto = eliminarCosto;
-    window.cambiarTabPers = cambiarTabPers;
-    window.cambiarTabDrop = cambiarTabDrop;
-    window.cambiarWorkspace = cambiarWorkspace;
-    window.cambiarSubTabIngreso = cambiarSubTabIngreso;
-    window.cargarTodo = cargarTodo;
-    window.toggleFormularioPedidoManual = toggleFormularioPedidoManual;
-    window.filtrarPedidosPorEstado = filtrarPedidosPorEstado;
-    window.toggleSeleccionPedido = toggleSeleccionPedido;
-    window.toggleSeleccionarTodosPedidos = toggleSeleccionarTodosPedidos;
-    window.eliminarPedidosSeleccionados = eliminarPedidosSeleccionados;
-    window.cambiarEstadoPedidoRapido = cambiarEstadoPedidoRapido;
-    window.abrirModalEditarPedido = abrirModalEditarPedido;
-    window.cerrarModalEditarPedido = cerrarModalEditarPedido;
-    window.renderizarTablaPedidos = renderizarTablaPedidos;
-    window.abrirModalCSV = abrirModalCSV;
-    window.cerrarModalCSV = cerrarModalCSV;
-    window.procesarArchivoPedidosDirecto = procesarArchivoPedidosDirecto;
-    window.procesarArchivoPedidosGenerico = procesarArchivoPedidosGenerico;
-    window.aplicarValoresDefecto = aplicarValoresDefecto;
-    window.guardarCSVEnSupabase = guardarCSVEnSupabase;
-    window.abrirModalNuevaTarjeta = abrirModalNuevaTarjeta;
-    window.abrirModalEditarTarjeta = abrirModalEditarTarjeta;
-    window.cerrarModalTarjeta = cerrarModalTarjeta;
-    window.cambiarBancoModalTarjeta = cambiarBancoModalTarjeta;
-    window.cambiarTipoTarjetaModal = cambiarTipoTarjetaModal;
-    window.actualizarPreviewTarjetaModal = actualizarPreviewTarjetaModal;
-    window.eliminarTarjeta = eliminarTarjeta;
-    window.abrirModalTraspaso = abrirModalTraspaso;
-    window.abrirModalTraspasoNegocioInyeccion = abrirModalTraspasoNegocioInyeccion;
-    window.abrirModalTraspasoNegocioRetiro = abrirModalTraspasoNegocioRetiro;
-    window.cerrarModalTraspaso = cerrarModalTraspaso;
-    window.alCambiarCuentasTraspaso = alCambiarCuentasTraspaso;
-    window.alCambiarMontoTraspaso = alCambiarMontoTraspaso;
-    window.eliminarTraspaso = eliminarTraspaso;
-    window.filtrarTraspasosPorTipo = filtrarTraspasosPorTipo;
-    window.irATabTarjetasDesdeNegocio = irATabTarjetasDesdeNegocio;
-    window.procesarModuloTarjetas = procesarModuloTarjetas;
-    window.toggleDesplegableHonorarios = toggleDesplegableHonorarios;
-    window.toggleDesplegableKpisPersonal = toggleDesplegableKpisPersonal;
-    window.toggleDesplegableKpisTarjetas = toggleDesplegableKpisTarjetas;
-    window.toggleDesplegableInversion = toggleDesplegableInversion;
-    window.toggleModoPrivacidad = toggleModoPrivacidad;
-    window.seleccionarTemaRapido = seleccionarTemaRapido;
-    window.seleccionarFuenteApp = seleccionarFuenteApp;
-    window.actualizarColorAcento = actualizarColorAcento;
-    window.actualizarColorIconos = actualizarColorIconos;
-    window.restablecerTemaDefecto = restablecerTemaDefecto;
-    window.abrirModalConfigTab = abrirModalConfigTab;
-    window.cerrarModalConfigTab = cerrarModalConfigTab;
-    window.guardarYcerrarModalConfigTab = guardarYcerrarModalConfigTab;
-    window.cambiarSeccionConfig = cambiarSeccionConfig;
-    window.abrirModalConfig = abrirModalConfig;
-    window.cerrarModalConfig = cerrarModalConfig;
-    window.abrirModalCuadreRapidoNegocio = abrirModalCuadreRapidoNegocio;
-    window.cerrarModalCuadreRapidoNegocio = cerrarModalCuadreRapidoNegocio;
-    window.actualizarDiferenciaCuadre = actualizarDiferenciaCuadre;
-    window.guardarCuadreRapidoNegocio = guardarCuadreRapidoNegocio;
-    window.calcularSaldosTarjeta = calcularSaldosTarjeta;
-    window.renderizarWidgetTarjetaNegocio = renderizarWidgetTarjetaNegocio;
-    window.cargarLogoLocal = cargarLogoLocal;
-    window.cargarFaviconLocal = cargarFaviconLocal;
-    window.actualizarFaviconEnDOM = actualizarFaviconEnDOM;
-
-    // InicializaciÃ³n general
-    inicializarAuth();
-    aplicarConfiguraciones();
-    setupDragAndDrop();
-    cargarTodo();
-  </script>
-</body>
-</html>
+N¦¢“l
+,rr¹"£jÍÃ­—GZ}ç‰„¢Õ69d¤£ İÙ¡¶œ+xÄåÅ§Á´% Ø@f#ŠÓm/§ãvµGV$êš¸Mñ¿?:xİ×$£¼¬nacı-00nz,ãŸm£rGÄ´”^DãQ~A6Ñê
+Ã,àX!ÂäÃ¢PD¿“ˆöĞğo·vÓ}Pƒfë0™©6}å`NAjÔ¿ôk:D -@‡L?À¸
+2%–mş*p°íõİäTVoKNy²½ÿ†¼¢àŒFQĞÒ‹Â ³0  ­O¹íë.5T\¬ÁÔ·Ó÷Á lUc8c!‰0ÌD[kú$Oò :a1² ‚.¬ğO/ÇµæÉÄr"ôèÉš]Üã$=NÖ	Ú)SêÑšUŒÈD“0.Ğ˜#æ
+<2:d¸	¦ÍN‚˜7°ú¨·fø,8n¥-´NÖ*n“è(Z7«ƒÕÇİÁJw°Öª–‚fÀh(Š­¬ÚÅ€OÀz€|P+ìÒ§»YÛÉxJFWvdLì
+€ËÀ	.a´©ît,{YkÕÉZjì9À„˜²5Í“q’ƒfªå±£ Ô`^s ÷ó˜èá|şâ<1‡¿VyĞÍ`Oæ1ØÃÇu¶2˜Ça+zOj9le‹­ãtWæ²ØG±F,¦†((»„’ßÎÙ×†O+¿½µŒk!ı–µ_LÛ6Î€f¨­Ì«¶–…"	Íâ;·Uæ²ÖéŠšBSeÙ;[W¸:)Ôôaiz|]­Ûó4¶ÓZHmW!pİ]Mv)ğj©¡Å9T>î¡¹WÓõ=X©ÌÅBTÄ<où¤¢ÚEò
+^šè'Z¤n¥&¿”ï"2»¤)—äPmË!mKŒwª²×¥‚cğÅÒDHRKÅÊY9›H!‹äçe±sÕÊ`µÀ+>¯Öx5÷£Qº¢‹LJ›ºÆ µ ïÊ ÿğqaÌñîÍ—Üšš+¾}“Ô#ÃkAßVë2­"Î"è2}qõŞŒülÿ¼ÎE{j”ªÕåà¨(‚Ù¢{l|¥?~²,zÑÜâ%••BvğÔ.²œ¼/%‡U {ÍÆÉ—¥õ%âié…Ä8mqƒ'ÛN¦|‹ÀÀ
+½^$7X•^ñõ‘¶wí3^ Š¡^Ue\Î\CÍªÇ°'0±sRÚ`¨ÕrGÏ²[Å¥Ğ‹ºPtï“9`Ú ÒêÕ–qD•®Ÿ|¢­@h´Ãñ!xËâEĞ+è¢fªd.6áHH›j@IebW¦uÈ:i?Àï¶,ÔU;=jvp®å-?sğö!3Ç„¸ÙÑ,RúY¡\±Z¶òCô“$ÆvÔóÇÉ4[7»e”˜éÔŸİ³¿iú~ŸˆX
+òùá^fÌ}>aÇÈ\u»¦¾™°.gŸ.çCµ,oï½R ¦g‹@Ë¦gNXœİ›â$íJ’ú5FLÀó!v|Óä°®6{¼#§€úĞ{Ãh6JšÁŠÙ%ºCŒR$c–¹± ã'`Jìî•“·dÆ,Ö^0}	¬*4%ƒá:&ÿUw˜UÅßŒ”ıÎ—îIvZisNGã¢9ëRºŠ¯âÃÉ–ÌßÑ[à..²µªTEş1wÙÉD®Câ='§;ïÿïÜR“/Êk}t”’•SÜxÄ¤™	½ÿ‹fÖv:oNêUª¸±w".—5¡™ØÛ³lFBèy&ğŞŠø/:É§™ÎşvÄÔ¨îGç#&¶­$ß›äËå:Nï"‰Á@ë#CùÿÕÛN/¥átHÛí`8\&|E¾’O”ò¸T>‰Ø/¦¸ó7ÑÉ¤³t*Ô è4<P=Û»TÒ lÇm4ùp½Ñ@n“ïôÜò‹^
+Ó"lWÙ˜ôÍ:òwà«PwÊ–DT¢hçY]35®F1{~şåÛoÿ ŞUsô,¢Èr%¤ÙO„±ÚÑ6yjç[ô&7È£Á"m~GÀ†¦èoÜdcà¿û/²º»`ßì(änÇ’Ã¶´šRI‹ËŒ05¸!Ë&IÌ€¦YK·	^ˆåjr£¹Å¦Ò[2tüÏ_®ÕÊC“Tèƒ¬;•Z†4Ô é#Vz Åoğ¬!œšÕ½ûÅúkqËÛ€ÚÀ=0ÛŠ€¸ØÔéåÉ«äŠ¦ÛAnEÅCà[šÕ bÖètôÁ7=3hCÿÃbl~€ALÓÏ÷_!ç†â³]¾Ş½±4L@+O‚¸{™ÜtWVÅÎç!ªÖ”hëækƒÁeqşãgƒAÿñ€pá@ÃîêuDÎ’˜F~tÑª_¢Ò€0é>^Ú´,[!ŞàC 7>ë®.mşåÛş§g}ÈŸ['ca˜›Ò—6_'ä"¸Qk€ ĞS å›5sÙ4×İ+l~|İÅp;çİDÿÑÒæŸ¿Û½ÒiyŸN)p	Şÿg²”Lã@Í.M“eÔ‘ÔÆ	IŠT#?ÅıT$J`‚àQ•õÜÈŸMóTWÌÈ†ßl,g)[¾^Oé¥`ÆvgIuprİ}„<°ŠãÌ7ø?†ş]$—4]W)Øãr;DÁ 0`Š<æ(d`\u£‘ú¦àöWĞĞ}iw’ğå•
+_òÃïÿ¼‘»ÚRÂ‘‹³vOû¢«&„
+Qê%·oöØóoLìÀ€¬®Îî)ç©pòK^ÜGïäpõ(Kó8A!«ùâà¦×6WÆªn¼Yù09*Ë…3Ë“a~ˆeĞÑ¤Yc·ÁzX6l¶V¶kQ öG™­Œ9(ûY5cÊnôKzè¦‹šqô¹Š3Â?¢çüÄ°=@z€Jü¡;Âu°€ÛzZM¬Ÿ­úOäÜâ	QŞ
+ñÉ?ÑÎ ˆ?*5GÉµ ãl6ÀQ4Ú)ZÃ"¡ÚrahUšw-»›ÇıUzãø[kŞªáÏØ$Éé•¶§eƒ4JŒÆe’Ö¾L¹
+_ »›f,çËNíí­İ•É4DæàË$™"P1p‘!üÓ­¥«l¥£¼+8ú9 !ZQgÕõT
+b·"NzUô¹ÔŸ
+Ó 53ŒƒIw÷xÆ@¾32¢×ü_òõ¼Øó›îÍ¯(+(tFJ¡! %ÁVÎ#H¼`aEF |âPzÏy#6lPZã¬S8ÍQG?tÀP\éƒÆ’aèGÈ¸Æ-ºŠZtĞ[+H0KÒl0[Ú|ğÎ¶&¹†kÍõ±1,ÎÀˆ´¯	Ö`Â‰!:/M»Q0Á'Š®rì¤ã\‡±xªJ'e8iGê4„unüdD¼MB.mşğ¿%¯öşá‹½­-‰çÌÖÌM¨şÅ#	'5†]İ˜†l:£$·Êğ1Ú•ßñ0b<D#8ş‡_ÿ`@Š°ÖqÅÉqÑ*Dß,{ÖŸ8ùÏeÍñ›½Ñkp7DQ%ÌADš…3Í*äã`ÑFL{‡!“¶0K)¡M}Iì%ÜúÑ%Ñ¶°êpxóÿı·9çíˆÚèË¨£¬wèƒD ı•ÿ—9ğ®L®•h£”…ÿ¡ØÌ@Ìàˆ¯’1(N°5÷lÍpÏ*ŞYÑ+Ğ:Júg9‹’á7K›üh.)l¤ZùViEùwòd².l*Gu‹3ÉÅ)åYyÆç²»´ÌÊ)×hVŠfÙè"÷MÃÛÓïK\*""°#£pw ¡eñùèS³BuWZÁĞ—9z‚9ó*—/WÅ­Ú%1WªÄ¬ŠÍ-¾ÛRzë˜§I<2éÆ­" ï
+b>„ú	^RƒWİœ;(›Çnó˜ÛTØ«n>ä¤Ÿı„ğš\TÜÜïvÉ§Ašrâ0MxĞ¿o“4g¿”—Xu»õÆ—ˆ4QaatÍ	 ºR?–GÜùà]ávÎ~2Hğ”#h³îhÑ|Ì»²û•²]ˆøJ©X””æ¹–¡ëë­öBT£4àR¬›'İ”œ§É¸ŒÙ\²@NvÁI
+y¹fcPê¹n ?Ã)TÇXp‰dù*¼+æ‰—6ıT¸½Ê›#4\Kº™Ñoá.AqUDKHYÿgv°ìq³`™Ç–wäì‘iè)GiŞ*¸Vòş_¾ı×ï%sËT¥júdëôB÷û¬wX²šxª»Ø³Nïk@ºİju\"å‚Å›r™â3–åè?ñ‰|“,fÆÒö6ÍßKU­a=KÂ›ºu!tùÒ§ZøÀ*æªÇ}¦rLRìm©îbùïß}[Yà°pfëYn>ËC‚6$ŒèÆÒcÍT~\şWvïæ^Z'Å‰ãL.ï&$@VÉH £¦½gı<Á Mjaóü}1¤U\Åèë£¯eĞ:TÃŠİŞh˜îR‚œUEÉ#ÓLàRTyè¶ÎğÆ˜‚& {|WëŒ÷ÙÊ»L±ª“ÁéÛ]¹×¹]nÊ˜×Š¹üaÂunvˆí®¸³5Àå¹F­èÌ¢dZIm	FÈÄ@ßËşá×¿kÖ·­m3V9ï…+§Y³]s«‚Ú™Ğ¼c–èôºŸºÆ˜˜ÃšG.ç³{É§C­ivŠO;ùëÔªÃÊæJe»LÙç•=G'‹òÏ.‹ƒ¾œÓouxY©¼¿ÚéevI›`»ŸÀKPt©ağ¬SÌ"qÑƒÌ•Zê,óÂDªfn²Ù½¾h)Mñ»”¼:SŒ…ÕmgÇü²„ººcl[m$ä¥[Öv+¼ôÿ—w‘¶Ì¢‘NÑœ½¯Â¹	6’&šËMÅõ}r¸¾ŠËœš2y›ª'ê•]‹Fáái?”v¨´!.Å¾ÏÛtH\¸W¬ŞŠ&æVÑ[ÈºrU‡°²º ¹˜ªÃ4‹ ƒ™#¢:€ÕÆBp©%µ¦0¸Ô§5 ûİæÎÜ$DËÚñÏ§{Cy`
+Ñ RV8ß>UéœWo—	›ˆâ°}šíÚs±Lè¹WæoLj¢G¼˜ÜÔãüH\†ú…Q·æÂÎ]ä¨½÷áÄjØ+OUsĞJÌz÷¦| ùëÜ›rg¡ìHß]Z»¶Ã|	îÚ)sg©îiï\¸¼³
+{úIxÏ¥Ÿ*¹$éßˆ~Ğ®Vs›À/nç;‘r^P+„píí´ñ;_MËÁÌ½—Vá3÷RZÖPznQ•êb.¥i¬û=mpJmÌ…Wèœ9 µıD¨Ÿš+c¥Â˜Mh —‚(7. tjolµUEÓ*êGkÅy¥]—2iÚ¶¥¢jûgi–…šĞt•ÖÆŠ¯¥el£Ğ[µıp(¦í˜Š¬¶[û4m¢¢Ñ´VÖ*­Úhî$1•Z³›«…nj prğõ÷	áTw5îa’‚h¿„ÿ¸‰qÈo–¢,ÑHÆæo_¯uop¿OÀ¸×ß.ÒÆq1H5ÚÇrÎ¾¦CĞsYÆFq;\öÉ]V2y¹”¥Ëš$\v‰„e[öØ'o"bÙšÏËÖÜ[vÌÇ^Ç—v\¬c×Q—ÿ´+â~a,°¹aaÚÁ3jßry‹ÑÎÌ™—Ñ„ŞÔYâOÊ¥)T€Nİwh:÷Şm§4p3Q\+g±ı·!L–ø(±8;ü5˜Á8UnÎdı²c1<Û˜×‹á[zğ®¸u¶¸­8Ğn+îyn+ÖDPÃË©ˆÃ/óÜ×yøò?ÜõÇ¦åí»û˜xn3şHÁ&Ô¸Ã¸îb÷ğ’÷ÎbÕ3qg±d¾åœj‡n{äU¢Vš/ ĞûïS6„ï KÆxBŒ˜í*á,z‰±Fš;ŒJûÎ
+–´wŞ]<ƒ]²VİZ4¹ŸØfëÅn/vm…a¡b`¼¡åv×Ë”7İzï–‘Tkş·{ 5¹ÌøÚbå-5©(\30rmÜ†ÃâÉù"J(ò}“
+Œ}ùBFÎ5 ÆKù¶Eò¥
+cS‰êJ§èT]Œ^ÖØÏ3¨oå3…]§ÀÓ¼e˜œE &2¹\9]ÌßT“ãß1d¬HsĞÓ7ˆ„æB%ÎÔ›%¹¥k‰<xwÄï™jãïWœ2A²:×MÊƒæ~ MÆ‘¶vL`Fº„ïx¶vV¢¢YGÇ´/P-©,İ›» ¤Ôm‹=&YåŒ°+SÒÚOX qsûìcù.ñ¾µ×³¬|ur©209˜Mü¢Q5¯?Ì:¢bãÆëPõ3Ÿ5„ò *_bRm7.$aQLÁ(„¹vdñ{Ÿêõ¾¼´ºMÄ°œù'œYj‚[†4DĞ×Ô<l2VKrş_ûB³õº$ëçŞw¤ÁÑ¨x:ş8:Ct_Î½oip4dtÆÌèÈíˆÆkÅ¶i°œ33‘—ï0Å%<
+fq¤Ø^ĞY&SËä-œfµ'h¿o*5SİjW8>xwK„f}®]Ì*3]ãX/íÕı‹¹[ø/§øƒÿ¨¹ :ns8—Ö¯†;ÌB_”\(¨Æà
+óĞï|q#±Y$Ñz[m¡Rh1•˜Y ¸&mjcÒ£Å%O£0¨âÈ¼İbe”4+Ÿ]ÃK9Äš	•æT_»Ã»bÅrÌ‚ºGv¶S¡n^ø6ÎÇÆj¬o\ª¨½@ÆEØ­_ã8›‰Nø/ôäy.ãÓ2d½®o{.ÏÛ&ó®÷-gös…AÙc€Šlƒ€…Ÿ«o:^ÖnéÚ7ÉÌ{µyW÷™P#ü(1ÒÄx"M˜Q³ÒÍÑß&sìœ7'C¸75»7¸(nŞ ÉínR†oÔ=óÚjƒ1yCÛ­“ŒPÙ/¢Typİ,|ä¹eU>b\½äÔV²º‘ çkzÙU­j,}ªv@EbĞ67ˆ«q{ñC”Q÷[_Œ¾q€TOö[sœí>ô;sš÷ğãGb«æĞm¢±zhŒO)ËÑ˜¸±¸B³ÆŒ‡>ŞsÎñ,ô¼Æf±kø~ædØzyÎ	A!ÄŞ@'²êâ³ods‹Çg›©[E|uÒÆŠWÄ”OH5LÅ¥’È¶5V+¤„øóJ¤”{+`¥ÀË:q?ODÔ?¦àäkWàÛàìEn¨·6d6ÉÒ
+û+À÷Æ“$U}«Ç ÇóãLBP§ ÇA†wÎZAß%:óã Ù F£è¾•/Ø¥–}[w3¥Å"œT©šÈTâáx3å«Á[C`¢G¤4ÀË/Äåğ/ Ü ß¶¿{I%|?—Â¼M/sÇE® £ÁË\!Üár~“@>±‚…Íí
+¼±uîèï}Ã&»ãI~óŠÅøH‘aàÙƒ(.ĞíV~ªÈê…AÎƒúo#6iï¤ÀàÁ°¼bßÌ4 ¨ÃZí4¹Z&¬S½¯¤Y±õÊ~Õz-6Ø½EéÅb;óˆö;¤Ù0eş*9O•+Ê’çC4‘Ù'+³Sãêf=oWnÉ+[à¯yh¿ÏÊß­½˜k7qõvå¯±a«†Šƒrè¡™æ¼4Í:—wrîÂ‰SŞ7Dm^Dêø¥Z£¹õ[DŞrY<¾åíŒÔ4É½‡z4OoÄ×FÈ´øƒà HÑngÖ€_Ú©kë^4ü3•şdš]´«Ìi{´ §™½çÿü{IÖñ««Ê¼gĞÔŸó94şÓUºò(š·¤ói´¡íp£PûŸUªx)màì¸ëÁ´'®’•gÓ ÁUÎ|?M’¹‡J¼VJ¡Åø–$r‰sm}Ùç³:Ä~`­RÄÜ%)£Ï˜W´±w&şLÇLp¥¢¼Ä|X½³ş¼d¾Í4c¿á`ç£ñ:½Ñ²ÿ3K×âÇV†æ~›kîÂràŸòåoÇ­)^o@¬”§Fiñ .d&ª´™b”ĞT_èK–±3á´>›æ*IQIÔäP¢dÄbÙ/“dÄÍ3ÁYVkÆN2Ê+?;-mn;Éì¿ô‡ÒmN¤#š¡ñµAœéFÍŠûˆÒŞN3jè|	…õŸF¹<Š%ºmş2R“?ríÍ¬ƒÍ„I¦•Îª°…˜ò¸ûaÄ,Š‚²x3* ¥^fdó%ÅÎè¹eœ÷‹‡Û”½}^¤¸ÅYêX·› µùæ,*œ¤£éğKæI„ ÜO=³ÛªìÉ1yÖt*d‘†ûO¹{Z—o@’"Y£¢8ÜM'¿YsƒÌ-ã”-»\•|¦^vĞäŠ•ã¡©84iÔ÷åù([áÏtò¢^µ’æ¬ñ„@¢ŞµĞjéÎš{1¿7—ËŸJš³Æ—<_–æ¿%·B}ÊÀ/g©mdzOùo—–‘Ï¬—JF&xÊî¤ÉÄ(‹	®²Åïeé"ÉUæ@“¯p”uŒd«ß…—„¢´úá¸/’tŒ[yZÈÂd_÷¨ËvJYŸ&’í5kåÔÉ}Q¶*êEz!ó*™ïä™ç“À®l×h‰^ŠÒo‚	µ!«æÕJ…‚îŒzyPTöäx´…¸« £;Ãƒ5İ²ğÛ‡£(j&ÔÉ~Ù°Wö›ù ½¤1Å½Å^Pª€Ù×IÄ`Bñk:i¶CÏ%6Ît—‚nº”‘ì¡.¿Œ¤ÜéêÎ¨å'We#Ç7ZeÅj¢kğ@‹]Ó“å”¦àXËì}¹ëÌ“cö·X°<Lé%£WŒÚ|§L(Ñ·R<t>Nã™9gUâœ:¯é(Á²ßã„ajóÍYêFÊ(áÿ²[TË.Ú#%VÎ3",w}ƒrÕ62Ü£VÖ²“\ºKå¡Bş*u—cÔféÈÄr¯{RIL àÏtÊ&s¹B“If†CèIDGø~ÖgåóbJÿ9së¡|>a™fÙÕæÏ‡¤u©6¿’n4ú300,p˜²KğnEdØ•lÔË4‹ƒBƒ;Ó}5_ ƒÓ­ÉÄ¬X${¤/`k(Ã:ÓëjîùÅŒ•š"İÒ÷^\Ia6coJEæÎğé{Œ€ÏM­¯R½º_«æJvéÍôÔ¯ËvÚÒEÊh¶´\Û[GWëûéê¤¯…i¦T°V)Jjó½m;AÕğğÖ;§)†pQÇ`0;Óió8qñgZãæ8l@<‡<6íÏY8¢¹,SbP_ÀáQ½JFÉ+|è¼p«ŠGéÁ%˜±YAOôĞ[ÙwöZër5Ä¯KD·¢ID²‡NVMw†KƒšWE–úÓL¯³kUEWr­M[­¨¥ûf‡ªd'¹¸W•Õ:­UĞøíÁ]ßšäHõá­Ws%[–TÍ±	nPÕä»(¡·n'¹=j­B%ÍCs¡Â ™å£Q€7¯ÎK460T}D#Û„ÃÏj‰[P•q#núœWÄmë¾Šƒ­ÉöÙå(p}`ª¹.ÿ—İm!áK2NJÕP_Â#óÅ¢äšáŞ•ª¿æÈ÷Ù^|ñ9ùtzêI›_È’âñÂ@¡ J\ğê8¬Ñ½œMÎt—İ²ƒ›ïâ
+¼‘2g®Ô1ı>Ù‹ÖÅÓ#ŒÏfE^ŠpjÑPò°w¦)_^¢Å’bFóéd'F[qˆaR•^+EÊ³>ß’oŞ{ÖÇ«Ãñó"G›÷ş  ÿÿ áW[˜
