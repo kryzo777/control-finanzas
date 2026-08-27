@@ -8320,8 +8320,8 @@
             const margen = ing - prod - env - dropi;
             margenEntregados += margen;
             pedidosEntregadosCount++;
-          } else if (['devuelto', 'cancelado', 'incidencia', 'sin respuesta'].includes(est)) {
-            // Flete perdido / descontado directamente de la Wallet por Dropi
+          } else if (est === 'devuelto') {
+            // Flete perdido / cobrado por la transportadora sólo si fue despachado y devuelto
             const fletePerdido = Number(v.costo_envio || 0);
             if (fletePerdido > 0) {
               totalFletesDevolucion += fletePerdido;
@@ -8709,7 +8709,11 @@
       if (elSaldoBanco) elSaldoBanco.textContent = formatoCLP(info.saldoBancoReal);
       if (elMargenWallet) elMargenWallet.textContent = formatoCLP(info.saldoWalletDropi);
       if (elNumEntregados) elNumEntregados.textContent = `${info.pedidosEntregadosCount} ent.`;
-      if (elWalletDetalle) elWalletDetalle.textContent = `Base: ${formatoCLP(info.saldoWalletDropiBase)} | Ent: +${formatoCLP(info.margenEntregados)}`;
+      if (elWalletDetalle) {
+        elWalletDetalle.textContent = info.totalFletesDevolucion > 0 
+          ? `Base: ${formatoCLP(info.saldoWalletDropiBase)} | Ent: +${formatoCLP(info.margenEntregados)} | Dev: -${formatoCLP(info.totalFletesDevolucion)}`
+          : `Base: ${formatoCLP(info.saldoWalletDropiBase)} | Ent: +${formatoCLP(info.margenEntregados)}`;
+      }
       
       const totalGastosOperativos = info.totalAds + info.totalFijos;
       if (elGastosOperativos) elGastosOperativos.textContent = `-${formatoCLP(totalGastosOperativos)}`;
