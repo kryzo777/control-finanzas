@@ -9549,7 +9549,7 @@
       actualizarPreviewTarjetaModal();
     }
 
-    function actualizarPreviewTarjetaModal() {
+                function actualizarPreviewTarjetaModal() {
       const nombre = (document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre'))?.value || 'Mi Cuenta';
       const banco = (document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco'))?.value || 'Banco Santander';
       const formato = (document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato'))?.value || 'Cuenta Corriente';
@@ -9558,7 +9558,6 @@
       const saldo = Number((document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial'))?.value || 0);
       const colorCustom = document.getElementById('tarjeta-input-color')?.value;
       const preset = PRESETS_BANCOS[banco] || PRESETS_BANCOS['Otro'];
-
       const prevBanco = document.getElementById('preview-banco-nombre') || document.getElementById('tarjeta-preview-banco');
       const prevFormato = document.getElementById('preview-formato-tarjeta');
       const prevNombre = document.getElementById('preview-nombre-titular') || document.getElementById('tarjeta-preview-nombre');
@@ -9566,13 +9565,11 @@
       const prevTipo = document.getElementById('preview-tipo-badge') || document.getElementById('tarjeta-preview-tipo');
       const prevSaldo = document.getElementById('preview-saldo-monto') || document.getElementById('tarjeta-preview-saldo');
       const prevCard = document.getElementById('tarjeta-preview-card');
-
       if (prevBanco) prevBanco.textContent = banco.toUpperCase();
       if (prevFormato) prevFormato.textContent = formato;
       if (prevNombre) prevNombre.textContent = nombre;
       if (prevDigitos) prevDigitos.textContent = digitos ? digitos.slice(-4) : '4589';
       if (prevSaldo) prevSaldo.textContent = formatoCLP(saldo);
-
       let tipoLabel = 'Principal';
       if (tipo === 'principal') tipoLabel = 'â­ Principal';
       if (tipo === 'negocio') tipoLabel = 'ğŸ¢ Negocio';
@@ -9580,87 +9577,77 @@
       if (tipo === 'costos') tipoLabel = 'ğŸ’¸ Costos';
       if (tipo === 'ahorro') tipoLabel = 'ğŸ›¡ï¸ Ahorro';
       if (prevTipo) prevTipo.textContent = tipoLabel;
-
       if (prevCard) {
-        const gradiente = colorCustom ? `from-[${colorCustom}] to-slate-950` : preset.gradiente;
-        prevCard.className = `w-full max-w-sm mx-auto h-44 rounded-2xl p-4 text-white shadow-xl flex flex-col justify-between relative overflow-hidden transition-all duration-300 bg-gradient-to-r ${gradiente} border border-white/10`;
+        const gradiente = colorCustom ? ('from-[' + colorCustom + '] to-slate-950') : (preset?.gradiente || 'from-slate-800 to-slate-950');
+        prevCard.className = 'p-4 sm:p-5 rounded-2xl bg-gradient-to-br ' + gradiente + ' border border-slate-700/80 shadow-lg relative overflow-hidden transition-all duration-300';
       }
     }
 
-    let procesandoGuardarTarjeta = false;
-    function guardarTarjeta(e) {
+    async function guardarTarjeta(e) {
       if (e) e.preventDefault();
-      if (procesandoGuardarTarjeta) return;
-      procesandoGuardarTarjeta = true;
+      const id = document.getElementById('tarjeta-id')?.value;
+      const nombre = document.getElementById('tarjeta-nombre')?.value?.trim();
+      const banco = document.getElementById('tarjeta-banco')?.value || 'Banco Santander';
+      const tipo = document.getElementById('tarjeta-tipo')?.value || 'principal';
+      const formato = document.getElementById('tarjeta-formato')?.value || 'Cuenta Corriente';
+      const digitos = document.getElementById('tarjeta-digitos')?.value?.trim() || '';
+      const saldoInicial = Number(document.getElementById('tarjeta-saldo-inicial')?.value || 0);
+      const tasaInteres = Number(document.getElementById('tarjeta-tasa-interes')?.value || 0);
 
-      try {
-        const idInput = (document.getElementById('tarjeta-id') || document.getElementById('tarjeta-form-id'))?.value;
-        const nombre = (document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre'))?.value?.trim() || '';
-        const banco = (document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco'))?.value || 'Banco Santander';
-        const formato = (document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato'))?.value || 'Cuenta Corriente';
-        const digitos = (document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos'))?.value?.trim() || '';
-        const tipo = (document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo'))?.value || 'principal';
-        const saldoInicial = Number((document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial'))?.value || 0);
-        const tasa = Number((document.getElementById('tarjeta-tasa-interes') || document.getElementById('tarjeta-input-interes'))?.value || 0);
-        const colorCustom = document.getElementById('tarjeta-input-color')?.value?.trim() || '';
+      if (!nombre) {
+        mostrarToast('Por favor ingresa un nombre para la tarjeta.', 'error');
+        return;
+      }
 
-        if (!nombre) {
-          mostrarToast('Ingresa un nombre para la tarjeta o cuenta.', 'warning');
-          return;
-        }
-
-        if (idInput) {
-          // Editar existente
-          const tar = tarjetasUsuario.find(t => t.id == idInput);
-          if (tar) {
-            tar.nombre = nombre;
-            tar.banco = banco;
-            tar.formato = formato;
-            tar.digitos = digitos;
-            tar.tipo = tipo;
-            tar.saldo_inicial = saldoInicial;
-            tar.tasa_anual_interes = tasa;
-            tar.color_personalizado = colorCustom;
-          }
-          mostrarToast('Â¡Tarjeta actualizada con Ã©xito!', 'success');
-        } else {
-          // Crear nueva
-          const nuevoId = Date.now();
-          tarjetasUsuario.push({
-            id: nuevoId,
+      if (id) {
+        const idx = tarjetasUsuario.findIndex(t => t.id == id);
+        if (idx !== -1) {
+          tarjetasUsuario[idx] = {
+            ...tarjetasUsuario[idx],
             nombre,
             banco,
+            tipo,
             formato,
             digitos,
-            tipo,
-            saldo_inicial: saldoInicial,
-            tasa_anual_interes: tasa,
-            color_personalizado: colorCustom
-          });
-          mostrarToast('Â¡Tarjeta agregada correctamente!', 'success');
+            saldoInicial,
+            tasaInteres
+          };
         }
-
-        guardarTarjetasEnAlmacenamiento();
-        cerrarModalTarjeta();
-        procesarModuloTarjetas();
-      } finally {
-        setTimeout(() => { procesandoGuardarTarjeta = false; }, 350);
+      } else {
+        const nueva = {
+          id: 'tar_' + Date.now(),
+          nombre,
+          banco,
+          tipo,
+          formato,
+          digitos,
+          saldoInicial,
+          tasaInteres,
+          creadoEn: new Date().toISOString()
+        };
+        tarjetasUsuario.push(nueva);
       }
+
+      guardarTarjetasEnAlmacenamiento();
+      cerrarModalTarjeta();
+      procesarModuloTarjetas();
+      mostrarToast(id ? 'Tarjeta actualizada con Ã©xito.' : 'Nueva tarjeta guardada con Ã©xito.', 'success');
     }
-    window.guardarTarjeta = guardarTarjeta;
+
+    function cerrarModalTarjeta() {
+      const modal = document.getElementById('modal-tarjeta');
+      if (modal) modal.classList.add('hidden');
+    }
 
     async function eliminarTarjeta(id) {
       const tar = tarjetasUsuario.find(t => t.id == id);
       if (!tar) return;
-
       const confirmado = await pedirConfirmacion({
-        titulo: `Â¿Eliminar Tarjeta "${tar.nombre}"?`,
-        mensaje: `Se removerÃ¡ esta cuenta de tus tarjetas activas. Los traspasos histÃ³ricos asociados mantendrÃ¡n su registro.`,
+        titulo: 'Â¿Eliminar Tarjeta ' + tar.nombre + '?',
+        mensaje: 'Se removerÃ¡ esta cuenta de tus tarjetas activas.',
         btnTexto: 'SÃ­, Eliminar'
       });
-
       if (!confirmado) return;
-
       tarjetasUsuario = tarjetasUsuario.filter(t => t.id != id);
       guardarTarjetasEnAlmacenamiento();
       mostrarToast('Tarjeta eliminada.', 'success');
@@ -9668,6 +9655,47 @@
     }
 
     // ==========================================
-    // MODAL DE TRASPASO ENTRE CUENTAS / TARJETAS
-    // ===========================xï¿½ï¿½}ï¿½rIï¿½Ø½ï¿½"ë™ªRï¿½
->ï¿½Cï¿½@C ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½Deï¿½ï¿½ï¿½Yï¿½5ï¿½Y
+    // MODAL Y LOGICA DE TRASPASOS ENTRE TARJETAS
+    // ==========================================
+    let filtroTraspasoActivo = 'todos';
+
+    function poblarSelectsModalTraspaso() {
+      const selOri = document.getElementById('traspaso-origen');
+      const selDes = document.getElementById('traspaso-destino');
+      if (!selOri || !selDes) return;
+
+      const opciones = [
+        '<option value="">-- Selecciona una tarjeta / cuenta --</option>',
+        ...tarjetasUsuario.map(t => '<option value="' + t.id + '">' + (t.banco || '') + ' - ' + (t.nombre || '') + ' (' + (t.digitos ? '...' + t.digitos : '') + ')</option>')
+      ].join('');
+
+      selOri.innerHTML = opciones;
+      selDes.innerHTML = opciones;
+    }
+
+    function abrirModalTraspaso(origenId = null, destinoId = null, tipoSugerido = null) {
+      poblarSelectsModalTraspaso();
+      const modal = document.getElementById('modal-traspaso-tarjeta');
+      const selOri = document.getElementById('traspaso-origen');
+      const selDes = document.getElementById('traxœä=Ën$Grw}Emow¯ØÍ¦F#{gH(’’¸!‰!eÙ˜ÙUÉfiª«JUÕ|¬v |l0`XÈ7öäËŞxşÄ?àıG¾Ÿõè&…ÕÂ„4dWeFFDFDFDfdW®òqLª:ÉòÁèÙˆıDyVÕ¨"éAŠ«äí¢8–’Õ“9©RBÿüôî8êWHÄš&’<sA%Ùg$ºÂ½ ]Ò–>€—yVç½ ,hKÀçi^õÃ`N[R p`((IR&×8] —‘tˆk2Mêüøüô¼.“lŸª"Mêáàb0z=ıú™ŠÑ2’D)PƒİŒa<’¨[ÍŒv0M§e‚~ö3”—ÉœdÇññgª‡|ñÌîvH*ÚML¿èU?õÆé(ÄúÖI‘Ÿ/ç¤Lâ|¤%FA0ß+¬qz€³—K`>®.ã‡#sœEãt„Ø¯	•®êERÕ“’,òk2\%qL” ½ã°/—YTƒü¡ˆ”%._Ò¾:úÎ	¹M Xƒ±‹—ßÚÍ,qw¡ØÌO1Á}$—Oô`ôœO€§ÏtÆûÀQ!(ZÛ*pè7¿AªÍ›8)I+±Æªñ¼m ¢$×	¹1&	fjîê}[w0ÑÅ™9†eÄiœ¯	õ`×1581Eè­OáçLCÉéJP}Y-q™ä“Ë$‹‡5ÚİCõ$‰Ñî®W—@\r„zõ‡¦¶õå³7³8©Ém} ¦¨á )nÏ¡ûk2ÃY”£Ñ áÿEƒI–/f%¡§hp’ÓaHD¥ÇØ²»rrGjšÇœÓOÙ —y¹Àu~ğâL¢Áºà4Z¦8Î©Ì›/³$JÀşÀãéˆ!5¶Ğà"1¢á£@ÙÉI¦¯$ÓÇ«ÌF“5×L2í$Y½“lÒŒçÚøñGÒÖ€`’ìãÿ&#óş˜­µŞƒ?üöûGÇ¼ßûÿ£‹ND×gNGf»Oğ‚­°Åíø#TÜ§“'¨Ì—YLâñå2MÑl>%*šñ/LM=x<¢Y^Æ¤¿Ô›¿šŠ¦¯·§Åí×À¸¬Ïò46°x‡HZæ’ÔI™¯Bğ?ı½b`ùF_ÖIšÄ”{}‚a•Z¹ü£O,~Rq‘—5y“d×¤¬ØrÑMì¿ş=Úgİ`fyG˜æõi-–e‘M¬øìS+^¬@n'-ÿüHú èĞYW&¤z{§© |èÓ^ø`şn®î²H;3s°æ1.•CôÜÑi†dB— ö\âeZBú¨÷÷s”×ú ®ÎBD'K*İÃŞÁ‡áèLB/W„X«¦·&\°ÍiãcÍW±ìç d/C)Ø/Ç8¯ìUâ‘hıÈˆ^´†-ò
+F*/r\WÉ/½ú•(b.7€ÃBwRj&ƒM4€à!/µW…Xáe™=³#£ÅvwõÀånÁÅ’@Ğ Ø–(Åh‘T¼*N\hwvAôñ8J…lcO³êB´ğ˜6ôßå%¼ûói¿Á-)È–ä:W³¸k®èñSC†¨A¥Ü”›áhSµ’<ÕOc7r {ı‘éŠşh‰°~Ì¤ÎhUpS²§Š%	T˜’¥áaIuj_+•«Ë;ƒ\¯á/ÏOO&.+2Ló§çu^â9¡jr\“…Öêt”\)^­ÙÿE¸®†0+£¶Ñ4ZR:ì&“eV]%—õĞš05Œ…aÕ‚á&§«b<K.ï†ö0##˜…år¼¢Ì#R±×Ë4¿Ğõ{[€•|•dĞào’Û¤†	¦æ†0¹­–€¬Cğ½…ğ¥§éã@´hÓÌĞ@”û5ÊwóB¢3`X”,ÑV!{hh>Côs«6´ùç/½"¸“ù'Ë ‹>Ã<Ç;ÌË$e2)eı,// —!EHs†µR
+¶]¯s‘³Iåu±8ùµRëï¸ÕœÕÙ˜Ã1’9]7¬¡Ô®²OèİfŸ®jşUw_"z‚âœRpÆõÆGzı(+¦Ìš`×Ñ#qF¥ADÎSÒ–ã›ÁdËóUS;î ÏfÔMafO,ÿ!©ï—ƒKù¶òËÓ9÷³o+îcWd‘P?›úê ÈÉ<"}ñ›«šê
+LÚÍ¸Zğ:¡òfÅ¸b=\$N–*¤°
+?T®r`üS!ş€Æ¬0ócÅä’ eòkeç¥êT¬¥ƒkzfy|×ê}âYŠ•ÌUc½ÆšÙGÎHù8â+¿Å¢oáes3[V]©Yd{ÿê½ÈoHy€+æ+1¯ı™Á!nc†…–Éâ A|Dí77b&q&Dõ÷„ş™°ÿNŒ³»4¹š*ß®6Ö¸Æ‚œ ?`	I—à¬Ô‘7Šp4%Ù¼¾b¸Zn:> ”‘ò‹‹—/¨ïÔåŞNÃ¦@M¶»ñÉsp«İ¦õwJªãŸ˜Jü4©qšDRİ7öNrt…ïš_Ã{ª&;[u¼ÿ”{†67xú>šš´.†u²ÅyÏr]NÔfÖ3FÜ30t<¦P!­ñ\ílv(O%?[S*Úìi&?¶({"s³³EÁšŒd	Î2 ªÁ¼æz(Ş?7¹±gdK…´
+-^¾r=Bî“sÜØùO™ü\ÿ@r=
+î™IÜØyMÕÔd8ÊÉ,„ÄI@©,Ÿ”Ú­O¦%|ëñT[ÈU|Àl ô»·ãÇŸÀz1nòÄµ‹càÚ‡ĞŸÚ“~0mŸÈá#5BÎ÷\òÀOnïîğUttV1Ã?.1ß‰;/±½ír?\øpZ × Ä âí0sï¦œ,ø„ÕÀ3 `¥¯ê½Ù²_å° &ÑÛİ’&‹$32Â¿0RJjaœ_Fö"¦×,Ãñ,óŠ;£…v_§EË²w¥Èºnìıá·ÿòÿûûïw¶8:{5{y{7š|}‡'¾s²Û1Iìúğïe,i`‡opR£Üêò@<gÉc•OjpeA>şû¿p‹Q; ÏFª‹dş†@ës‚h½óöşÙˆå;G×	,„)M*¦:£G ¢¥ÙC	"¯à+øüıï6‘{à¹éÌÖD?@9ÃæÚJhì·ãŞÈ<ÚEF¤vÏÔÔ¨+§$&<ÎCY¤®L•¡­-º¢ôü‘=^~ùâÁ_îŸ£¿C§Ÿ¾8ş|ÿàøôäè|MÀt¶b²Œ•»d„ô]çyuØÒ€{Ó ¡s°µ˜5Uiê³c•£×Gpp9§›¿ê!©b²Ÿ‚/0‰fâÈ\D;Å‹wx³ä=¢…Âvf½Şt‚WAÙ¨…
+‘5`ã&kİ0Xì°ñnGY#3Ãªáá©……î¨CÏ‚|ñ@úT:SŒ'KrÍ¥‹cÄöğ2ğ¨Ö<»Å€xyEf{{vóÖşqÂöíEŞ7‰ı~'Ì7èîË}¿ÿKuvõ¦i*¿ïQVS¸»;á£çu;ßyæOŒkÚØ‡qF²˜Jm&°c#ãBvğa,óºuÃ‘Ã‰h³1]G—AŒğƒ˜ö„SŞ¾=í¯,@5oï:LzP'x|M×xnBÜé#+Ñ²hœ«ŠfaY4Ã{
+<ò’ LşL»Àƒ÷[ºÖßŠà]v¶C¶ØÏÌrõ	¥vUÅ	¸ˆY´…Ngi2Ç‘wD„·¥¸ÒõñW@Æov"œ{ù—Ñœë,Où/Xê˜ÿ6:±½Ú…rg¹È=…Ş´
+ı…®6J'v$eÓèÇt”ësCW¥¨#SkL=µ:7€a::’ÊjtgJğ’+e#\ÕFZK] •Ô^zÖ¢~R´vz ¤Ö€m ¨âˆk¤ÑTïo´æÑOB„ó	§¿­A‹v¾3¥Ií³ä«ætBÇsÜí€nõx%’]Ò ¯I£nøMƒÚ0¨#¯a‹ğ †¥İoØ!Û~‡)@n–Øiİ°pnä6âË€È…æ)(aºá;ï¬>'&%ÌQhŠzŒ_ùü>wÆ| û/ì=A•¨»–ßˆi"¡.|H@îÁX½åM¯Æëä4ıa†"Ğ#Àƒ^Çşø­~æ/ééCæe+:ÒÎQ37&èïU›Bï®ÙbËye?;tÎj¬×İçnxË‘DgïŞóÎ!4¶ÎXÖ¢ßw$Ço!Åv	V‚oøõhG¥”¿o°íà¸}Gğ‚cˆ'ÅŠ’dÆ-ÌÉV
+„ŞÌ@ÊLº¶}vÆî8›—¤Âh™I{PàÓ(i¥Ã‹liÄ+I|ŒX³˜Üc¶Ä"lñ“Ğ¾t_{¼m‡.´×Ğêkëœ$ı™L&~«M«	'y“Y¯Miu6İÛtT{ÓR¿M[[6mÙŞt$qS‹Í&Ÿh—w=üQ}8;Ä²SAŒØÆ3¡tbMTzŸµcKP±¬®ØÁKìŸèÈõ)óœ¤p‚šÃi:HÉ]u Ã<•t»óeÃ&	GÅß!éöúÃÔ?v÷l³…SÍ6ìdØş!4îºHâè®KUë‚î¬-\åQÂ÷ÛpqóÉ.'Ùv‰æ¥½]ÒSBr!wBpŸ[ĞšÓ¼ ƒùfyi¦9œêeµ„”Œ¶JHÕ{ÌJ¼rÊÅëŒuË×ì°Rw¦;(ÙrÁİ5Já0?•bxIıÈàÄı+ç™t˜K³|fmzmØşÁN^0qf@w76öÆct®jKÀ‘Öa<ŞÙâm÷æêá.ìì¼s#\ØÜ<ñs¾mo+4TKWéææØŞşHã£¨¯pÉ•¾UÑ·°7Tf·5G™RwÅláôı(©mWĞ’Ü7gĞÆ/G¾~†ü'eh¼d½¡êôÚˆG¶¶ÓK(¬l°oì÷^>«Í8C‰bªÛZ„©§8´h­æĞ‹Ü*‹P0éÑY<è¯D÷,ì[é‹U[œ¨%l¸† µÄÏ5ˆşâ
+Dé„Óã4|@;*•*óµvÆê SD@RUèÊ\¿ÿ!MâˆÉ”"¿Î>mŒ§	tNyœ°‡,¥ó¨‚4úJ»[[h‘—5­€ÀO1ñŞ6Ó3SŞ–Ö.z‰ë+X¡o‡ÓMä-«Â”Œ9»ŒérMN?+´vøg,|ë„€û³<³
+é€¥èıĞjºÕÊèôĞªD}İU8P¸’Vã®’k·Jã¡|†?>Ê=¼9™ûet•\‹Ù|ÉÇ0$±H$)•\jÏp	ø>§ñ!©Oßû}ìš¶dœñ3	ÌÇ¦6‘	~ì€U^š>D3gÃ¤‰
+:ûlÙ0Âµ[>×púZÚö¿_Hè³“kFî* ı"İ)êÕCnÈnòsŸ¾WtÛAv¤j±3W}:çğ§&‘úITÒYSÌî[HÇÿÿ,£kW²¦Öá˜ãZµ:OÆ¥0u¢“F¼-’ÎÃbĞFBa{Í'½ %;·ĞÙàš^hC¡t6&¶ScĞN:%q_¬8‘XuÀƒKİÂ¾Ñ|\øy+Fmû¶¦El&#©Š<KfipŒ]£Ş9Éâ’2‘•`Ñç¦Ÿ¥ÎF¨·§e2O26œõ’»Q/™‰w^ù—ŸïÃü"â¯BIUeûbÛö9˜~¨C– 3øÌî¨ˆ0ûÙG¯ºàhzMîá©©c|ã‰uB@ÆØ‚¶å5ùc!›?sZs6÷ç…iÀ,¹bL²Ét¸m¹pDTÀdwŞCSZ²3tÜ²ÛĞÏÑötJc—Ï’[·iÏÔ‰ràTÅÁÖdãX³ÉÎJ»8RÒ9•eVæ„É`¸AiÛè ²¥[Ô›Ò¼!¦¾®.<A‘5£¥ÒÅH³udÛÇ~DiG¦mt Ùóş2L¬Gd!XF¾´ÈgØã¹V ó“{°|d'!kÈËÅr©sò
+b)–‹òZ¾½nÎ¬‰a‹§,««q°ºÏXU<‹½meHšÁ·V;ãæjgA±Sï'×²6,ÊÓ1-{äu•N¹óöT×åşb:İz2UÎÙG·©{İY¨|·¥Fš3ÙØ­hîíşEœï‡';[€¬QPæ:“!5[Tæß²ÆÌÆà&›Ø¹~Ğ|„÷ì™7 ¨OKĞ„‘Ä¦y4ëH-¢¶S¸*I5&±lOŒ1i³$üdóñ_Z¾2¹ˆÈønü…÷É5As¦pY‘ÍeJnaÒÉ¢Ãd–5úfYÕÉåİxFêB2¿» xV¨fÑ‰ªfŸüj`ö¸ñV>´,
+RF¸"r;ˆé&«ÛäÅÁA¯Û¥–·4”G&‹z¼ío3íl]=n€[X`!
+–ÛGÔÅ^ô¬¶Y”RÅA¾o…ß4£Â8Ì1­ÍA@’šŞrÈcÌeJ>Ş((sËYƒ%J¼¤5T´ÒÁ»â@YÎÚz®ÿóoß›®ı°·f¬‹¶*Æ]s·6·÷d7>6$@[”'´Xø#Cıš‚-_tîil
+ìê»D)ë–}ÚßU]9+^Ywpø>ZfÖ{ßƒv‹È¥/å^¶'\–oGEÏmvØŒOk
+VàIa”ëÒv£ìX†Ë8ÔÆ¼æhOzÇü,@ãvÃ`ËzmÖ¾pÇ”?o]Oä+æCP‡»±u?ÉºákäÕxôÖRek¥ææ2ÍoÆ<YŞÄğ•w3ÊËH1¼—%fàİªê»” JI\_qVJ"7öš‰Y[V
+Xs×5B¦ãÑ 4”¤=z®‘ ÜU)ò%>ùtÃ“\f	h[õFTË*C/`™Tc^>™·“X“å­˜Í)à–Õ‡nqáÜYªeã"œ²ãäî0Ÿ­-tAï£¼d[œv¾ƒ¾¢\jÿ"vQë­³i¤ôkzg8¦Ã0YS™g5 Û{TÀ‘;‚{û{¸f¢î+ÚyM¿{<¤”5"ƒWe=¹ïUYœ†î{²‚·|‘ZÁÈ„wA\EƒÂÂ
+WÙæ.&~ù,ıùQoâŠ²ÂAE¯ƒÚÀöñÀ	PÁ˜s~ôHj]kØ°Cóg‚(u´E­¨ëP¥)’¶0äâí÷tÁœ¹¦ÙÑ×Ü±ã-¬¸º4É{{ÜM;T]×‰¬´3¶Öå,_½8;zu>?:9zµÿâˆŞÎ²ÀofA¯öÏ÷×½¡Eq!)÷aõWÊ0BÅ-l/XâWyù–ùšÃAA`¹Ë¬]*Qªˆggğ.)ö]—.ûaà3'`ßÎ“ì©Š%Muµ—yQ]%E‘dóĞÀ‡ğ¢Æ êbÇ_Œv–—G0PœU’½)åÈ‡M¢üw:½çÉ‚}Íôpêß„B¯ÓÉ£·Ì§yÿıNzÆ…%¿ó èˆqIù"ùv	¨}R_R;œ•KZö“:MyvÆRgÛO¸;¨3}¢uYUé¼€‘)=æÑgèçhhßb{†H3Ãıb0Ÿ¢™ËSúç&J9ÎğÙï:O¾Èj‰òÓ<%õÚgfeÍBIÖ~?VIä|0l=$az_©&ü ËĞr´aÒ9:AØâ„‡É”ŒWò,háSø¨«kShy'\<áÍL^€ÚœÖgôĞLaÙ0¯íÓ¦èûÀN†¯“9,ô:Ã¤˜å0âóÉM	3­<¡&õÉ†@œåSØØŸ^p mà^aàÀƒ ¼•€™çwu7€Øç…Ş5©y•Ì3ÊW¸ ¹Ò;¹Mfˆ6u§¸ù<Íg b5E…éH“(§w/¿©È|©+.su¤HÆ;ÊÄ5HÚ mÚC›×MYK™0tC£Ç{NnŒ[™dTÏç).R2‡“(³åŸï §"zî ^ÆøJòkÒyÉ¹¡Ò‘.­öĞıë"©ÎÄêu„ßœ±¿şèêßî‰nøşé‡D÷XŞczoYP7¢’{£»–óuô·g§¯.Ø=xèó§Ÿî¿@ğßé§¿<º8E_Ÿ~µ&ğ0ùÍÄõoØÙBûÑ³@{áçèÖâAC[*êV[úÀjËY¦#?+“k‰›B­~:	Ã,úµ‰î#'g…£¼g#ì/iXìMĞEcç‰İZ.±¬Ñ9©øwŸ7àt¾œ%å.ë<Ånæ‹&ÎoFf[BÂ(X#›/úòªB­7MxëşC«ü‚.ÕŞ~`µU×ªÆÎ“ZŒ¯üñ6R ;iĞ=œ'a*ts÷‘Õ¾á«<Ô~½÷¦ƒîWÉ¹â6êSÜoİ·h“WYzÜ4W²û(4K²­ù18?²¡õ¹s•^¶WO›ğ6»…‡ğ7û¸°³¼[(Ú¯šğô 4¾³ ´UP¹åuHìó=ZşíçVÏæ¬to~éÂ$ xÿÀgığc'¶|øí¹³£:eö“ÀÊtµÕ|ÛÅô€CpÌ÷İ$Ÿ› É÷í”ß£^Z0Ì˜z™_ˆ&ò.ò˜WoÈÏ”o(¾&6ù5¿‡ÍÁ-qÊ^³«‚Q¢Z”Ô•€ÈÊº„—y¸Onp™Ñ;b’aê„ĞÏI6
+¡¡}¸H@†{=Ë’]!AªÈÂoj[A¨^BÜ¸ŸÅ,Ö¶dŞdHÍ².ì4£[À5Ô‰µbÉÍS èÎV•IQï}°³E¿ „ş¾ªéŞÿ  ÿÿ `âJë
