@@ -737,6 +737,220 @@
 
         </div>
 
+        <!-- ================================================================= -->
+        <!-- PANEL DE PROYECCIÃ“N DE VALOR NETO DE LA EMPRESA A 12 MESES (CHART.JS) -->
+        <!-- ================================================================= -->
+        <div id="seccion-proyeccion-valor-neto" class="bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 p-4 md:p-6 rounded-2xl border border-sky-800/40 shadow-2xl space-y-5">
+          
+          <!-- Encabezado del Panel -->
+          <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800/80 pb-4">
+            <div class="flex items-start gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600/30 via-indigo-600/20 to-emerald-500/20 border border-sky-500/40 flex items-center justify-center text-2xl shadow-inner shrink-0 text-sky-400">
+                ğŸ’
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-sm md:text-base font-bold text-white tracking-wide">
+                    ProyecciÃ³n del Valor Neto de la Empresa a 12 Meses
+                  </h3>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-800/80">
+                    Modelo Flujo Libre + ROAS
+                  </span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1 max-w-3xl">
+                  ProyecciÃ³n patrimonial a 12 meses basada en tu flujo de caja neto actual, ROAS ponderado y tasa de reinversiÃ³n operativa. Estima la capitalizaciÃ³n y valor de mercado (Valuation) de tu negocio e-commerce.
+                </p>
+              </div>
+            </div>
+
+            <!-- Selector de Escenarios RÃ¡pidos y Actualizar -->
+            <div class="flex flex-wrap items-center gap-2 self-stretch lg:self-auto justify-end">
+              <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 shadow-inner">
+                <button id="btn-escenario-conservador" onclick="seleccionarEscenarioProyeccion('conservador')" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+                  ğŸ›¡ï¸ Conservador
+                </button>
+                <button id="btn-escenario-base" onclick="seleccionarEscenarioProyeccion('base')" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition">
+                  âš–ï¸ Base Actual
+                </button>
+                <button id="btn-escenario-optimista" onclick="seleccionarEscenarioProyeccion('optimista')" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+                  ğŸš€ Escalamiento
+                </button>
+              </div>
+              <button onclick="recalcularYRenderizarProyeccionValorNeto()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs px-3 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5" title="Recalcular proyecciÃ³n con datos actuales">
+                <span>ğŸ”„ Recalcular</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 MÃ©tricas Clave de la ProyecciÃ³n a 12 Meses -->
+          <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- 1. Valor Neto Proyectado Mes 12 -->
+            <div class="bg-slate-950/80 p-3.5 rounded-xl border border-emerald-500/40 relative overflow-hidden group">
+              <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition"></div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-emerald-400">Valor Neto Empresa (Mes 12)</span>
+                <span class="text-xs">ğŸ†</span>
+              </div>
+              <p id="kpi-proy-valor-neto-final" class="text-lg md:text-2xl font-extrabold text-emerald-300 font-mono mt-1">$0</p>
+              <div class="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+                <span id="kpi-proy-crecimiento-patrimonio" class="text-emerald-400 font-medium">+0% vs Actual</span>
+                <span id="kpi-proy-caja-acumulada" class="text-slate-400 font-mono">Caja: $0</span>
+              </div>
+            </div>
+
+            <!-- 2. Flujo de Caja Mensual Proyectado (Mes 12) -->
+            <div class="bg-slate-950/80 p-3.5 rounded-xl border border-sky-500/40 relative overflow-hidden group">
+              <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-sky-500/10 rounded-full blur-xl group-hover:bg-sky-500/20 transition"></div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-sky-400">Flujo Mensual (Mes 12)</span>
+                <span class="text-xs">ğŸ’µ</span>
+              </div>
+              <p id="kpi-proy-flujo-mensual-final" class="text-lg md:text-2xl font-extrabold text-sky-300 font-mono mt-1">$0/mes</p>
+              <div class="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+                <span id="kpi-proy-margen-neto-final" class="text-sky-300 font-medium">Margen: 0%</span>
+                <span id="kpi-proy-ebitda-anual" class="text-slate-400 font-mono">Run-rate: $0/a</span>
+              </div>
+            </div>
+
+            <!-- 3. ROAS Ponderado y Eficiencia Publicitaria -->
+            <div class="bg-slate-950/80 p-3.5 rounded-xl border border-indigo-500/40 relative overflow-hidden group">
+              <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition"></div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-indigo-400">ROAS Promedio Modelado</span>
+                <span class="text-xs">ğŸ“¢</span>
+              </div>
+              <p id="kpi-proy-roas-promedio" class="text-lg md:text-2xl font-extrabold text-indigo-300 font-mono mt-1">0.0x</p>
+              <div class="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+                <span id="kpi-proy-ads-mensual" class="text-indigo-300 font-medium">Pauta: $0/m</span>
+                <span id="kpi-proy-ventas-anuales" class="text-slate-400 font-mono">Ventas 12m: $0</span>
+              </div>
+            </div>
+
+            <!-- 4. Multiplicador de ValuaciÃ³n (MÃºltiplo EBITDA / SDE) -->
+            <div class="bg-slate-950/80 p-3.5 rounded-xl border border-amber-500/40 relative overflow-hidden group">
+              <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition"></div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-amber-400">MÃºltiplo de ValoraciÃ³n</span>
+                <span class="text-xs">ğŸ·ï¸</span>
+              </div>
+              <p id="kpi-proy-multiplo-sde" class="text-lg md:text-2xl font-extrabold text-amber-300 font-mono mt-1">3.0x SDE</p>
+              <div class="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+                <span class="text-amber-300/80 font-medium">E-Commerce & Dropi</span>
+                <span id="kpi-proy-valor-mercado-est" class="text-slate-400 font-mono">Val: $0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controles de Ajuste DinÃ¡mico de ParÃ¡metros -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-950/70 p-3.5 rounded-xl border border-slate-800">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label class="text-slate-300 font-medium flex items-center gap-1">
+                  <span>ğŸ“¢</span> Ajuste de ROAS (%):
+                </label>
+                <span id="lbl-proy-slider-roas" class="text-indigo-400 font-bold font-mono">+0%</span>
+              </div>
+              <input type="range" id="slider-proy-roas" min="-30" max="60" step="5" value="0" oninput="actualizarProyeccionDesdeControles()" class="w-full accent-indigo-500 cursor-pointer">
+              <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                <span>-30%</span>
+                <span>ROAS Real</span>
+                <span>+60%</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label class="text-slate-300 font-medium flex items-center gap-1">
+                  <span>ğŸ“ˆ</span> Crecimiento Mensual Base (% MoM):
+                </label>
+                <span id="lbl-proy-slider-growth" class="text-sky-400 font-bold font-mono">6%</span>
+              </div>
+              <input type="range" id="slider-proy-growth" min="0" max="25" step="1" value="6" oninput="actualizarProyeccionDesdeControles()" class="w-full accent-sky-500 cursor-pointer">
+              <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                <span>0% (Plano)</span>
+                <span>6% Base</span>
+                <span>25% Agresivo</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label class="text-slate-300 font-medium flex items-center gap-1">
+                  <span>ğŸ”„</span> Tasa de ReinversiÃ³n de Utilidad:
+                </label>
+                <span id="lbl-proy-slider-reinv" class="text-emerald-400 font-bold font-mono">70%</span>
+              </div>
+              <input type="range" id="slider-proy-reinv" min="10" max="100" step="5" value="70" oninput="actualizarProyeccionDesdeControles()" class="w-full accent-emerald-500 cursor-pointer">
+              <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                <span>10% (Ordinaria)</span>
+                <span>70% (Crecimiento)</span>
+                <span>100% (Total)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GrÃ¡fico Principal Chart.js -->
+          <div class="bg-slate-950/90 p-4 rounded-xl border border-slate-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+              <div>
+                <h4 class="text-xs font-bold uppercase text-slate-200 flex items-center gap-2">
+                  <span>ğŸ“Š</span> Curva Evolutiva de Valor Neto & Flujos de Caja Proyectados (Mes 1 a Mes 12)
+                </h4>
+                <p class="text-[11px] text-slate-400">VisualizaciÃ³n de patrimonio acumulado, ingresos brutos, pauta de Meta Ads y flujo de caja libre mensual</p>
+              </div>
+              <div class="flex flex-wrap gap-2 text-[10px]">
+                <span class="flex items-center gap-1 text-emerald-400 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Valor Neto Empresa ($)</span>
+                <span class="flex items-center gap-1 text-sky-400 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>Flujo Mensual Libre ($)</span>
+                <span class="flex items-center gap-1 text-indigo-400 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>Caja Neta Acumulada ($)</span>
+                <span class="flex items-center gap-1 text-amber-400 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Ventas Mensuales ($)</span>
+              </div>
+            </div>
+            <div class="h-72 md:h-80 relative w-full">
+              <canvas id="chart-proyeccion-valor-neto"></canvas>
+            </div>
+          </div>
+
+          <!-- Hitos Trimestrales & DiagnÃ³stico EstratÃ©gico -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 pt-1">
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-sky-400">Hito Q1 (Mes 3)</span>
+                <span class="text-[10px] text-slate-500">ConsolidaciÃ³n</span>
+              </div>
+              <p id="proy-hito-q1-valor" class="text-sm font-bold text-white font-mono mt-0.5">$0</p>
+              <span id="proy-hito-q1-desc" class="text-[10px] text-slate-400 block truncate mt-0.5">EstabilizaciÃ³n ROAS</span>
+            </div>
+
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-teal-400">Hito Q2 (Mes 6)</span>
+                <span class="text-[10px] text-slate-500">Escalamiento</span>
+              </div>
+              <p id="proy-hito-q2-valor" class="text-sm font-bold text-white font-mono mt-0.5">$0</p>
+              <span id="proy-hito-q2-desc" class="text-[10px] text-slate-400 block truncate mt-0.5">ExpansiÃ³n de pauta</span>
+            </div>
+
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-indigo-400">Hito Q3 (Mes 9)</span>
+                <span class="text-[10px] text-slate-500">AceleraciÃ³n</span>
+              </div>
+              <p id="proy-hito-q3-valor" class="text-sm font-bold text-white font-mono mt-0.5">$0</p>
+              <span id="proy-hito-q3-desc" class="text-[10px] text-slate-400 block truncate mt-0.5">Caja libre optimizada</span>
+            </div>
+
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-emerald-400">Hito Q4 (Mes 12)</span>
+                <span class="text-[10px] text-slate-500">Madurez & Valor</span>
+              </div>
+              <p id="proy-hito-q4-valor" class="text-sm font-bold text-emerald-300 font-mono mt-0.5">$0</p>
+              <span id="proy-hito-q4-desc" class="text-[10px] text-slate-400 block truncate mt-0.5">ValoraciÃ³n consolidada</span>
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
       <div id="tab-drop-pedidos" class="tab-drop-content hidden space-y-4">
@@ -3425,6 +3639,8 @@
     let chartEvolucion = null;
     let chartDistribucion = null;
     let chartPedidosEstados = null;
+    let chartProyeccionValorNeto = null;
+    let escenarioProyeccionActivo = 'base';
     let chartFlujoPersonal = null;
     let chartGastosCat = null;
     let chartInversiones = null;
@@ -7853,7 +8069,364 @@
       }
     }
 
-    // -------------------------------------------------------------
+
+    // =========================================================================
+    // PROYECCIÃ“N DE VALOR NETO DE LA EMPRESA A 12 MESES (CHART.JS)
+    // =========================================================================
+    function seleccionarEscenarioProyeccion(escenario) {
+      escenarioProyeccionActivo = escenario;
+      const btnCons = document.getElementById('btn-escenario-conservador');
+      const btnBase = document.getElementById('btn-escenario-base');
+      const btnOpt = document.getElementById('btn-escenario-optimista');
+
+      const clActivo = 'px-2.5 py-1 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition';
+      const clInactivo = 'px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+
+      if (btnCons) btnCons.className = escenario === 'conservador' ? clActivo : clInactivo;
+      if (btnBase) btnBase.className = escenario === 'base' ? clActivo : clInactivo;
+      if (btnOpt) btnOpt.className = escenario === 'optimista' ? clActivo : clInactivo;
+
+      const sliderRoas = document.getElementById('slider-proy-roas');
+      const sliderGrowth = document.getElementById('slider-proy-growth');
+      const sliderReinv = document.getElementById('slider-proy-reinv');
+
+      if (escenario === 'conservador') {
+        if (sliderRoas) sliderRoas.value = -10;
+        if (sliderGrowth) sliderGrowth.value = 3;
+        if (sliderReinv) sliderReinv.value = 50;
+      } else if (escenario === 'optimista') {
+        if (sliderRoas) sliderRoas.value = 20;
+        if (sliderGrowth) sliderGrowth.value = 12;
+        if (sliderReinv) sliderReinv.value = 85;
+      } else {
+        if (sliderRoas) sliderRoas.value = 0;
+        if (sliderGrowth) sliderGrowth.value = 6;
+        if (sliderReinv) sliderReinv.value = 70;
+      }
+
+      actualizarProyeccionDesdeControles();
+    }
+
+    function actualizarProyeccionDesdeControles() {
+      const sliderRoas = document.getElementById('slider-proy-roas');
+      const sliderGrowth = document.getElementById('slider-proy-growth');
+      const sliderReinv = document.getElementById('slider-proy-reinv');
+
+      const valRoas = sliderRoas ? parseInt(sliderRoas.value, 10) : 0;
+      const valGrowth = sliderGrowth ? parseInt(sliderGrowth.value, 10) : 6;
+      const valReinv = sliderReinv ? parseInt(sliderReinv.value, 10) : 70;
+
+      const lblRoas = document.getElementById('lbl-proy-slider-roas');
+      const lblGrowth = document.getElementById('lbl-proy-slider-growth');
+      const lblReinv = document.getElementById('lbl-proy-slider-reinv');
+
+      if (lblRoas) lblRoas.textContent = (valRoas >= 0 ? `+${valRoas}%` : `${valRoas}%`);
+      if (lblGrowth) lblGrowth.textContent = `${valGrowth}% MoM`;
+      if (lblReinv) lblReinv.textContent = `${valReinv}%`;
+
+      renderizarProyeccionValorNeto();
+    }
+
+    function recalcularYRenderizarProyeccionValorNeto() {
+      actualizarProyeccionDesdeControles();
+      mostrarToast('ProyecciÃ³n a 12 meses recalculada con datos actuales', 'info');
+    }
+
+    function renderizarProyeccionValorNeto() {
+      if (typeof Chart === 'undefined') return;
+      if (workspaceActivo !== 'dropshipping') return;
+
+      const canvas = document.getElementById('chart-proyeccion-valor-neto');
+      if (!canvas) return;
+
+      const sliderRoas = document.getElementById('slider-proy-roas');
+      const sliderGrowth = document.getElementById('slider-proy-growth');
+      const sliderReinv = document.getElementById('slider-proy-reinv');
+
+      const modRoasPct = sliderRoas ? parseInt(sliderRoas.value, 10) : 0;
+      const growthMoMPct = sliderGrowth ? parseInt(sliderGrowth.value, 10) : 6;
+      const reinversionPct = sliderReinv ? parseInt(sliderReinv.value, 10) : 70;
+
+      // Extraer mÃ©tricas financieras reales del negocio
+      const ventasConcretadas = (datosDrop.ventas || []).filter(v => esPedidoConcretado(v.estado));
+      let totalVentasActual = ventasConcretadas.reduce((acc, v) => acc + Number(v.ingreso_total || 0), 0);
+      let totalCostosDropiActual = ventasConcretadas.reduce((acc, v) => acc + (Number(v.costo_producto || 0) + Number(v.costo_envio || 0) + Number(v.comision_dropi || 0)), 0);
+      let totalAdsActual = (datosDrop.ads || []).reduce((acc, a) => acc + Number(a.gasto || 0), 0);
+      let totalFijosMesActual = (datosDrop.costos || []).reduce((acc, c) => acc + Number(c.monto || 0) / (c.frecuencia_dias === 90 ? 3 : (c.frecuencia_dias === 365 ? 12 : 1)), 0);
+
+      // Si no hay datos registrados aÃºn, usar una base financiera realista de partida
+      let ventasBase = totalVentasActual > 0 ? totalVentasActual : 4800000;
+      let adsBase = totalAdsActual > 0 ? totalAdsActual : 1600000;
+      let fijosBase = totalFijosMesActual > 0 ? totalFijosMesActual : 220000;
+
+      // Calcular ROAS histÃ³rico ponderado
+      let roasHistorico = adsBase > 0 ? (ventasBase / adsBase) : 3.0;
+      if (roasHistorico < 1.0 || isNaN(roasHistorico)) roasHistorico = 2.8;
+
+      // Ajustar ROAS segÃºn escenario y slider
+      let factorEscenarioRoas = 1.0;
+      let multiploValuacion = 3.0;
+
+      if (escenarioProyeccionActivo === 'conservador') {
+        factorEscenarioRoas = 0.90;
+        multiploValuacion = 2.5;
+      } else if (escenarioProyeccionActivo === 'optimista') {
+        factorEscenarioRoas = 1.15;
+        multiploValuacion = 3.5;
+      }
+
+      const effectiveRoas = Math.max(1.1, (roasHistorico * factorEscenarioRoas) * (1 + modRoasPct / 100));
+
+      // Margen de contribuciÃ³n bruto de producto/logÃ­stica Dropi
+      let margenBrutoRatio = (totalVentasActual > 0 && totalCostosDropiActual > 0)
+        ? Math.max(0.25, Math.min(0.85, (totalVentasActual - totalCostosDropiActual) / totalVentasActual))
+        : 0.52;
+
+      // Saldo centralizado inicial en banco + wallet
+      const tarjetasNegocio = (tarjetasUsuario || []).filter(t => t.tipo === 'negocio');
+      let cajaInicial = tarjetasNegocio.reduce((acc, t) => acc + Number(t.saldo || 0), 0);
+      if (cajaInicial <= 0) cajaInicial = 1500000;
+
+      const mesesNombres = [
+        'Mes 1', 'Mes 2', 'Mes 3', 'Mes 4', 'Mes 5', 'Mes 6',
+        'Mes 7', 'Mes 8', 'Mes 9', 'Mes 10', 'Mes 11', 'Mes 12'
+      ];
+
+      const proyeccion = {
+        labels: mesesNombres,
+        valorNeto: [],
+        flujoMensual: [],
+        cajaAcumulada: [],
+        ventas: [],
+        ads: []
+      };
+
+      let adsMes = adsBase;
+      let fijosMes = fijosBase;
+      let cajaAcumulada = cajaInicial;
+      let totalVentas12Meses = 0;
+      let totalFlujo12Meses = 0;
+
+      for (let m = 1; m <= 12; m++) {
+        const factorGrowth = 1 + (growthMoMPct / 100);
+
+        if (m > 1) {
+          // ReinversiÃ³n calculada: parte del flujo libre generado se suma al presupuesto de pauta
+          const flujoAnterior = Math.max(0, proyeccion.flujoMensual[m - 2]);
+          const reinversionPauta = (flujoAnterior * (reinversionPct / 100)) * 0.35;
+          adsMes = (adsMes * factorGrowth) + reinversionPauta;
+          fijosMes = fijosMes * 1.012; // Crecimiento marginal de fijos e infraestructura
+        }
+
+        const ventasMes = adsMes * effectiveRoas;
+        const costosDropiMes = ventasMes * (1 - margenBrutoRatio);
+        const flujoNetoMes = ventasMes - costosDropiMes - adsMes - fijosMes;
+        
+        const retencionCajaMes = Math.max(0, flujoNetoMes * (reinversionPct / 100));
+        cajaAcumulada += retencionCajaMes;
+
+        // Valor Neto Empresarial: Caja acumulada lÃ­quida + MÃºltiplo de valoraciÃ³n sobre utilidad operativa anualizada
+        const runRateAnualizado = Math.max(0, flujoNetoMes * 12);
+        const valorEmpresaMes = cajaAcumulada + (runRateAnualizado * (multiploValuacion / 2.2));
+
+        totalVentas12Meses += ventasMes;
+        totalFlujo12Meses += flujoNetoMes;
+
+        proyeccion.valorNeto.push(Math.round(valorEmpresaMes));
+        proyeccion.flujoMensual.push(Math.round(flujoNetoMes));
+        proyeccion.cajaAcumulada.push(Math.round(cajaAcumulada));
+        proyeccion.ventas.push(Math.round(ventasMes));
+        proyeccion.ads.push(Math.round(adsMes));
+      }
+
+      // Actualizar MÃ©tricas Superiores
+      const valorNetoFinal = proyeccion.valorNeto[11];
+      const flujoFinal = proyeccion.flujoMensual[11];
+      const ventasFinal = proyeccion.ventas[11];
+      const margenNetoFinalPct = ventasFinal > 0 ? ((flujoFinal / ventasFinal) * 100).toFixed(1) : 0;
+      const incrementoPatrimonioPct = cajaInicial > 0 ? (((valorNetoFinal - cajaInicial) / cajaInicial) * 100).toFixed(0) : 0;
+
+      const elValorFinal = document.getElementById('kpi-proy-valor-neto-final');
+      if (elValorFinal) elValorFinal.textContent = formatoCLP(valorNetoFinal);
+
+      const elCrecPatrimonio = document.getElementById('kpi-proy-crecimiento-patrimonio');
+      if (elCrecPatrimonio) elCrecPatrimonio.textContent = `+${incrementoPatrimonioPct}% vs Actual`;
+
+      const elCajaAcum = document.getElementById('kpi-proy-caja-acumulada');
+      if (elCajaAcum) elCajaAcum.textContent = `Caja: ${formatoCLP(proyeccion.cajaAcumulada[11])}`;
+
+      const elFlujoFinal = document.getElementById('kpi-proy-flujo-mensual-final');
+      if (elFlujoFinal) elFlujoFinal.textContent = `${formatoCLP(flujoFinal)}/mes`;
+
+      const elMargenNetoFinal = document.getElementById('kpi-proy-margen-neto-final');
+      if (elMargenNetoFinal) elMargenNetoFinal.textContent = `Margen: ${margenNetoFinalPct}% Neto`;
+
+      const elEbitdaAnual = document.getElementById('kpi-proy-ebitda-anual');
+      if (elEbitdaAnual) elEbitdaAnual.textContent = `Run-rate: ${formatoCLP(flujoFinal * 12)}/a`;
+
+      const elRoasProm = document.getElementById('kpi-proy-roas-promedio');
+      if (elRoasProm) elRoasProm.textContent = `${effectiveRoas.toFixed(2)}x`;
+
+      const elAdsMensual = document.getElementById('kpi-proy-ads-mensual');
+      if (elAdsMensual) elAdsMensual.textContent = `Pauta M12: ${formatoCLP(proyeccion.ads[11])}`;
+
+      const elVentasAnuales = document.getElementById('kpi-proy-ventas-anuales');
+      if (elVentasAnuales) elVentasAnuales.textContent = `Ventas 12m: ${formatoCLP(totalVentas12Meses)}`;
+
+      const elMultiplo = document.getElementById('kpi-proy-multiplo-sde');
+      if (elMultiplo) elMultiplo.textContent = `${multiploValuacion.toFixed(1)}x SDE`;
+
+      const elValMercado = document.getElementById('kpi-proy-valor-mercado-est');
+      if (elValMercado) elValMercado.textContent = `Val: ${formatoCLP(valorNetoFinal)}`;
+
+      // Actualizar Hitos Trimestrales
+      const elHitoQ1 = document.getElementById('proy-hito-q1-valor');
+      if (elHitoQ1) elHitoQ1.textContent = formatoCLP(proyeccion.valorNeto[2]);
+      const elHitoQ1Desc = document.getElementById('proy-hito-q1-desc');
+      if (elHitoQ1Desc) elHitoQ1Desc.textContent = `Flujo: ${formatoCLP(proyeccion.flujoMensual[2])}/m`;
+
+      const elHitoQ2 = document.getElementById('proy-hito-q2-valor');
+      if (elHitoQ2) elHitoQ2.textContent = formatoCLP(proyeccion.valorNeto[5]);
+      const elHitoQ2Desc = document.getElementById('proy-hito-q2-desc');
+      if (elHitoQ2Desc) elHitoQ2Desc.textContent = `Flujo: ${formatoCLP(proyeccion.flujoMensual[5])}/m`;
+
+      const elHitoQ3 = document.getElementById('proy-hito-q3-valor');
+      if (elHitoQ3) elHitoQ3.textContent = formatoCLP(proyeccion.valorNeto[8]);
+      const elHitoQ3Desc = document.getElementById('proy-hito-q3-desc');
+      if (elHitoQ3Desc) elHitoQ3Desc.textContent = `Flujo: ${formatoCLP(proyeccion.flujoMensual[8])}/m`;
+
+      const elHitoQ4 = document.getElementById('proy-hito-q4-valor');
+      if (elHitoQ4) elHitoQ4.textContent = formatoCLP(proyeccion.valorNeto[11]);
+      const elHitoQ4Desc = document.getElementById('proy-hito-q4-desc');
+      if (elHitoQ4Desc) elHitoQ4Desc.textContent = `Flujo: ${formatoCLP(proyeccion.flujoMensual[11])}/m`;
+
+      // Renderizar o actualizar grÃ¡fico Chart.js
+      const ctx = canvas.getContext('2d');
+      if (chartProyeccionValorNeto) {
+        chartProyeccionValorNeto.destroy();
+      }
+
+      chartProyeccionValorNeto = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: proyeccion.labels,
+          datasets: [
+            {
+              label: 'Valor Neto Empresa ($)',
+              data: proyeccion.valorNeto,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.14)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.35,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#10b981',
+              yAxisID: 'y'
+            },
+            {
+              label: 'Flujo de Caja Libre Mensual ($)',
+              data: proyeccion.flujoMensual,
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.08)',
+              borderWidth: 2.5,
+              fill: false,
+              tension: 0.35,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+              pointBackgroundColor: '#38bdf8',
+              yAxisID: 'y'
+            },
+            {
+              label: 'Caja Neta Acumulada ($)',
+              data: proyeccion.cajaAcumulada,
+              borderColor: '#818cf8',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              tension: 0.35,
+              pointRadius: 2.5,
+              pointHoverRadius: 5,
+              pointBackgroundColor: '#818cf8',
+              yAxisID: 'y'
+            },
+            {
+              label: 'Ventas Mensuales Proyectadas ($)',
+              data: proyeccion.ventas,
+              borderColor: '#fbbf24',
+              backgroundColor: 'transparent',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              tension: 0.35,
+              pointRadius: 2,
+              pointHoverRadius: 4,
+              pointBackgroundColor: '#fbbf24',
+              yAxisID: 'y'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#94a3b8',
+                boxWidth: 12,
+                font: { size: 11, family: 'Plus Jakarta Sans' },
+                padding: 12
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.95)',
+              titleColor: '#f8fafc',
+              bodyColor: '#cbd5e1',
+              borderColor: 'rgba(56, 189, 248, 0.3)',
+              borderWidth: 1,
+              padding: 10,
+              boxPadding: 4,
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${formatoCLP(context.raw)}`;
+                },
+                afterBody: function(items) {
+                  const idx = items[0]?.dataIndex;
+                  if (idx !== undefined && proyeccion.ads[idx]) {
+                    return [
+                      `Pauta Meta Ads: ${formatoCLP(proyeccion.ads[idx])}`,
+                      `ROAS Modelo: ${effectiveRoas.toFixed(2)}x`
+                    ];
+                  }
+                  return [];
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#64748b', font: { size: 10 } },
+              grid: { color: '#1e293b' }
+            },
+            y: {
+              ticks: {
+                color: '#64748b',
+                font: { size: 10 },
+                callback: (val) => formatoCLP(val)
+              },
+              grid: { color: '#1e293b' }
+            }
+          }
+        }
+      });
+    }
+
+        // -------------------------------------------------------------
     // ACCIÃ“N RÃPIDA: FILTRAR Y ATENDER PEDIDOS SIN RESPUESTA
     // -------------------------------------------------------------
     function irAPedidosSinRespuesta() {
@@ -9003,1363 +9576,57 @@
       renderizarTablaTraspasos();
 
       // Poblar selects del modal de traspasos
-      poblarSelectsModalTraspaso();
-
-      // Actualizar widget de Dropshipping
-      renderizarWidgetTarjetaNegocio();
-    }
-
-    function renderizarGaleriaTarjetas() {
-      const cont = document.getElementById('contenedor-tarjetas-galeria');
-      if (!cont) return;
-
-      if (!tarjetasUsuario || tarjetasUsuario.length === 0) {
-        cont.innerHTML = `
-          <div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/60 rounded-2xl border border-dashed border-slate-800 p-6">
-            <div class="text-3xl mb-2">ğŸ’³</div>
-            <div class="text-sm font-semibold text-slate-300">No tienes tarjetas ni cuentas configuradas</div>
-            <div class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">AÃ±ade tu cuenta principal, cuenta de negocio o billetera de inversiÃ³n para gestionar tus saldos y traspasos inter-Ã¡reas.</div>
-            <button onclick="abrirModalNuevaTarjeta()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 cursor-pointer">
-              â• AÃ±adir Primera Tarjeta
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      cont.innerHTML = tarjetasUsuario.map(tar => {
-        const info = calcularSaldosTarjeta(tar.id);
-        const preset = PRESETS_BANCOS[tar.banco] || PRESETS_BANCOS['Otro'];
-        const gradiente = tar.color_personalizado || preset.gradiente;
-        const tasa = Number(tar.tasa_anual_interes || 0);
-
-        let badgeTipoHtml = '';
-        if (tar.tipo === 'principal') {
-          badgeTipoHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">ğŸ‘‘ Cuenta Principal</span>';
-        } else if (tar.tipo === 'negocio') {
-          badgeTipoHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-400/20 text-sky-300 border border-sky-400/40">ğŸ’¼ Flujo Negocio</span>';
-        } else if (tar.tipo === 'inversion') {
-          badgeTipoHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-400/20 text-purple-300 border border-purple-400/40">ğŸ“ˆ InversiÃ³n ${tasa > 0 ? `(${tasa}% EA)` : ''}</span>`;
-        } else {
-          badgeTipoHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-400/20 text-slate-300 border border-slate-400/40">ğŸ’³ Personal</span>';
-        }
-
-        return `
-          <div class="relative rounded-2xl bg-gradient-to-br ${gradiente} p-5 text-white shadow-xl shadow-black/40 border border-white/15 flex flex-col justify-between min-h-[220px] group transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl overflow-hidden">
-            <!-- PatrÃ³n de brillo de fondo -->
-            <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
-            
-            <!-- Encabezado Tarjeta -->
-            <div>
-              <div class="flex items-start justify-between gap-2 mb-3">
-                <div class="flex flex-col">
-                  <span class="text-[10px] font-mono tracking-widest text-white/70 uppercase font-semibold">${tar.banco}</span>
-                  <h4 class="text-sm font-bold text-white leading-tight drop-shadow-sm">${tar.nombre}</h4>
-                </div>
-                <div>${badgeTipoHtml}</div>
-              </div>
-
-              <!-- Chip EMV & Contactless -->
-              <div class="flex items-center gap-2 my-2 opacity-90">
-                <div class="w-8 h-6 rounded bg-gradient-to-tr from-amber-200 via-amber-400 to-amber-200 border border-amber-300/80 shadow-sm flex items-center justify-center">
-                  <div class="w-6 h-4 border border-amber-600/40 rounded-sm grid grid-cols-2 gap-0.5 p-0.5">
-                    <div class="bg-amber-500/30 rounded-xs"></div>
-                    <div class="bg-amber-500/30 rounded-xs"></div>
-                  </div>
-                </div>
-                <span class="text-xs text-white/70 font-mono tracking-widest">â€¢â€¢â€¢â€¢ ${tar.digitos || '0000'}</span>
-              </div>
-            </div>
-
-            <!-- Cuerpo / Saldo Disponible -->
-            <div class="my-2 bg-black/25 backdrop-blur-md rounded-xl p-3 border border-white/10">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] text-white/80 font-medium tracking-wide">SALDO DISPONIBLE</span>
-                <span class="text-[10px] text-white/60 font-mono">${tar.formato || 'Cuenta'}</span>
-              </div>
-              <div class="text-xl md:text-2xl font-extrabold font-mono text-white tracking-tight drop-shadow-md mt-0.5">
-                ${formatoCLP(info.saldoFinal)}
-              </div>
-              
-              <!-- Desglose segÃºn tipo de tarjeta -->
-              ${tar.tipo === 'negocio' ? `
-                <div class="mt-2 pt-2 border-t border-white/10 flex flex-col gap-1 text-[10px] text-white/80">
-                  <div class="flex items-center justify-between">
-                    <span>ğŸ“¦ Entregados + Dropi: <strong class="text-emerald-300">${formatoCLP(info.saldoWalletDropi)}</strong></span>
-                    <span>ğŸ“¥ Inyecciones: <strong class="text-sky-300">+${formatoCLP(info.traspasosEntrantes)}</strong></span>
-                  </div>
-                  <div class="flex items-center justify-between text-rose-200/90">
-                    <span>ğŸ“£ Ads + Fijos: <strong>-${formatoCLP(info.totalAds + info.totalFijos)}</strong></span>
-                    <span>ğŸ’¡ Inversiones: <strong>-${formatoCLP(info.totalInversionesBancoNegocio)}</strong></span>
-                  </div>
-                </div>
-              ` : (tar.tipo === 'inversion' && tasa > 0 ? `
-                <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/80">
-                  <span>âš¡ Rentabilidad estimada:</span>
-                  <span class="font-bold text-emerald-300">+${formatoCLP(info.saldoFinal * (tasa / 100))}/aÃ±o</span>
-                </div>
-              ` : `
-                <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/80">
-                  <span>ğŸ“¥ Entradas: ${formatoCLP(info.traspasosEntrantes)}</span>
-                  <span>ğŸ“¤ Salidas: ${formatoCLP(info.traspasosSalientes)}</span>
-                </div>
-              `)}
-            </div>
-
-            <!-- Botones de AcciÃ³n RÃ¡pida -->
-            <div class="flex items-center justify-between gap-1.5 pt-1">
-              <button onclick="abrirModalTraspaso(${tar.id})" class="flex-1 py-1.5 px-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-[11px] font-semibold backdrop-blur-sm transition flex items-center justify-center gap-1 cursor-pointer">
-                <span>ğŸ”„</span> <span>Traspasar</span>
-              </button>
-              <button onclick="abrirModalEditarTarjeta(${tar.id})" class="p-1.5 bg-black/20 hover:bg-black/40 text-white/90 hover:text-white rounded-lg text-xs backdrop-blur-sm transition cursor-pointer" title="Editar detalles de la tarjeta">
-                âœï¸
-              </button>
-              <button onclick="eliminarTarjeta(${tar.id})" class="p-1.5 bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white rounded-lg text-xs backdrop-blur-sm transition cursor-pointer" title="Eliminar tarjeta">
-                ğŸ—‘ï¸
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderizarTablaTraspasos() {
-      const tbody = document.getElementById('tabla-traspasos-tarjetas');
-      if (!tbody) return;
-
-      let filtrados = traspasosTarjetas || [];
-      const buscador = document.getElementById('buscador-traspasos')?.value?.trim().toLowerCase();
-
-      if (filtroTraspasosTipo !== 'todos') {
-        if (filtroTraspasosTipo === 'inyeccion') {
-          filtrados = filtrados.filter(t => t.tipo_operacion === 'inversion_a_negocio' || t.tipo_operacion === 'principal_a_negocio' || t.tipo_operacion === 'inyeccion_negocio');
-        } else if (filtroTraspasosTipo === 'retiro') {
-          filtrados = filtrados.filter(t => t.tipo_operacion === 'negocio_a_principal' || t.tipo_operacion === 'retiro_negocio');
-        } else if (filtroTraspasosTipo === 'inversion') {
-          filtrados = filtrados.filter(t => t.tipo_operacion === 'principal_a_inversion' || t.tipo_operacion === 'negocio_a_inversion' || t.tipo_operacion === 'aporte_inversion');
-        } else {
-          filtrados = filtrados.filter(t => t.tipo_operacion === filtroTraspasosTipo);
-        }
-      }
-
-      if (buscador) {
-        filtrados = filtrados.filter(t => 
-          (t.origen_nombre && t.origen_nombre.toLowerCase().includes(buscador)) ||
-          (t.destino_nombre && t.destino_nombre.toLowerCase().includes(buscador)) ||
-          (t.glosa && t.glosa.toLowerCase().includes(buscador)) ||
-          (t.tipo_operacion && t.tipo_operacion.toLowerCase().includes(buscador))
-        );
-      }
-
-      if (filtrados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No hay transferencias ni traspasos registrados con el filtro actual.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = filtrados.map(tr => {
-        let badgeHtml = '';
-        if (tr.tipo_operacion === 'inyeccion_negocio' || tr.tipo_operacion === 'principal_a_negocio' || tr.tipo_operacion === 'inversion_a_negocio') {
-          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-700 whitespace-nowrap">ğŸš€ InyecciÃ³n Negocio</span>';
-        } else if (tr.tipo_operacion === 'retiro_negocio' || tr.tipo_operacion === 'negocio_a_principal') {
-          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700 whitespace-nowrap">ğŸ’µ Retiro Ganancia / Sueldo</span>';
-        } else if (tr.tipo_operacion === 'aporte_inversion' || tr.tipo_operacion === 'principal_a_inversion' || tr.tipo_operacion === 'negocio_a_inversion') {
-          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-700 whitespace-nowrap">ğŸ“ˆ Aporte InversiÃ³n</span>';
-        } else if (tr.tipo_operacion === 'retiro_inversion') {
-          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700 whitespace-nowrap">ğŸ’° Retiro InversiÃ³n</span>';
-        } else {
-          badgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700 whitespace-nowrap">ğŸ”„ Traspaso General</span>';
-        }
-
-        return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3 text-slate-400 font-mono text-xs whitespace-nowrap">${tr.fecha || hoyFechaStr}</td>
-            <td class="p-3 text-xs">
-              <div class="flex items-center gap-1.5 font-medium">
-                <span class="text-rose-300 font-semibold">${tr.origen_nombre || 'Origen'}</span>
-                <span class="text-slate-500 font-bold">â”</span>
-                <span class="text-emerald-300 font-semibold">${tr.destino_nombre || 'Destino'}</span>
-              </div>
-            </td>
-            <td class="p-3 text-xs">${badgeHtml}</td>
-            <td class="p-3 text-right font-mono font-bold text-white text-xs">${formatoCLP(Number(tr.monto || 0))}</td>
-            <td class="p-3 text-xs text-slate-400 max-w-xs truncate" title="${tr.glosa || ''}">${tr.glosa || 'â€”'}</td>
-            <td class="p-3 text-center">
-              <button onclick="eliminarTraspaso(${tr.id})" class="text-rose-400 hover:text-rose-200 text-xs px-2 py-1 bg-rose-950/50 hover:bg-rose-900 rounded-lg border border-rose-800/60 transition cursor-pointer" title="Eliminar este movimiento">ğŸ—‘ï¸</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function poblarSelectsModalTraspaso() {
-      const selOri = document.getElementById('traspaso-origen') || document.getElementById('traspaso-cuenta-origen');
-      const selDes = document.getElementById('traspaso-destino') || document.getElementById('traspaso-cuenta-destino');
-      if (!selOri || !selDes) return;
-
-      if (!tarjetasUsuario || tarjetasUsuario.length === 0) {
-        selOri.innerHTML = '<option value="">Sin tarjetas creadas</option>';
-        selDes.innerHTML = '<option value="">Sin tarjetas creadas</option>';
-        return;
-      }
-
-      const optsOri = tarjetasUsuario.map(t => {
-        const info = calcularSaldosTarjeta(t.id);
-        return `<option value="${t.id}">${t.nombre} (${t.banco} â€¢â€¢â€¢â€¢ ${t.digitos || '0000'}) - Saldo: ${formatoCLP(info.saldoFinal)}</option>`;
-      }).join('');
-
-      const optsDes = tarjetasUsuario.map(t => {
-        const info = calcularSaldosTarjeta(t.id);
-        return `<option value="${t.id}">${t.nombre} (${t.banco} â€¢â€¢â€¢â€¢ ${t.digitos || '0000'}) - Saldo: ${formatoCLP(info.saldoFinal)}</option>`;
-      }).join('');
-
-      selOri.innerHTML = optsOri;
-      selDes.innerHTML = optsDes;
-
-      // Seleccionar diferentes por defecto si hay al menos 2
-      if (tarjetasUsuario.length > 1) {
-        selOri.selectedIndex = 0;
-        selDes.selectedIndex = 1;
-      } else {
-        selOri.selectedIndex = 0;
-        selDes.selectedIndex = 0;
-      }
-    }
-
-    function renderizarWidgetTarjetaNegocio() {
-      const seccion = document.getElementById('seccion-tarjeta-negocio-widget');
-      if (!seccion) return;
-
-      const tarjetasNegocio = tarjetasUsuario.filter(t => t.tipo === 'negocio');
-      const tarjetaNegocio = tarjetasNegocio[0] || null;
-
-      const elBadgeNombre = document.getElementById('badge-tarjeta-negocio-nombre');
-      const elSaldoTotal = document.getElementById('widget-negocio-saldo-disponible');
-      const elSaldoBanco = document.getElementById('widget-negocio-saldo-banco');
-      const elMargenWallet = document.getElementById('widget-negocio-margen-entregados');
-      const elNumEntregados = document.getElementById('widget-negocio-num-entregados');
-      const elWalletDetalle = document.getElementById('widget-negocio-wallet-detalle');
-      const elGastosOperativos = document.getElementById('widget-negocio-total-gastos-operativos');
-      const elGastosDetalle = document.getElementById('widget-negocio-gastos-detalle');
-      const elInversiones = document.getElementById('widget-negocio-inversiones-crecimiento');
-      const elInversionesDetalle = document.getElementById('widget-negocio-inversiones-detalle');
-      const elInyecciones = document.getElementById('widget-negocio-total-inyecciones') || document.getElementById('widget-negocio-inyecciones-total');
-      const elRetiros = document.getElementById('widget-negocio-total-retiros') || document.getElementById('widget-negocio-retiros-total');
-      const elTarjetaDetalle = document.getElementById('widget-negocio-tarjeta-detalle');
-
-      // Elementos del TermÃ³metro Ejecutivo / RecuperaciÃ³n de InversiÃ³n
-      const elBadgeVerdes = document.getElementById('badge-estado-numeros-verdes');
-      const elTxtProgresoInvRet = document.getElementById('txt-progreso-invertido-vs-retirado');
-      const elTxtProgresoPct = document.getElementById('txt-progreso-pct-recuperado');
-      const elBarraProgreso = document.getElementById('barra-progreso-recuperacion');
-      const elMensajeMetas = document.getElementById('mensaje-meta-numeros-verdes');
-
-      if (!tarjetaNegocio) {
-        if (elBadgeNombre) elBadgeNombre.textContent = 'Sin Tarjeta Configurada';
-        if (elSaldoTotal) elSaldoTotal.textContent = '$0';
-        if (elSaldoBanco) elSaldoBanco.textContent = '$0';
-        if (elMargenWallet) elMargenWallet.textContent = '$0';
-        if (elNumEntregados) elNumEntregados.textContent = '0 ent.';
-        if (elWalletDetalle) elWalletDetalle.textContent = 'Base: $0 | Ent: +$0';
-        if (elGastosOperativos) elGastosOperativos.textContent = '-$0';
-        if (elInversiones) elInversiones.textContent = '$0';
-        if (elInversionesDetalle) elInversionesDetalle.textContent = 'Bolsillo: $0 | Banco: $0';
-        if (elInyecciones) elInyecciones.textContent = '+$0';
-        if (elRetiros) elRetiros.textContent = '-$0';
-        if (elTarjetaDetalle) elTarjetaDetalle.textContent = 'Configura una tarjeta como Negocio';
-        return;
-      }
-
-      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
-
-      if (elBadgeNombre) elBadgeNombre.textContent = `${tarjetaNegocio.banco} + Wallet`;
-      if (elSaldoTotal) elSaldoTotal.textContent = formatoCLP(info.saldoFinal);
-      if (elSaldoBanco) elSaldoBanco.textContent = formatoCLP(info.saldoBancoReal);
-      if (elMargenWallet) elMargenWallet.textContent = formatoCLP(info.saldoWalletDropi);
-      if (elNumEntregados) elNumEntregados.textContent = `${info.pedidosEntregadosCount} ent.`;
-      if (elWalletDetalle) {
-        elWalletDetalle.textContent = info.totalFletesDevolucion > 0 
-          ? `Base: ${formatoCLP(info.saldoWalletDropiBase)} | Ent: +${formatoCLP(info.margenEntregados)} | Dev: -${formatoCLP(info.totalFletesDevolucion)}`
-          : `Base: ${formatoCLP(info.saldoWalletDropiBase)} | Ent: +${formatoCLP(info.margenEntregados)}`;
-      }
-      
-      const totalGastosOperativos = info.totalAds + info.totalFijos;
-      if (elGastosOperativos) elGastosOperativos.textContent = `-${formatoCLP(totalGastosOperativos)}`;
-      if (elGastosDetalle) elGastosDetalle.textContent = `Meta: ${formatoCLP(info.totalAds)} | Fijos: ${formatoCLP(info.totalFijos)}`;
-
-      if (elInversiones) elInversiones.textContent = formatoCLP(info.totalInversionesNegocio);
-      if (elInversionesDetalle) elInversionesDetalle.textContent = `Bolsillo: ${formatoCLP(info.totalInversionesBolsilloNegocio)} | Banco: ${formatoCLP(info.totalInversionesBancoNegocio)}`;
-
-      if (elInyecciones) elInyecciones.textContent = `+${formatoCLP(info.traspasosEntrantes)}`;
-      if (elRetiros) elRetiros.textContent = `-${formatoCLP(info.traspasosSalientes)}`;
-      if (elTarjetaDetalle) elTarjetaDetalle.textContent = `${tarjetaNegocio.banco} (â€¢â€¢â€¢â€¢ ${tarjetaNegocio.digitos || '0000'}) + Dropi`;
-
-      // CÃLCULO DEL TERMÃ“METRO EJECUTIVO (RecuperaciÃ³n de Capital Propio / Aportes de Bolsillo)
-      const totalInyectadoBolsillo = info.traspasosEntrantes + (Number(tarjetaNegocio.saldo_inicial || 0) > 0 ? Number(tarjetaNegocio.saldo_inicial || 0) : 0) + info.totalInversionesBolsilloNegocio;
-      const totalRetiradoGanancia = info.traspasosSalientes;
-      let pctRecuperacion = 0;
-
-      if (totalInyectadoBolsillo > 0) {
-        pctRecuperacion = Math.round((totalRetiradoGanancia / totalInyectadoBolsillo) * 100);
-      } else if (totalRetiradoGanancia > 0) {
-        pctRecuperacion = 100;
-      }
-
-      const faltaPorRecuperar = Math.max(0, totalInyectadoBolsillo - totalRetiradoGanancia);
-      const gananciaNetaBolsillo = Math.max(0, totalRetiradoGanancia - totalInyectadoBolsillo);
-
-      if (elTxtProgresoInvRet) {
-        elTxtProgresoInvRet.textContent = `Invertido de bolsillo: ${formatoCLP(totalInyectadoBolsillo)} | Retirado a personal: ${formatoCLP(totalRetiradoGanancia)}`;
-      }
-      if (elTxtProgresoPct) {
-        elTxtProgresoPct.textContent = `${Math.min(100, pctRecuperacion)}% Recuperado`;
-      }
-      if (elBarraProgreso) {
-        elBarraProgreso.style.width = `${Math.min(100, Math.max(0, pctRecuperacion))}%`;
-      }
-
-      if (elBadgeVerdes) {
-        if (totalInyectadoBolsillo === 0 && totalRetiradoGanancia === 0) {
-          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 self-start sm:self-auto';
-          elBadgeVerdes.textContent = 'âšª Sin inyecciones registradas';
-        } else if (totalRetiradoGanancia >= totalInyectadoBolsillo && totalInyectadoBolsillo > 0) {
-          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-600 shadow-sm self-start sm:self-auto';
-          elBadgeVerdes.textContent = `ğŸŸ¢ Â¡En NÃºmeros Verdes! (+${formatoCLP(gananciaNetaBolsillo)} ganancia neta)`;
-        } else if (pctRecuperacion >= 50) {
-          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-600 self-start sm:self-auto';
-          elBadgeVerdes.textContent = `ğŸŸ¡ ${pctRecuperacion}% Amortizado (Faltan ${formatoCLP(faltaPorRecuperar)})`;
-        } else {
-          elBadgeVerdes.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800 self-start sm:self-auto';
-          elBadgeVerdes.textContent = `ğŸ”´ En Fase de InversiÃ³n (${pctRecuperacion}% amortizado)`;
-        }
-      }
-
-      if (elMensajeMetas) {
-        if (totalRetiradoGanancia >= totalInyectadoBolsillo && totalInyectadoBolsillo > 0) {
-          elMensajeMetas.innerHTML = `
-            <span class="text-emerald-400 font-semibold flex items-center gap-1">
-              <span>ğŸš€</span> <span>Â¡Has recuperado el 100% de tu capital de bolsillo! El negocio ahora se autofinancia y genera utilidades reales.</span>
-            </span>
-            <span class="text-slate-400 text-[11px] font-mono">Retirado: ${formatoCLP(totalRetiradoGanancia)}</span>
-          `;
-        } else if (totalInyectadoBolsillo > 0) {
-          const margenPromedioPorPedido = info.pedidosEntregadosCount > 0 ? (info.margenEntregados / info.pedidosEntregadosCount) : 12000;
-          const pedidosEstimadosFaltantes = Math.ceil(faltaPorRecuperar / (margenPromedioPorPedido > 0 ? margenPromedioPorPedido : 12000));
-          elMensajeMetas.innerHTML = `
-            <span class="text-slate-300 text-[11px]">
-              ğŸ¯ Te faltan <strong class="text-amber-400 font-mono">${formatoCLP(faltaPorRecuperar)}</strong> para recuperar tu inversiÃ³n. Con tu margen promedio, necesitas aprox. <strong class="text-sky-300">${pedidosEstimadosFaltantes} pedidos entregados</strong> para alcanzar el punto de equilibrio total.
-            </span>
-            <span class="text-slate-400 text-[11px] font-mono whitespace-nowrap">Meta: 100% Retorno</span>
-          `;
-        } else {
-          elMensajeMetas.innerHTML = `
-            <span class="text-slate-400 text-[11px]">Inyecta capital de trabajo o registra retiros con los botones superiores para activar la proyecciÃ³n ejecutiva.</span>
-          `;
-        }
-      }
-    }
-
-    // ==========================================
-    // MODAL DE CUADRE RÃPIDO DE CUENTA DE NEGOCIO
-    // ==========================================
-    function abrirModalCuadreRapidoNegocio() {
-      const tarjetaNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
-      if (!tarjetaNegocio) {
-        mostrarToast('Debes tener al menos una tarjeta creada para calibrar saldos.', 'warning');
-        return;
-      }
-
-      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
-
-      const elNombre = document.getElementById('cuadre-modal-nombre-tarjeta');
-      const elSaldoBase = document.getElementById('cuadre-modal-saldo-base-actual');
-      const elSaldoBanco = document.getElementById('cuadre-modal-saldo-banco-calculado');
-      const elSaldoWalletBase = document.getElementById('cuadre-modal-saldo-wallet-base');
-      const elMargenEntregados = document.getElementById('cuadre-modal-margen-entregados');
-      const inpRealBanco = document.getElementById('cuadre-saldo-real-banco');
-      const inpRealWallet = document.getElementById('cuadre-saldo-real-wallet');
-
-      if (elNombre) elNombre.textContent = `${tarjetaNegocio.nombre} (${tarjetaNegocio.banco} â€¢â€¢â€¢â€¢ ${tarjetaNegocio.digitos || '0000'})`;
-      if (elSaldoBase) elSaldoBase.textContent = formatoCLP(Number(tarjetaNegocio.saldo_inicial || 0));
-      if (elSaldoBanco) elSaldoBanco.textContent = formatoCLP(info.saldoBancoReal);
-      if (elSaldoWalletBase) elSaldoWalletBase.textContent = formatoCLP(Number(tarjetaNegocio.saldo_wallet_dropi_base || 0));
-      if (elMargenEntregados) elMargenEntregados.textContent = `+${formatoCLP(info.margenEntregados)}`;
-
-      if (inpRealBanco) inpRealBanco.value = info.saldoBancoReal >= 0 ? Math.round(info.saldoBancoReal) : '0';
-      if (inpRealWallet) inpRealWallet.value = tarjetaNegocio.saldo_wallet_dropi_base !== undefined ? Math.round(tarjetaNegocio.saldo_wallet_dropi_base) : '0';
-
-      actualizarDiferenciaCuadre();
-
-      const modal = document.getElementById('modal-cuadre-negocio');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function cerrarModalCuadreRapidoNegocio() {
-      const modal = document.getElementById('modal-cuadre-negocio');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function actualizarDiferenciaCuadre() {
-      const tarjetaNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
-      if (!tarjetaNegocio) return;
-
-      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
-      const saldoRealBanco = Number(document.getElementById('cuadre-saldo-real-banco')?.value || 0);
-      const saldoRealWallet = Number(document.getElementById('cuadre-saldo-real-wallet')?.value || 0);
-
-      const previewBanco = document.getElementById('cuadre-preview-banco');
-      const previewWalletBase = document.getElementById('cuadre-preview-wallet-base');
-      const previewEntregados = document.getElementById('cuadre-preview-entregados');
-      const totalResultado = document.getElementById('cuadre-total-centralizado-resultado');
-
-      if (previewBanco) previewBanco.textContent = formatoCLP(saldoRealBanco);
-      if (previewWalletBase) previewWalletBase.textContent = formatoCLP(saldoRealWallet);
-      if (previewEntregados) previewEntregados.textContent = `+${formatoCLP(info.margenEntregados - info.totalFletesDevolucion)}`;
-
-      const totalCentralizado = saldoRealBanco + saldoRealWallet + info.margenEntregados - info.totalFletesDevolucion;
-      if (totalResultado) totalResultado.textContent = formatoCLP(totalCentralizado);
-    }
-
-    function guardarCuadreRapidoNegocio(e) {
-      if (e) e.preventDefault();
-
-      const tarjetaNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio') || tarjetasUsuario[0];
-      if (!tarjetaNegocio) return;
-
-      const saldoRealBanco = Number(document.getElementById('cuadre-saldo-real-banco')?.value || 0);
-      const saldoRealWallet = Number(document.getElementById('cuadre-saldo-real-wallet')?.value || 0);
-
-      if (isNaN(saldoRealBanco) || saldoRealBanco < 0) {
-        mostrarToast('Ingresa un monto vÃ¡lido para el saldo en tu cuenta bancaria.', 'warning');
-        return;
-      }
-      if (isNaN(saldoRealWallet) || saldoRealWallet < 0) {
-        mostrarToast('Ingresa un monto vÃ¡lido para el saldo base en tu Wallet Dropi.', 'warning');
-        return;
-      }
-
-      // FÃ“RMULA DE CALIBRACIÃ“N:
-      // saldoBancoReal = saldoBase + traspasosEntrantes - traspasosSalientes - totalAds - totalFijos - totalInversionesBancoNegocio
-      // Queremos que saldoBancoReal == saldoRealBanco
-      // Por tanto: nuevoSaldoBase = saldoRealBanco - traspasosEntrantes + traspasosSalientes + totalAds + totalFijos + totalInversionesBancoNegocio
-      const info = calcularSaldosTarjeta(tarjetaNegocio.id);
-      const nuevoSaldoBase = Math.round(saldoRealBanco - info.traspasosEntrantes + info.traspasosSalientes + info.totalAds + info.totalFijos + info.totalInversionesBancoNegocio);
-
-      tarjetaNegocio.saldo_inicial = nuevoSaldoBase;
-      tarjetaNegocio.saldo_wallet_dropi_base = Math.round(saldoRealWallet);
-      guardarTarjetasEnAlmacenamiento();
-
-      mostrarToast(`Â¡Saldos de negocio cuadrados con Ã©xito! Total centralizado: ${formatoCLP(saldoRealBanco + saldoRealWallet + info.margenEntregados - info.totalFletesDevolucion)}`, 'success');
-      cerrarModalCuadreRapidoNegocio();
-      procesarModuloTarjetas();
-    }
-
-    // ==========================================
-    // MODAL DE CREAR / EDITAR TARJETA
-    // ==========================================
-    function abrirModalNuevaTarjeta() {
-      const elId = document.getElementById('tarjeta-id') || document.getElementById('tarjeta-form-id');
-      const elTitulo = document.getElementById('modal-tarjeta-titulo');
-      const elNombre = document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre');
-      const elBanco = document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco');
-      const elFormato = document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato');
-      const elDigitos = document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos');
-      const elTipo = document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo');
-      const elSaldo = document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial');
-      const elInteres = document.getElementById('tarjeta-tasa-interes') || document.getElementById('tarjeta-input-interes');
-      const elColor = document.getElementById('tarjeta-input-color');
-
-      if (elId) elId.value = '';
-      if (elTitulo) elTitulo.textContent = 'AÃ±adir Nueva Tarjeta / Cuenta';
-      if (elNombre) elNombre.value = '';
-      if (elBanco) elBanco.value = 'Banco Santander';
-      if (elFormato) elFormato.value = 'Cuenta Corriente';
-      if (elDigitos) elDigitos.value = '';
-      if (elTipo) elTipo.value = 'principal';
-      if (elSaldo) elSaldo.value = '0';
-      if (elInteres) elInteres.value = '0';
-      if (elColor) elColor.value = '';
-
-      cambiarBancoModalTarjeta('Banco Santander');
-      cambiarTipoTarjetaModal('principal');
-      actualizarPreviewTarjetaModal();
-
-      const modal = document.getElementById('modal-tarjeta');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function abrirModalEditarTarjeta(id) {
-      const tar = tarjetasUsuario.find(t => t.id == id);
-      if (!tar) return;
-
-      const elId = document.getElementById('tarjeta-id') || document.getElementById('tarjeta-form-id');
-      const elTitulo = document.getElementById('modal-tarjeta-titulo');
-      const elNombre = document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre');
-      const elBanco = document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco');
-      const elFormato = document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato');
-      const elDigitos = document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos');
-      const elTipo = document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo');
-      const elSaldo = document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial');
-      const elInteres = document.getElementById('tarjeta-tasa-interes') || document.getElementById('tarjeta-input-interes');
-      const elColor = document.getElementById('tarjeta-input-color');
-
-      if (elId) elId.value = tar.id;
-      if (elTitulo) elTitulo.textContent = 'Editar Tarjeta / Cuenta';
-      if (elNombre) elNombre.value = tar.nombre || '';
-      if (elBanco) elBanco.value = tar.banco || 'Banco Santander';
-      if (elFormato) elFormato.value = tar.formato || 'Cuenta Corriente';
-      if (elDigitos) elDigitos.value = tar.digitos || '';
-      if (elTipo) elTipo.value = tar.tipo || 'principal';
-      if (elSaldo) elSaldo.value = Number(tar.saldo_inicial || 0);
-      if (elInteres) elInteres.value = Number(tar.tasa_anual_interes || 0);
-      if (elColor) elColor.value = tar.color_personalizado || '';
-
-      cambiarBancoModalTarjeta(tar.banco || 'Banco Santander');
-      cambiarTipoTarjetaModal(tar.tipo || 'principal');
-      actualizarPreviewTarjetaModal();
-
-      const modal = document.getElementById('modal-tarjeta');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function cerrarModalTarjeta() {
-      const m = document.getElementById('modal-tarjeta');
-      if (m) m.classList.add('hidden');
-    }
-
-    function cambiarBancoModalTarjeta(banco) {
-      const preset = PRESETS_BANCOS[banco] || PRESETS_BANCOS['Otro'];
-      const previewCard = document.getElementById('tarjeta-preview-card');
-      const inputColor = document.getElementById('tarjeta-input-color');
-
-      if (previewCard && (!inputColor || !inputColor.value)) {
-        previewCard.className = `w-full max-w-sm mx-auto h-44 rounded-2xl p-4 text-white shadow-xl flex flex-col justify-between relative overflow-hidden transition-all duration-300 bg-gradient-to-r ${preset.gradiente} border border-white/10`;
-      }
-      actualizarPreviewTarjetaModal();
-    }
-
-    function cambiarTipoTarjetaModal(tipo) {
-      const campoInteres = document.getElementById('campo-tasa-interes-tarjeta') || document.getElementById('tarjeta-contenedor-interes');
-      if (campoInteres) {
-        if (tipo === 'inversion') {
-          campoInteres.classList.remove('opacity-40');
-        } else {
-          campoInteres.classList.add('opacity-40');
-        }
-      }
-      actualizarPreviewTarjetaModal();
-    }
-
-                function actualizarPreviewTarjetaModal() {
-      const nombre = (document.getElementById('tarjeta-nombre') || document.getElementById('tarjeta-input-nombre'))?.value || 'Mi Cuenta';
-      const banco = (document.getElementById('tarjeta-banco') || document.getElementById('tarjeta-input-banco'))?.value || 'Banco Santander';
-      const formato = (document.getElementById('tarjeta-formato') || document.getElementById('tarjeta-input-formato'))?.value || 'Cuenta Corriente';
-      const digitos = (document.getElementById('tarjeta-digitos') || document.getElementById('tarjeta-input-digitos'))?.value || '4589';
-      const tipo = (document.getElementById('tarjeta-tipo') || document.getElementById('tarjeta-input-tipo'))?.value || 'principal';
-      const saldo = Number((document.getElementById('tarjeta-saldo-inicial') || document.getElementById('tarjeta-input-saldo-inicial'))?.value || 0);
-      const colorCustom = document.getElementById('tarjeta-input-color')?.value;
-      const preset = PRESETS_BANCOS[banco] || PRESETS_BANCOS['Otro'];
-      const prevBanco = document.getElementById('preview-banco-nombre') || document.getElementById('tarjeta-preview-banco');
-      const prevFormato = document.getElementById('preview-formato-tarjeta');
-      const prevNombre = document.getElementById('preview-nombre-titular') || document.getElementById('tarjeta-preview-nombre');
-      const prevDigitos = document.getElementById('preview-digitos') || document.getElementById('tarjeta-preview-digitos');
-      const prevTipo = document.getElementById('preview-tipo-badge') || document.getElementById('tarjeta-preview-tipo');
-      const prevSaldo = document.getElementById('preview-saldo-monto') || document.getElementById('tarjeta-preview-saldo');
-      const prevCard = document.getElementById('tarjeta-preview-card');
-      if (prevBanco) prevBanco.textContent = banco.toUpperCase();
-      if (prevFormato) prevFormato.textContent = formato;
-      if (prevNombre) prevNombre.textContent = nombre;
-      if (prevDigitos) prevDigitos.textContent = digitos ? digitos.slice(-4) : '4589';
-      if (prevSaldo) prevSaldo.textContent = formatoCLP(saldo);
-      let tipoLabel = 'Principal';
-      if (tipo === 'principal') tipoLabel = 'â­ Principal';
-      if (tipo === 'negocio') tipoLabel = 'ğŸ¢ Negocio';
-      if (tipo === 'inversion') tipoLabel = 'ğŸš€ InversiÃ³n';
-      if (tipo === 'costos') tipoLabel = 'ğŸ’¸ Costos';
-      if (tipo === 'ahorro') tipoLabel = 'ğŸ›¡ï¸ Ahorro';
-      if (prevTipo) prevTipo.textContent = tipoLabel;
-      if (prevCard) {
-        const gradiente = colorCustom ? ('from-[' + colorCustom + '] to-slate-950') : (preset?.gradiente || 'from-slate-800 to-slate-950');
-        prevCard.className = 'p-4 sm:p-5 rounded-2xl bg-gradient-to-br ' + gradiente + ' border border-slate-700/80 shadow-lg relative overflow-hidden transition-all duration-300';
-      }
-    }
-
-    async function guardarTarjeta(e) {
-      if (e) e.preventDefault();
-      const id = document.getElementById('tarjeta-id')?.value;
-      const nombre = document.getElementById('tarjeta-nombre')?.value?.trim();
-      const banco = document.getElementById('tarjeta-banco')?.value || 'Banco Santander';
-      const tipo = document.getElementById('tarjeta-tipo')?.value || 'principal';
-      const formato = document.getElementById('tarjeta-formato')?.value || 'Cuenta Corriente';
-      const digitos = document.getElementById('tarjeta-digitos')?.value?.trim() || '';
-      const saldoInicial = Number(document.getElementById('tarjeta-saldo-inicial')?.value || 0);
-      const tasaInteres = Number(document.getElementById('tarjeta-tasa-interes')?.value || 0);
-
-      if (!nombre) {
-        mostrarToast('Por favor ingresa un nombre para la tarjeta.', 'error');
-        return;
-      }
-
-      if (id) {
-        const idx = tarjetasUsuario.findIndex(t => t.id == id);
-        if (idx !== -1) {
-          tarjetasUsuario[idx] = {
-            ...tarjetasUsuario[idx],
-            nombre,
-            banco,
-            tipo,
-            formato,
-            digitos,
-            saldoInicial,
-            tasaInteres
-          };
-        }
-      } else {
-        const nueva = {
-          id: 'tar_' + Date.now(),
-          nombre,
-          banco,
-          tipo,
-          formato,
-          digitos,
-          saldoInicial,
-          tasaInteres,
-          creadoEn: new Date().toISOString()
-        };
-        tarjetasUsuario.push(nueva);
-      }
-
-      guardarTarjetasEnAlmacenamiento();
-      cerrarModalTarjeta();
-      procesarModuloTarjetas();
-      mostrarToast(id ? 'Tarjeta actualizada con Ã©xito.' : 'Nueva tarjeta guardada con Ã©xito.', 'success');
-    }
-
-    function cerrarModalTarjeta() {
-      const modal = document.getElementById('modal-tarjeta');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    async function eliminarTarjeta(id) {
-      const tar = tarjetasUsuario.find(t => t.id == id);
-      if (!tar) return;
-      const confirmado = await pedirConfirmacion({
-        titulo: 'Â¿Eliminar Tarjeta ' + tar.nombre + '?',
-        mensaje: 'Se removerÃ¡ esta cuenta de tus tarjetas activas.',
-        btnTexto: 'SÃ­, Eliminar'
-      });
-      if (!confirmado) return;
-      tarjetasUsuario = tarjetasUsuario.filter(t => t.id != id);
-      guardarTarjetasEnAlmacenamiento();
-      mostrarToast('Tarjeta eliminada.', 'success');
-      procesarModuloTarjetas();
-    }
-
-    // ==========================================
-    // MODAL Y LOGICA DE TRASPASOS ENTRE TARJETAS
-    // ==========================================
-    let filtroTraspasoActivo = 'todos';
-
-    function poblarSelectsModalTraspaso() {
-      const selOri = document.getElementById('traspaso-origen');
-      const selDes = document.getElementById('traspaso-destino');
-      if (!selOri || !selDes) return;
-
-      const opciones = [
-        '<option value="">-- Selecciona una tarjeta / cuenta --</option>',
-        ...tarjetasUsuario.map(t => '<option value="' + t.id + '">' + (t.banco || '') + ' - ' + (t.nombre || '') + ' (' + (t.digitos ? '...' + t.digitos : '') + ')</option>')
-      ].join('');
-
-      selOri.innerHTML = opciones;
-      selDes.innerHTML = opciones;
-    }
-
-    function abrirModalTraspaso(origenId = null, destinoId = null, tipoSugerido = null) {
-      poblarSelectsModalTraspaso();
-      const modal = document.getElementById('modal-traspaso-tarjeta');
-      const selOri = document.getElementById('traspaso-origen');
-      const selDes = document.getElementById('traspaso-destino');
-      const selClasif = document.getElementById('traspaso-clasificacion');
-      const inFecha = document.getElementById('traspaso-fecha');
-      const inMonto = document.getElementById('traspaso-monto');
-      const inGlosa = document.getElementById('traspaso-glosa');
-
-      if (inFecha) inFecha.value = new Date().toISOString().split('T')[0];
-      if (inMonto) inMonto.value = '';
-      if (inGlosa) inGlosa.value = '';
-
-      if (selOri && origenId) selOri.value = origenId;
-      if (selDes && destinoId) selDes.value = destinoId;
-      if (selClasif && tipoSugerido) selClasif.value = tipoSugerido;
-
-      alCambiarCuentasTraspaso();
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function cerrarModalTraspaso() {
-      const modal = document.getElementById('modal-traspaso-tarjeta');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function alCambiarCuentasTraspaso() {
-      const selOri = document.getElementById('traspaso-origen')?.value;
-      const selDes = document.getElementById('traspaso-destino')?.value;
-      const clasif = document.getElementById('traspaso-clasificacion')?.value || 'traspaso_directo';
-      
-      const tag = document.getElementById('preview-traspaso-tipo-tag');
-      const txtOri = document.getElementById('preview-traspaso-origen-txt');
-      const saldoOri = document.getElementById('preview-traspaso-origen-saldo');
-      const txtDes = document.getElementById('preview-traspaso-destino-txt');
-      const saldoDes = document.getElementById('preview-traspaso-destino-saldo');
-
-      const tarOri = tarjetasUsuario.find(t => t.id == selOri);
-      const tarDes = tarjetasUsuario.find(t => t.id == selDes);
-
-      if (txtOri) txtOri.textContent = tarOri ? (tarOri.banco + ' - ' + tarOri.nombre) : 'No seleccionada';
-      if (saldoOri) saldoOri.textContent = tarOri ? ('Saldo: ' + formatoCLP(tarOri.saldoCalculado || tarOri.saldoInicial || 0)) : '-';
-      if (txtDes) txtDes.textContent = tarDes ? (tarDes.banco + ' - ' + tarDes.nombre) : 'No seleccionada';
-      if (saldoDes) saldoDes.textContent = tarDes ? ('Saldo: ' + formatoCLP(tarDes.saldoCalculado || tarDes.saldoInicial || 0)) : '-';
-
-      if (tag) {
-        if (clasif === 'inyeccion_negocio') {
-          tag.textContent = 'ğŸ¢ InyecciÃ³n a Negocio';
-          tag.className = 'px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold';
-        } else if (clasif === 'retiro_negocio') {
-          tag.textContent = 'ğŸ’¸ Retiro de Utilidades';
-          tag.className = 'px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800 text-[10px] font-bold';
-        } else if (clasif === 'aporte_inversion') {
-          tag.textContent = 'ğŸš€ Aporte a InversiÃ³n';
-          tag.className = 'px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800 text-[10px] font-bold';
-        } else {
-          tag.textContent = 'ğŸ”„ Traspaso Directo';
-          tag.className = 'px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-800 text-[10px] font-bold';
-        }
-      }
-    }
-
-    async function guardarTraspaso(e) {
-      if (e) e.preventDefault();
-      const origenId = document.getElementById('traspaso-origen')?.value;
-      const destinoId = document.getElementById('traspaso-destino')?.value;
-      const monto = Number(document.getElementById('traspaso-monto')?.value || 0);
-      const fecha = document.getElementById('traspaso-fecha')?.value || new Date().toISOString().split('T')[0];
-      const clasificacion = document.getElementById('traspaso-clasificacion')?.value || 'traspaso_directo';
-      const glosa = document.getElementById('traspaso-glosa')?.value?.trim() || 'Traspaso de fondos';
-
-      if (!origenId || !destinoId) {
-        mostrarToast('Debes seleccionar cuenta de origen y destino.', 'error');
-        return;
-      }
-      if (origenId === destinoId) {
-        mostrarToast('La cuenta de origen y destino no pueden ser la misma.', 'error');
-        return;
-      }
-      if (monto <= 0) {
-        mostrarToast('El monto a transferir debe ser mayor a $0.', 'error');
-        return;
-      }
-
-      const nuevoTraspaso = {
-        id: 'traspaso_' + Date.now(),
-        origenId,
-        destinoId,
-        monto,
-        fecha,
-        clasificacion,
-        glosa,
-        creadoEn: new Date().toISOString()
-      };
-
-      let listaTraspasos = [];
-      try {
-        listaTraspasos = JSON.parse(localStorage.getItem('traspasos_tarjetas') || '[]');
-      } catch(err) {
-        listaTraspasos = [];
-      }
-      listaTraspasos.unshift(nuevoTraspaso);
-      localStorage.setItem('traspasos_tarjetas', JSON.stringify(listaTraspasos));
-
-      cerrarModalTraspaso();
-      procesarModuloTarjetas();
-      mostrarToast('Traspaso registrado exitosamente.', 'success');
-    }
-
-    function abrirModalTraspasoNegocioInyeccion() {
-      const tarNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio');
-      const tarPrincipal = tarjetasUsuario.find(t => t.tipo === 'principal');
-      abrirModalTraspaso(tarPrincipal?.id, tarNegocio?.id, 'inyeccion_negocio');
-    }
-
-    function abrirModalTraspasoNegocioRetiro() {
-      const tarNegocio = tarjetasUsuario.find(t => t.tipo === 'negocio');
-      const tarPrincipal = tarjetasUsuario.find(t => t.tipo === 'principal');
-      abrirModalTraspaso(tarNegocio?.id, tarPrincipal?.id, 'retiro_negocio');
-    }
-
-    function filtrarTraspasosPorTipo(tipo) {
-      filtroTraspasoActivo = tipo;
-      const botones = [
-        { id: 'btn-filtro-traspaso-todos', val: 'todos' },
-        { id: 'btn-filtro-traspaso-inyeccion', val: 'inyeccion_negocio' },
-        { id: 'btn-filtro-traspaso-retiro', val: 'retiro_negocio' },
-        { id: 'btn-filtro-traspaso-inversion', val: 'aporte_inversion' }
-      ];
-      botones.forEach(b => {
-        const el = document.getElementById(b.id);
-        if (el) {
-          if (b.val === tipo) {
-            el.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow-sm transition';
-          } else {
-            el.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition';
-          }
-        }
-      });
-      renderizarModuloTraspasos();
-    }
-
-    function renderizarModuloTraspasos() {
-      const tbody = document.getElementById('tabla-traspasos-tarjetas');
-      if (!tbody) return;
-
-      let listaTraspasos = [];
-      try {
-        listaTraspasos = JSON.parse(localStorage.getItem('traspasos_tarjetas') || '[]');
-      } catch(err) {
-        listaTraspasos = [];
-      }
-
-      const q = (document.getElementById('buscador-traspasos')?.value || '').toLowerCase().trim();
-      let filtrados = listaTraspasos;
-      if (filtroTraspasoActivo !== 'todos') {
-        filtrados = filtrados.filter(t => t.clasificacion === filtroTraspasoActivo);
-      }
-      if (q) {
-        filtrados = filtrados.filter(t => (t.glosa || '').toLowerCase().includes(q));
-      }
-
-      if (filtrados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500 italic text-xs">No hay traspasos registrados.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = filtrados.map(tr => {
-        const ori = tarjetasUsuario.find(t => t.id == tr.origenId);
-        const des = tarjetasUsuario.find(t => t.id == tr.destinoId);
-        let tagClasif = '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px]">Directo</span>';
-        if (tr.clasificacion === 'inyeccion_negocio') tagClasif = '<span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px]">InyecciÃ³n Negocio</span>';
-        if (tr.clasificacion === 'retiro_negocio') tagClasif = '<span class="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800 text-[10px]">Retiro Utilidad</span>';
-        if (tr.clasificacion === 'aporte_inversion') tagClasif = '<span class="px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800 text-[10px]">Aporte InversiÃ³n</span>';
-
-        return '<tr class="border-b border-slate-800/60 hover:bg-slate-800/30 text-xs">' +
-          '<td class="py-2.5 px-3 text-slate-400">' + (tr.fecha || '-') + '</td>' +
-          '<td class="py-2.5 px-3 font-semibold text-slate-200">' + (ori ? (ori.banco + ' - ' + ori.nombre) : 'Cuenta Externa') + '</td>' +
-          '<td class="py-2.5 px-3 font-semibold text-slate-200">' + (des ? (des.banco + ' - ' + des.nombre) : 'Cuenta Externa') + '</td>' +
-          '<td class="py-2.5 px-3">' + tagClasif + '</td>' +
-          '<td class="py-2.5 px-3 font-bold text-sky-400">' + formatoCLP(tr.monto) + '</td>' +
-          '<td class="py-2.5 px-3 text-right"><button onclick="eliminarTraspaso(\'' + tr.id + '\')" class="text-slate-500 hover:text-rose-400 p-1 rounded transition cursor-pointer">ğŸ—‘ï¸</button></td>' +
-        '</tr>';
-      }).join('');
-    }
-
-    async function eliminarTraspaso(id) {
-      const confirmado = await pedirConfirmacion({
-        titulo: 'Â¿Eliminar este Traspaso?',
-        mensaje: 'Se revertirÃ¡ el registro visual de la transferencia.',
-        btnTexto: 'SÃ­, Eliminar'
-      });
-      if (!confirmado) return;
-      let lista = JSON.parse(localStorage.getItem('traspasos_tarjetas') || '[]');
-      lista = lista.filter(t => t.id != id);
-      localStorage.setItem('traspasos_tarjetas', JSON.stringify(lista));
-      mostrarToast('Traspaso eliminado.', 'success');
-      procesarModuloTarjetas();
-    }
-
-    // ==========================================
-    // MODULO DE DEUDAS Y OBLIGACIONES
-    // ==========================================
-    let deudasUsuario = [];
-    let pagosDeudasUsuario = [];
-    let filtroCategoriaDeudaActivo = 'todas';
-
-    function cargarDeudasDesdeAlmacenamiento() {
-      try {
-        deudasUsuario = JSON.parse(localStorage.getItem('deudas_usuario') || '[]');
-        pagosDeudasUsuario = JSON.parse(localStorage.getItem('pagos_deudas_usuario') || '[]');
-      } catch(e) {
-        deudasUsuario = [];
-        pagosDeudasUsuario = [];
-      }
-    }
-
-    function guardarDeudasEnAlmacenamiento() {
-      localStorage.setItem('deudas_usuario', JSON.stringify(deudasUsuario));
-      localStorage.setItem('pagos_deudas_usuario', JSON.stringify(pagosDeudasUsuario));
-    }
-
-    function abrirModalNuevaDeuda(deudaId = null) {
-      const modal = document.getElementById('modal-deuda');
-      const titulo = document.getElementById('modal-deuda-titulo');
-      const inId = document.getElementById('deuda-id');
-      const inNombre = document.getElementById('deuda-nombre');
-      const inTipo = document.getElementById('deuda-tipo');
-      const inEntidad = document.getElementById('deuda-entidad');
-      const inTotal = document.getElementById('deuda-monto-total');
-      const inPendiente = document.getElementById('deuda-saldo-pendiente');
-      const inCuota = document.getElementById('deuda-cuota-mensual');
-      const inPagadas = document.getElementById('deuda-cuotas-pagadas');
-      const inTotales = document.getElementById('deuda-cuotas-totales');
-      const inDia = document.getElementById('deuda-dia-vencimiento');
-      const inCupo = document.getElementById('deuda-cupo-total');
-      const inNotas = document.getElementById('deuda-notas');
-
-      if (deudaId) {
-        const d = deudasUsuario.find(x => x.id == deudaId);
-        if (d) {
-          if (titulo) titulo.textContent = 'Editar Deuda / ObligaciÃ³n';
-          if (inId) inId.value = d.id;
-          if (inNombre) inNombre.value = d.nombre || '';
-          if (inTipo) inTipo.value = d.tipo || 'consumo';
-          if (inEntidad) inEntidad.value = d.entidad || '';
-          if (inTotal) inTotal.value = d.montoTotal || '';
-          if (inPendiente) inPendiente.value = d.saldoPendiente || '';
-          if (inCuota) inCuota.value = d.cuotaMensual || '';
-          if (inPagadas) inPagadas.value = d.cuotasPagadas || 0;
-          if (inTotales) inTotales.value = d.cuotasTotales || 1;
-          if (inDia) inDia.value = d.diaVencimiento || 5;
-          if (inCupo) inCupo.value = d.cupoTotal || '';
-          if (inNotas) inNotas.value = d.notas || '';
-        }
-      } else {
-        if (titulo) titulo.textContent = 'Registrar Deuda / ObligaciÃ³n';
-        if (inId) inId.value = '';
-        if (inNombre) inNombre.value = '';
-        if (inTipo) inTipo.value = 'tc';
-        if (inEntidad) inEntidad.value = '';
-        if (inTotal) inTotal.value = '';
-        if (inPendiente) inPendiente.value = '';
-        if (inCuota) inCuota.value = '';
-        if (inPagadas) inPagadas.value = 0;
-        if (inTotales) inTotales.value = 12;
-        if (inDia) inDia.value = 5;
-        if (inCupo) inCupo.value = '';
-        if (inNotas) inNotas.value = '';
-      }
-
-      alCambiarTipoDeudaModal(inTipo?.value || 'tc');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function cerrarModalDeuda() {
-      const modal = document.getElementById('modal-deuda');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function alCambiarTipoDeudaModal(tipo) {
-      const contCupo = document.getElementById('contenedor-cupo-tarjeta');
-      if (contCupo) {
-        if (tipo === 'tc') contCupo.classList.remove('hidden');
-        else contCupo.classList.add('hidden');
-      }
-    }
-
-    async function guardarDeuda(e) {
-      if (e) e.preventDefault();
-      const id = document.getElementById('deuda-id')?.value;
-      const nombre = document.getElementById('deuda-nombre')?.value?.trim();
-      const tipo = document.getElementById('deuda-tipo')?.value || 'consumo';
-      const entidad = document.getElementById('deuda-entidad')?.value?.trim() || '';
-      const montoTotal = Number(document.getElementById('deuda-monto-total')?.value || 0);
-      const saldoPendiente = Number(document.getElementById('deuda-saldo-pendiente')?.value || montoTotal);
-      const cuotaMensual = Number(document.getElementById('deuda-cuota-mensual')?.value || 0);
-      const cuotasPagadas = Number(document.getElementById('deuda-cuotas-pagadas')?.value || 0);
-      const cuotasTotales = Number(document.getElementById('deuda-cuotas-totales')?.value || 1);
-      const diaVencimiento = Number(document.getElementById('deuda-dia-vencimiento')?.value || 5);
-      const cupoTotal = Number(document.getElementById('deuda-cupo-total')?.value || 0);
-      const notas = document.getElementById('deuda-notas')?.value?.trim() || '';
-
-      if (!nombre) {
-        mostrarToast('Ingresa un nombre para la deuda.', 'error');
-        return;
-      }
-
-      if (id) {
-        const idx = deudasUsuario.findIndex(d => d.id == id);
-        if (idx !== -1) {
-          deudasUsuario[idx] = {
-            ...deudasUsuario[idx],
-            nombre, tipo, entidad, montoTotal, saldoPendiente, cuotaMensual, cuotasPagadas, cuotasTotales, diaVencimiento, cupoTotal, notas
-          };
-        }
-      } else {
-        const nueva = {
-          id: 'deuda_' + Date.now(),
-          nombre, tipo, entidad, montoTotal, saldoPendiente, cuotaMensual, cuotasPagadas, cuotasTotales, diaVencimiento, cupoTotal, notas,
-          creadoEn: new Date().toISOString()
-        };
-        deudasUsuario.push(nueva);
-      }
-
-      guardarDeudasEnAlmacenamiento();
-      cerrarModalDeuda();
-      procesarModuloDeudas();
-      mostrarToast('Deuda registrada correctamente.', 'success');
-    }
-
-    async function eliminarDeuda(id) {
-      const d = deudasUsuario.find(x => x.id == id);
-      if (!d) return;
-      const confirmado = await pedirConfirmacion({
-        titulo: 'Â¿Eliminar Deuda ' + d.nombre + '?',
-        mensaje: 'Se eliminarÃ¡ esta deuda y el registro asociado.',
-        btnTexto: 'SÃ­, Eliminar'
-      });
-      if (!confirmado) return;
-      deudasUsuario = deudasUsuario.filter(x => x.id != id);
-      guardarDeudasEnAlmacenamiento();
-      mostrarToast('Deuda eliminada.', 'success');
-      procesarModuloDeudas();
-    }
-
-    function abrirModalPagoDeuda(deudaId = null) {
-      const modal = document.getElementById('modal-pago-deuda');
-      const selDeuda = document.getElementById('pago-deuda-select');
-      const inFecha = document.getElementById('pago-deuda-fecha');
-      const inMonto = document.getElementById('pago-deuda-monto');
-      const inNumCuota = document.getElementById('pago-deuda-num-cuota');
-      const inGlosa = document.getElementById('pago-deuda-glosa');
-
-      if (inFecha) inFecha.value = new Date().toISOString().split('T')[0];
-      if (inMonto) inMonto.value = '';
-      if (inNumCuota) inNumCuota.value = '';
-      if (inGlosa) inGlosa.value = '';
-
-      if (selDeuda) {
-        selDeuda.innerHTML = [
-          '<option value="">-- Selecciona una deuda --</option>',
-          ...deudasUsuario.map(d => '<option value="' + d.id + '">' + d.nombre + ' (Pendiente: ' + formatoCLP(d.saldoPendiente) + ')</option>')
-        ].join('');
-        if (deudaId) selDeuda.value = deudaId;
-      }
-
-      alSeleccionarDeudaEnModalPago(selDeuda?.value);
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function cerrarModalPagoDeuda() {
-      const modal = document.getElementById('modal-pago-deuda');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function alSeleccionarDeudaEnModalPago(deudaId) {
-      const d = deudasUsuario.find(x => x.id == deudaId);
-      const inMonto = document.getElementById('pago-deuda-monto');
-      const inNumCuota = document.getElementById('pago-deuda-num-cuota');
-      if (d) {
-        if (inMonto && !inMonto.value && d.cuotaMensual) inMonto.value = d.cuotaMensual;
-        if (inNumCuota) inNumCuota.value = (d.cuotasPagadas || 0) + 1;
-      }
-    }
-
-    async function guardarPagoDeuda(e) {
-      if (e) e.preventDefault();
-      const deudaId = document.getElementById('pago-deuda-select')?.value;
-      const fecha = document.getElementById('pago-deuda-fecha')?.value || new Date().toISOString().split('T')[0];
-      const monto = Number(document.getElementById('pago-deuda-monto')?.value || 0);
-      const numCuota = Number(document.getElementById('pago-deuda-num-cuota')?.value || 1);
-      const glosa = document.getElementById('pago-deuda-glosa')?.value?.trim() || 'Pago de cuota';
-
-      if (!deudaId || monto <= 0) {
-        mostrarToast('Selecciona la deuda e ingresa un monto vÃ¡lido.', 'error');
-        return;
-      }
-
-      const pago = {
-        id: 'pago_' + Date.now(),
-        deudaId,
-        fecha,
-        monto,
-        numCuota,
-        glosa,
-        creadoEn: new Date().toISOString()
-      };
-
-      pagosDeudasUsuario.unshift(pago);
-
-      const d = deudasUsuario.find(x => x.id == deudaId);
-      if (d) {
-        d.saldoPendiente = Math.max(0, (d.saldoPendiente || 0) - monto);
-        d.cuotasPagadas = (d.cuotasPagadas || 0) + 1;
-      }
-
-      guardarDeudasEnAlmacenamiento();
-      cerrarModalPagoDeuda();
-      procesarModuloDeudas();
-      mostrarToast('Abono registrado con Ã©xito.', 'success');
-    }
-
-    function abrirModalImportarDeudas() {
-      const modal = document.getElementById('modal-importar-deudas-masivas');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function cerrarModalImportarDeudas() {
-      const modal = document.getElementById('modal-importar-deudas-masivas');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function procesarArchivoDeudasMasivas(e) {
-      const file = e?.target?.files?.[0];
-      if (!file) return;
-      mostrarToast('Procesando archivo de deudas...', 'info');
-      cerrarModalImportarDeudas();
-    }
-
-    function filtrarCategoriaDeuda(cat) {
-      filtroCategoriaDeudaActivo = cat;
-      const botones = [
-        { id: 'btn-filtro-deuda-todas', val: 'todas' },
-        { id: 'btn-filtro-deuda-tc', val: 'tc' },
-        { id: 'btn-filtro-deuda-consumo', val: 'consumo' },
-        { id: 'btn-filtro-deuda-hipo', val: 'hipotecario' },
-        { id: 'btn-filtro-deuda-otros', val: 'otros' }
-      ];
-      botones.forEach(b => {
-        const el = document.getElementById(b.id);
-        if (el) {
-          if (b.val === cat) {
-            el.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-600 text-white shadow-sm transition';
-          } else {
-            el.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition';
-          }
-        }
-      });
-      renderizarModuloDeudas();
-    }
-
-    function renderizarModuloDeudas() {
-      const galeria = document.getElementById('contenedor-deudas-galeria');
-      const kpiTotal = document.getElementById('kpi-deudas-total-pendiente');
-      const kpiConteo = document.getElementById('kpi-deudas-conteo');
-      const kpiCuota = document.getElementById('kpi-deudas-cuota-mensual');
-      const kpiAmortizado = document.getElementById('kpi-deudas-total-amortizado');
-      const kpiProgreso = document.getElementById('kpi-deudas-progreso-pct');
-      const kpiCupo = document.getElementById('kpi-deudas-cupo-disponible');
-      const kpiCupoTotal = document.getElementById('kpi-deudas-cupo-total-txt');
-
-      let totalPendiente = 0;
-      let totalOriginal = 0;
-      let cuotasMes = 0;
-      let cupoUsado = 0;
-      let cupoTotalTc = 0;
-
-      deudasUsuario.forEach(d => {
-        totalPendiente += Number(d.saldoPendiente || 0);
-        totalOriginal += Number(d.montoTotal || d.saldoPendiente || 0);
-        cuotasMes += Number(d.cuotaMensual || 0);
-        if (d.tipo === 'tc' && d.cupoTotal) {
-          cupoTotalTc += Number(d.cupoTotal);
-          cupoUsado += Number(d.saldoPendiente || 0);
-        }
-      });
-
-      const totalAmortizado = Math.max(0, totalOriginal - totalPendiente);
-      const pctAmortizado = totalOriginal > 0 ? ((totalAmortizado / totalOriginal) * 100).toFixed(1) : 0;
-      const cupoDisp = Math.max(0, cupoTotalTc - cupoUsado);
-
-      if (kpiTotal) kpiTotal.textContent = formatoCLP(totalPendiente);
-      if (kpiConteo) kpiConteo.textContent = deudasUsuario.length + ' activas';
-      if (kpiCuota) kpiCuota.textContent = formatoCLP(cuotasMes);
-      if (kpiAmortizado) kpiAmortizado.textContent = formatoCLP(totalAmortizado);
-      if (kpiProgreso) kpiProgreso.textContent = pctAmortizado + '% amortizado';
-      if (kpiCupo) kpiCupo.textContent = formatoCLP(cupoDisp);
-      if (kpiCupoTotal) kpiCupoTotal.textContent = 'de ' + formatoCLP(cupoTotalTc) + ' total';
-
-      if (!galeria) return;
-
-      let filtradas = deudasUsuario;
-      if (filtroCategoriaDeudaActivo !== 'todas') {
-        filtradas = filtradas.filter(d => d.tipo === filtroCategoriaDeudaActivo);
-      }
-
-      if (filtradas.length === 0) {
-        galeria.innerHTML = '<div class="col-span-full text-center py-10 bg-slate-900/50 rounded-2xl border border-slate-800 text-slate-500 italic text-xs">No hay deudas registradas en esta categorÃ­a.</div>';
-      } else {
-        galeria.innerHTML = filtradas.map(d => {
-          const amortizado = Math.max(0, (d.montoTotal || d.saldoPendiente) - d.saldoPendiente);
-          const pct = (d.montoTotal > 0 ? (amortizado / d.montoTotal) * 100 : 0).toFixed(0);
-          return '<div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition space-y-3 relative group">' +
-            '<div class="flex items-start justify-between">' +
-              '<div>' +
-                '<span class="px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-bold uppercase">' + d.tipo + '</span>' +
-                '<h3 class="text-sm font-bold text-white mt-1">' + d.nombre + '</h3>' +
-                '<p class="text-xs text-slate-400">' + (d.entidad || 'Entidad Financiera') + '</p>' +
-              '</div>' +
-              '<div class="flex items-center gap-1 opacity-80 group-hover:opacity-100">' +
-                '<button onclick="abrirModalNuevaDeuda(\'' + d.id + '\')" class="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition cursor-pointer">âœï¸</button>' +
-                '<button onclick="eliminarDeuda(\'' + d.id + '\')" class="p-1 text-slate-400 hover:text-rose-400 rounded hover:bg-slate-800 transition cursor-pointer">ğŸ—‘ï¸</button>' +
-              '</div>' +
-            '</div>' +
-            '<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">' +
-              '<div>' +
-                '<p class="text-[10px] text-slate-400">Saldo Pendiente</p>' +
-                '<p class="text-base font-bold text-rose-400">' + formatoCLP(d.saldoPendiente) + '</p>' +
-              '</div>' +
-              '<div class="text-right">' +
-                '<p class="text-[10px] text-slate-400">Cuota Mensual</p>' +
-                '<p class="text-xs font-semibold text-slate-200">' + (d.cuotaMensual ? formatoCLP(d.cuotaMensual) : '-') + '</p>' +
-              '</div>' +
-            '</div>' +
-            '<div class="space-y-1">' +
-              '<div class="flex justify-between text-[10px] text-slate-400">' +
-                '<span>Progreso: ' + (d.cuotasPagadas || 0) + '/' + (d.cuotasTotales || 1) + ' cuotas</span>' +
-                '<span>' + pct + '%</span>' +
-              '</div>' +
-              '<div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">' +
-                '<div class="h-full bg-emerald-500 transition-all duration-500" style="width: ' + pct + '%"></div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="pt-1 flex items-center justify-between">' +
-              '<span class="text-[10px] text-slate-500">Vence dÃ­a ' + (d.diaVencimiento || 5) + ' de cada mes</span>' +
-              '<button onclick="abrirModalPagoDeuda(\'' + d.id + '\')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold transition cursor-pointer">Abonar / Pagar</button>' +
-            '</div>' +
-          '</div>';
-        }).join('');
-      }
-
-      // Tabla de pagos
-      const tablaPagos = document.getElementById('tabla-pagos-deudas-cuerpo');
-      const badgeTotalPagos = document.getElementById('badge-total-pagos-deudas');
-      if (badgeTotalPagos) badgeTotalPagos.textContent = pagosDeudasUsuario.length + ' abonos';
-      if (tablaPagos) {
-        if (pagosDeudasUsuario.length === 0) {
-          tablaPagos.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-500 italic text-xs">No hay abonos registrados.</td></tr>';
-        } else {
-          tablaPagos.innerHTML = pagosDeudasUsuario.slice(0, 20).map(p => {
-            const d = deudasUsuario.find(x => x.id == p.deudaId);
-            return '<tr class="border-b border-slate-800/60 hover:bg-slate-800/30 text-xs">' +
-              '<td class="py-2.5 px-3 text-slate-400">' + (p.fecha || '-') + '</td>' +
-              '<td class="py-2.5 px-3 font-semibold text-slate-200">' + (d ? d.nombre : 'Deuda Eliminada') + '</td>' +
-              '<td class="py-2.5 px-3 text-slate-400">Cuota #' + (p.numCuota || 1) + '</td>' +
-              '<td class="py-2.5 px-3 font-bold text-emerald-400">' + formatoCLP(p.monto) + '</td>' +
-              '<td class="py-2.5 px-3 text-right text-slate-400">' + (p.glosa || 'Abono') + '</td>' +
-            '</tr>';
-          }).join('');
-        }
-      }
-    }
-
-    function procesarModuloDeudas() {
-      cargarDeudasDesdeAlmacenamiento();
-      renderizarModuloDeudas();
-    }
-
-    // ==========================================
-    // HELPERS GENERALES Y ACCIONES RAPIDAS
-    // ==========================================
-    function irATabTarjetasDesdeNegocio() {
-      cambiarWorkspace('personal');
-      cambiarTabPers('tarjetas');
-    }
-
-    function irAPedidosSinRespuesta() {
-      cambiarWorkspace('dropshipping');
-      cambiarTabDrop('pedidos');
-      filtrarPedidosPorEstado('Sin respuesta');
-    }
-
-    function actualizarSimuladorEscalamiento() {}
-
-    function calcularLiquidoHonorario(bruto, retencionPct = 14.5) {
-      const b = Number(bruto) || 0;
-      const ret = Math.round(b * (retencionPct / 100));
-      return { bruto: b, retencion: ret, liquido: b - ret };
-    }
-
-    function cerrarModalConfirmarBoleta() {
-      const modal = document.getElementById('modal-confirmar-boleta');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function recalcularModalBoleta() {}
-
-    function guardarBoletaDesdeModal() {
-      cerrarModalConfirmarBoleta();
-      mostrarToast('Boleta confirmada y guardada.', 'success');
-    }
-
-    function copiarOtPortapapeles(ot) {
-      if (!ot) return;
-      navigator.clipboard?.writeText(ot).then(() => {
-        mostrarToast('OT copiada al portapapeles: ' + ot, 'success');
-      }).catch(() => {
-        mostrarToast('OT: ' + ot, 'info');
-      });
-    }
-
-    function asignarOtRapido(id, ot) {
-      const p = (datosDrop.ventas || []).find(x => x.id == id);
-      if (p) {
-        p.numero_ot = ot;
-        guardarOtPedidoLocal(id, ot);
-        renderizarTablaPedidos();
-        mostrarToast('OT asignada: ' + ot, 'success');
-      }
-    }
-
-    // ==========================================
-    // EXPORTACIÃ“N GLOBAL AL OBJETO WINDOW
-    // ==========================================
-    window.cambiarWorkspace = cambiarWorkspace;
-    window.cambiarTabDrop = cambiarTabDrop;
-    window.cambiarTabPers = cambiarTabPers;
-    window.toggleModoPrivacidad = toggleModoPrivacidad;
-    window.abrirModalConfig = abrirModalConfig;
-    window.cerrarModalConfig = cerrarModalConfig;
-    window.abrirModalAuth = abrirModalAuth;
-    window.cerrarModalAuth = cerrarModalAuth;
-    window.confirmarCerrarSesion = confirmarCerrarSesion;
-    window.abrirModalSubirCartola = abrirModalSubirCartola;
-    window.cerrarModalSubirCartola = cerrarModalSubirCartola;
-    window.abrirModalNuevaTarjeta = abrirModalNuevaTarjeta;
-    window.abrirModalEditarTarjeta = abrirModalEditarTarjeta;
-    window.cerrarModalTarjeta = cerrarModalTarjeta;
-    window.guardarTarjeta = guardarTarjeta;
-    window.eliminarTarjeta = eliminarTarjeta;
-    window.abrirModalTraspaso = abrirModalTraspaso;
-    window.cerrarModalTraspaso = cerrarModalTraspaso;
-    window.guardarTraspaso = guardarTraspaso;
-    window.eliminarTraspaso = eliminarTraspaso;
-    window.filtrarTraspasosPorTipo = filtrarTraspasosPorTipo;
-    window.abrirModalTraspasoNegocioInyeccion = abrirModalTraspasoNegocioInyeccion;
-    window.abrirModalTraspasoNegocioRetiro = abrirModalTraspasoNegocioRetiro;
-    window.abrirModalNuevaDeuda = abrirModalNuevaDeuda;
-    window.cerrarModalDeuda = cerrarModalDeuda;
-    window.guardarDeuda = guardarDeuda;
-    window.eliminarDeuda = eliminarDeuda;
-    window.abrirModalPagoDeuda = abrirModalPagoDeuda;
-    window.cerrarModalPagoDeuda = cerrarModalPagoDeuda;
-    window.guardarPagoDeuda = guardarPagoDeuda;
-    window.abrirModalImportarDeudas = abrirModalImportarDeudas;
-    window.cerrarModalImportarDeudas = cerrarModalImportarDeudas;
-    window.procesarArchivoDeudasMasivas = procesarArchivoDeudasMasivas;
-    window.filtrarCategoriaDeuda = filtrarCategoriaDeuda;
-    window.irATabTarjetasDesdeNegocio = irATabTarjetasDesdeNegocio;
-    window.irAPedidosSinRespuesta = irAPedidosSinRespuesta;
-    window.copiarOtPortapapeles = copiarOtPortapapeles;
-    window.asignarOtRapido = asignarOtRapido;
-    window.toggleDesplegableHonorarios = toggleDesplegableHonorarios;
-    window.toggleDesplegableKpisPersonal = toggleDesplegableKpisPersonal;
-    window.toggleDesplegableKpisTarjetas = toggleDesplegableKpisTarjetas;
-    window.toggleDesplegableInversion = toggleDesplegableInversion;
-    window.mostrarToast = mostrarToast;
-    window.cargarTodo = cargarTodo;
-
-    // InicializaciÃ³n general
-    try { inicializarAuth(); } catch(e) { console.warn('Init auth warning:', e); }
-    try { aplicarConfiguraciones(); } catch(e) { console.warn('Config warning:', e); }
-    try { setupDragAndDrop(); } catch(e) { console.warn('DragDrop warning:', e); }
-    try { cargarTodo(); } catch(e) { console.warn('CargarTodo warning:', e); }
-    try { procesarModuloDeudas(); } catch(e) { console.warn('Deudas warning:', e); }
-  </script>
-</body>
-</html>
+      poblarSelectsMxœì}ko$Ç‘àwş9<[İí™j6çµÒ<8à”LßÉ#)û­0Sİ]l–T]Õ®ªæãd^ÀöÓé,é°€o±‚|à0î¾ŒÅxş‰ş€õ."_•Ïªê&é•ï<fª«2####"#"#3³q˜åa1‹¬Û{üİï|÷;„şY]%£r&ñ¿	sr'QIÆÙÊ³YqÏfq:eó(G9ü	-wæEe¸M²QÌÀb±KıxÊ8K•Šï…	<„¼fÑí‘OôQ–%ş]’§dœæÓ(-ûĞÌváãó‹q·ƒß£4gyPr Á„í‰I÷íAÛå<O•Óo¢îûÅ<ÌãŒüüçÄxÕO¢tR§OŸ’‚&E´ìÇiå?<zù}]}#äÉ8>%£$,Š§+£,	€äip<O2»Öî’2:/ƒô'ÊÙs‘„e<ÈpÂ¼3¬><›İÆÁİó„³HÈÿ	ÆaqÅ/Vém€0®¬«ØèøĞöî´é0¸»²şÍ—ŸıîÉ*|oªRLÉ1t:(¢i<Ì’±Šø½Á`e}7#eÃRH*’4&£9t`Çñd‡€v«öÎ“4Óğ<8C<¦çA8/32-ƒ5ìÆı•õ7ÿÇ–sŞ ™åq:ŠgarG¼Ï)ãR’‘aœ$Ÿ¾ÓÓ(/â7¿KÉ,„W“¨@–Y(ç)Âdœä‚”\v
+¨ Uƒ7_åQXô½ÎË˜>KGI<úøéJ8Ìãüe¸;Nïw{+¢Ï³óà>rÇ]ä àõZB¯O2@î‘òIA)sv—‘dQA7}œŠ“pœÉD<)ĞWï€<y’4Ëh¯LÖ!äëø÷„’7ÎÉ~ceÂñ7:½Êz­A0©óúqõ,Å’ı¼¬äÓ/S0§á¬ïÈÓuC*A}ÄéqUFa2š'a~HÇOP*õãqï±Yi–GE„Zgÿ`ûpûèğÕóİÍ½Ã°ü0LGÙ‡¨Œ½2Ï:ZÀ&Àæ1Š7Ã¼: Ë_Í€É€«PË©¶amöeit8»óé0Ê)êøæU˜‚®~E‡¤ TmNp6† âYöÃrš ŒNGêBƒïT¹u¤¸t45Gl8OP™)\{¹vĞ ‘ê9ÊŠ¬fç2v¤¬\bW‚ûŒõh)öæê>M¿U%ïPOıêWd“Iò¾@öÉ*"³®ví’DI9zÈeÿ¦ûW||¡õÛ}¥XÏ>ûßäİdşQFø,ºH·¸îÊÒ¦½¾bÇfó|–DZßø+»{JYÖÃÏÿ–ìTJö{ŸPÆ^'òŒ¼î²Ÿ—ß'Û½×ä°ê%§Àk›7;xt®Ñ†OÌoæ Ê’|Gö¹x»FO•N¦õüCìø4Ò§şI ÔDPfÁ0"J½q	sşuNàŠêñ§a>T^ĞÒ«kÈqÓ¿PUä£9ÌÇÁ0*Ï¢(%Ó8N‚îŞ¥› ^3œÓ"Æi2¤c˜Ùé{rÊ*@G@æş`íCñŠaƒÂßÇ	ü8‰Çã(µ,–[A@öÃ2G~)¦Ï$Éğ	´gÔØá°È’9Ğ!ÈãÉI‰1LMS|<ƒa#'ø•QÀàa2Ï)’|N¢S s¤Y­¬»æ{òÛé(FTÕó¹Ç´5ßª=¡ãN‹  ¹/­¡™„3`r°îÙ·”bWa(®J%$Ó,ÍpØGƒ;€—á%™nõ¯d>ƒ9n‘n‚¬¬£ˆóyTÈ¶“ûN›³²7'p> Qâğ’1¸)g­b*K³é0 µ“û.Ê8QÈ÷>ÑË¥»°xk½ÇÑß·‰l¿ü1y‹lBÂQ™DEas€w¸¹wÀÇíÂlâòƒ¦¡>Ş(˜ÚTeNs6ÁŞ=Ãjº%P¤úäš“AÆWßIrbã-ø”ıô°›†òC”Igs©–•"
+íMòxLÿB^.€6H&Tóôowkz{Òkzõ^ü¼pøõÁğrï½%”Â3’bçÏ•õ¯ñùa‚1'q™Q»±3€?ŸD:'Ó3–ŸG9X%«„Üd+.fY“¨^YO¹ÏÃ¦¨»`R}LEšªáéXõpfÁ=÷æ‰zÁ2©S¤|êP¡şÛ‚úÑ8Ouú¯¬n¼ØÚ#[;‡û{»;Ï_l{U_›¦*-”Üq–OÃ’:f/4š.·;!Óñ#úˆ3 m~ä!ÕÁ
+§UÚXvÚVÇ0zà¤{dò{Ÿpô7_ìwÑiëSWûİŒ¨Şe;üÊw+*&I³PMŞüSJ¨µŒÑß<L¸hØŞ¨õÊúV&şÅ9²4YÓ°®PW­/?5ëÊ¥˜™¡ŒÖøë¤Ì£IˆÛ4Î?‚ÏàÍ¦D¬€Fx<ö“c)H¹BY¯™æLş3øÑHF…îA­¬ß¶Û—!ìO´(ÚaP£!4¹XçÊU÷Ì¬õ÷?’1’üİø£¬êïzàèZV†	+\ı¦Õ%òg_	çK#²·Q¥ğs´Ø¸Wz5Êºß£»çuhÉ[oÕQ¼9lÏ¤’’áë_EP÷ã$‡c‚áÃi8ÕÑIÕø†‘«	ƒë+5I~€ä­’µÁ ×»\ßücæŸf¼ƒğ­%.ÕTºÇ!ğnkPKw„úŸĞN‰›€b™¨¨‡ªæVc:=ÏJ”6œ£6@¢Ï{ğæ«`Wo;5ÓœN6hƒì0‘üaj¹PÄfÆx|YÅªéT¶F×2ô93àØhŞU"ÖìÍ=g¸:™~X“¦Yë&`1U¢¾Ÿ_›¢Ú'|ñK>²üïy˜{)G˜»šÛã¨(bĞ’²QªÌ`…Š2v£ÈÌ;â{eÁM¨££A 0’ÀE}ºÂ0N,qV§,™„Ârr‘ñë¿ÿô¿ÿty"EI<UÖŠ8t¦}ÀÂs’>ôåC±("&ã£G·$ß|ùw¿jO[}ø×L.{ı ¡n§Óf¡õ(Ş‚ìXg-‡Ùø¢n¡µD T†rµÕ\e¥€Ë¬¸q'¨¼ÁĞ|Z­ ‰µ_t\>¨ÖOZÃy1‚
+yf¢L…\§÷¬&óèhïxÚí1ó";‹òÍ°ˆ´ånD™b•IÚ`¨‡ÜBó£ÌÆK3ûÊss…›¯fü]í·|îã.åàÂUI­WÙf{„`Ø?¯ÂWÒÁ¥igi¹nÓª´DV–í¹×¼İ…!skeÙ¾r, ÷jıÉ=k{iÔ½+%Ëb¯Ò^±Z½øW½mS:œey)Eı½n8èÕÓ—.äƒ*@B 5Z6£ "Ü-ûYO"àF«¥ö¾şJ—á>Ğ;™£¢j½4`bà+N3¨şn¨P0ú¸ƒú˜ş®j²çZ8—@)ïM_¡
+[[`ï<)óõ'å˜`DÌ§+•ù÷aMÊ
+Íü8	/ØäyÁü3ŠYòG•1‘G“¸à¼ZØ—3	iæQÿÉj9¿PÎüvªnÓä 37@.Š{Äó–:“Ê¬»°Wû`ÛºŞµŒ{kÓï<h\˜ş+xKM&hmiv–‡3\äüõ/D´=”v‹Õîª¼†D®)âI$\oI&Å7H%¾xÉõÙÿ"´Ÿä½0Q(08>Ày_ŠhÖŒĞ’[UpMN7Hg! ÉÜ”Jà%òçK6(]”ƒ«°äŸ¤÷lÙHv¾>ÆÏ_ÿCğW›®ßœV‘™‡-2&¼ùâ—DØ ä½(EÑZ*‘ô>ï‰t%‚Ô‰–•r€“Ÿ˜ğî©ÁEQcåœGG7ÀwÍûÇÑè$DI;É.ŞÅçÃ2¿¤Ó[s{¸t¸ø1zÇÊ*T»µ,ê(ß=Ó–êsÃ.ÃÕ¥=úÆ»ºäj¡ÊÜ”ü²²şõ?|± Uûºğ4l=Dt‹½ZpU³õèğÜ ĞªMBQÈ™Ò 4 #Eæ_Ş‡šl£¼­ñ5¹˜¥Ğâû|à­ŒkPr2#©Ø¹ä®^}ı‹/:m[ö-ûû£?J¸ÑˆşTÜz_ëÈPè¬Ğ]k2V*võ+zg0PƒAºš¢%Şf¹×Dƒ€é"2ÍNá't=CFc@Ş˜AFjù.ñ™eCÌs’hTzôÖŠùQ¢\ôáu¦:èÈ´(Í²¬e¥ÇV³ ˜­šå2½`»²–™âİH·
+7±€5b¸SÙŒI=]YY?ŒÓ*1~”G,•Òæ8†çuA«Í±†*cgŠõ	ÖFzµ˜¥.€œ£˜S-#rµJ?Ï#fæŠ#o¥G–lâZÂQs	$e|reÓ„që_hâänÎ4•"&Ërê»Œ¨Š±­ã˜†
+À„ı…`7ÁWÄ4–&dzvW•RD®“5—<T!FãĞôç€ÒÀ2³ÈZEËj^ê@?M
+A{÷¶*[˜ëâ×¼ˆÚÜÃØş.[QÒÒõ(¶"0ÒsŒ²aGÄûÇNˆ6@şæƒİr‘‚óaa%ÏÑ
+Ûef_İ:³HÀdËÂ(J¨äaDPFA	JU0–ùn>¸4™ba¸Tô _†9L´,÷f SZ-ˆdş4XJ~P{Øé|Z˜g
+±µÅ ŸÑz_”t ~/,@î¡G_Æ§!MS^‚	d‚·‘Å±ç°ıØ+	7€«ZX #nzÖÃ_{µ™º.È,®…iWuŒ>5Y‘r Æ"$‹#ÅÂA"Ä+y‘áZ}ñA
+L e^åU3\®OÈQ”Oßünat}û£h4G†&«ä YÌ‹oª¨ÂFNíúã<¢ZÊ1í
+–7È;J„?¥Õ\½?/÷ól’GE-Ô«­ƒ‚¼4ãÁ2†FNFdh°¾…ıQ{ğ³8“œ8N¸ÏÃ<äz‚@Á
+p.)Ù.¨ğ(-Â¢—Ôˆ¯:eå‚)Ãl2»‘´g.dk3gOŸHûèHoÒÍÕH¼:bïÊfµ×\8Q§Í6‰š ¿7ğÔ¥ScO›(ÛÔUçÀ1'¶©¯Mt=sæ3!E›Õzæ4gByØæòsLk{Dn»3ç³c3.@Šêïé3AúØGÏ9X}Ì’÷kñ~ÒñÄgWR…÷ôiÄ„é¤×î½JÑ·¢Š®‡{–f6Hæ'óT&COå–ÍE\î¦ıÉŠør¿Qğø5Í¥RÁq?ò6a,Z¹~Éq[éØ,ÜN€´àAd]@êóÕĞ) /:‹Æ05U¹Íl–—T[˜6t…¢œëÕ†’ç€àfÉœº€˜­†Ÿ‘×\Ç4¦ëc¹Şe¥‰¬
+Ì[PH‚…¡íGÄ—<n¢×»ÔÖgİ(r¯U¡c†Ï‰(:œ…†Œ{c—ĞÎ¯uz9ñPñWRÔ”öÂlíg23ï%&ßxà=¶¿àµ¥sZÏ#M;
+„]òØ‘™æµ2Ó4ofàeå~ejZp'„‹@-'²×-·±˜¼Ğ8Õ½v‰¤#İ¼àdèTºö^Cµ”+TÉ·©ÔofóÍß¼Ø|ÿÅÙÚ~A¶^¾ùüåöÑÁÙşÑöæûG;?Ş#]Ë—Ùg1†mö z;,+€&0‹ï9”(ô_D!©¬1t»ÕQjß¨êz§ñ(è"ß´Ò¾ü#üKÕ<~Î5iXú€{E2ÕÄì†ä YGàú(N
+Vj1W7•Ö5ĞË°<éÓu¶n×âªgzät;‹Œ•èXš±x~‹ì8LÊp?ËE\ ?Ï»ƒ;>N	Ü¤7½	¿ p™Õ€Õ«ÀGKûX®µaZXßM¡Ş6=lÁ­T=È ¨“ˆSn\•-J¹fl«GàÊû»mÅH§]õ;&3ô.¿/C!ãÌ‹€æóíkßúEyZò,ãâ İ¼:Î&*€Ëk[*†>‹ÂX~¼Oyáâ$Í,u+kí’èÑ>]tß§ê¸s~p™÷ıàB»~nÆÉ@E”ó³-Šé#úÏöRı)EÃ9ûú×ÿ`¤B‰Vé¦aáËsë‘§>Y$mÖ„×LÑ%2q3Lu8Ã•)üú›/¿üùÃWÛ)Ù}óO4úDXÁ[¤«[3.U
+B¼&)¼ï9NõÁ1u6ŒÅƒ¥ìBYx¯ƒW‘’_^4º
+
+ic
+Ö
+;¬û.ÎF©®>­ªwé¢ãÍK¤Ó(»¬lR‰ä™k¡Ôÿ<?ò.&£ÅªqEÜ&`(	¨ÓÅ«\Õà«[»Ş˜vP›ö"Y—wßÌ‡sl‹¤™,¾íñ×¿Ğ·=şá«†¨8ÅÄˆ)ú0}Ÿğc¹}­˜·Èv"TO²<„q'8ÎÇ1§Ø™Ğ\N2/ÙŞhª›Ã$Âcéyî—ÌÂûb–Q÷²Ó1ÄĞµ3B­ztTëAf–‹P€¡€‰™ˆï>	ÛÜ8âƒ;Æ6sMUô"ÖîƒÇ6.¢Û›LË”t‡š(£(Nl=v}İ`ˆú¾rTz½Ç×Åı•5¡»Íáß|ùoÿ;9Š˜UŸ:Ï”¨;ÒT©W¸òøvJh.IâQ!ÚÇ¥|ÅèBfœ0w@TFQãZO/Ïûõ§]€’óØ¥LR­¶È…É(Lñ4_âÙSGAp£ŸÍA
+‡˜ŞF¹ÂçÊ‹f‘)ªM@ú²<uQĞ<]•sî›œÃ%YUnxÒMø+lHÂWué¾¥şòİúœáœŒæ£2>’'xúl&÷ÉD|	6t©<ß\Åÿa««h¸·ü#«¼ÜÛÚxA¶¶Éæû[ÛäàÍßìïàqDøf{÷hŸv·ßÛÛÜÙ[º™ÀTíußœ‡ã<: ’EÀÂ±õØ—üSe¥ãš\"G~æƒj#qÓJè4Ã‘Í²°(»­hˆ§ãLU%i+=4Á’ò(D‚afç÷;wHç,ÌÓ8tì¿›X’i:ÙO#: –0,<éI¤ø“”Šö E†X}lßÒ©ON°P'àôq.ËV+K Í“Š{ozU»4(xs‚UœÎpY«-M¶h5yrÁ8¼æT0 £•D x«'¹¬1¬¦«:ÃÃG‡‹“tQHåUÿòCëĞëŸdÑÒàÕÍ¾Ëõ„à+<Å"~…¼ìî“ÉÎ=‹·X¨p/¹©M©ÌİÓXÎ l_ZèZ¡-©ÄŒ]4ÅÃ•å|¥=±¬ı”-¶¤ ^/Ì=ÑXÇ¦„
+Ab(ïUØŠÅÖh6Avm•NHm"Õ0\Œí¼Z¤-Òc ˜Ïÿ¬˜~M³Ó¨Ûa§íÖì%E9Lní'òÄ9[ \GáoƒÕáÉ§^|úWkSşS'®"ŸKø¡)òyg+rjY¼1Ã˜íè-Íòè4ÎÚN‰¼¸g>ä_2Ä:£€—YÈ&pkÌ”(æ	ÆZÀd	ªåÉùe@j^İšÊUÊö4:ûç»tYµˆÛ³éİ2××.Ğê$e½Zb"AMöŒ>)²©2î¶%|åv¡ÆµŞëlĞ3ØÂOR[¿ªœ€Æ‡¹K¯«¹HÔb ¡ÔÀ[ÑqX8&¬o‘>ıG#R«¦ØwM9Ä’F7ŸGİ¯İIq“	Û>|úæ«CsÔ‘D©roÆ!\À¯õ¢-Œ2oN¸kAœm{–¦“,á’¯®’wß|~ğòı4*²¹ñbçùÁÆæÎ›Ïw)e£õ©xhÜ&„‘€ØébUÍø#ÍºªVû9G
+ÿj¡9WŸ÷˜(™ªJ©·Ÿá©u@ÎG$ƒRı}ƒ¯Won»zs»êÍmµ7·[õæ:l!«/ŠÙnuËŸÚãÉ–ÑRrœÉŞ¤5cL‘ïZ‡ô©ÑÇµµlÆİ{s¶å8…o;İH¦!!ÛB¤izM2_ÿá+6:êmZTÅÉ“Şü×sğäo¶‹NµRŒÅ˜™Ra>á/æ£QTh¦Vƒ[#ÎòªÒ¢ó$«î¨3'Õ«Æd¶7È*ÙŞÚ9‚øÿGÛG×†Õï3=¡(Ù×îáâqÓ>|^––¶"iGq9OjíZæ"
+H%-ïÚ–Øï”û<ùşÎV˜Çél^ú·„6ú$7hÓ·µó]~ª‹F¹<-Ô¬¬c5¼Å£p-æ»…–u<2kÕ]´!j’UpGÛ4Èì6®jÙ¨i¡°Ã¯okÓë°@¨´üB8È:Vë›x#]+@Ñìaâ1MvËH[GÎ	éïI=`fo‰›©º’»ÍVùUo&4+,ímWÆoõØc‡‰ó!Ìú!î¸7«qÑëURXUå·ÏmfyNm³.—^%Hud™q¢Ì”ª#î\Ñc3®*Ì‚œ«zƒÕ¦LĞÜ #+&œã0§dcGËğ)Å¢¤Âd¬ö—¦5»ê-ƒ²p¿ÛgÎ¾Veé ©½ÌuÑQß‰Ş`•:bq<Fs]5h…Ãëõrÿ2mÿeÚşË´ı—iûº§mväş‚S7¿*`é9»”·ô±#çÚÍà¥¸HVZ~:/×g-5»—Æ­j­&ûRÜzƒ5ø•Úím‚v7·°Jÿ-ÇíÌ‰úam¶-<äü3µ3”p…×…Ÿ. ¶ğ2«wà†LLä|×i·¾J[[rÛóVfXmAyWšÌ¼¼ªbõÖ[`²) ñ¤Áê'“¾7­ª­%å¿>cÉöÖ5÷'ÁıûÚeÀ³à¾û¶ßúk|åÅÂÆİ»µwùw‡â½Ãæµå—+[«š…°–ûl©§šÕà=(<ËZÌÓ´œ6KWÓj¶Ñ¹0ÂkHì)EÅÄŞcĞ|3…Zß¡FÄ°÷—Cx QÙ÷¹êè©éNæX¦Âyğ¯°]ƒ÷ ®Åu^Æ–!Ãpr—¢•¥}
+¯mÃ7­Jw£¡+ùR~3‰a5–¾H3VWrF4¬î?xû&_-ĞXÒ;ÑppÊŠqei5csm®KíB6Ø6a‚ÈjÍçlÈáÚSõuÍø¾»–ÿ³˜à7§µpã."Şœj,×şĞD‚6:[a¾`<üÜ"<  ,&‘V-GãM!e* çÉ-Ø¸3T€ƒ“šh°`Û´¦³ñ+Z¬ÂÊTÒ¶\9[Cö.{6Sî9ÓAHXùáÎ&²ª
+Ï½z6*2¦³êIWYùaÔÓÄ3ñÔ/’xuƒû4‡V×ç.w†åcCYE\MF>y#zåÅ¾Ûß®L2õ²­æ×¿ıw¤±v•à¤ÕıæËOcæ·Êôú±ÍÌW”L€ÊŸıælúÉS7pæ”ÿÃWüı§dƒ}µ†„…6Ä“1 ’UÅC³uùIÂ¥Àle†zFºã<›tÈmíËmÒù€f¼Şy &,^)Ì&£g•B'i
+B9¡@«¦X¾C}Ï4z]ÅôÑ,x 9c†ƒ4Ì	âX5ú?ÀÛã¹ó–L–rÏª1÷Œ…ÅE:²Rÿ„ÓŞ6İOœ¸õÊƒÛ@H^0.tô˜ãm­ñLër¡¸v+;ğx‰Ååìîöf·A_#v©Ø¯;2;©)İÑcÅÖ™¢è€WŞzÛôàz].å­”OcŞtCLŒ;Oáï¸J<äìJ3«pinaª0×4†?³¦Eºt]<>÷¬Òcãı‹„æ9İ¯¬13Ÿ
+~ieé÷û®‚wôRŒÆK*NÆ;ãçbã-ç=ã­Êd&äŠ;Ô—Î@…ø¨2C“ñì Á+T×[ ‘ûivÖíiÍ;úo÷Şê»«ç®~{{­ôY{O·¡fÛé#’FggzËíÎáŞ!Hp:é*·Cª2™l6/Nº”(=Ë¶Éä9ÂÔm3é!ŒqÃUG¬%É(Ñ8T’
+û´Y¦ïGÖ(æH\2Æ~‹ µñvcÚ6/Ç¾¹<ä»Í§lçCxÆìôˆ|“¿ÇDË®"Llé†æÿG^ˆ$F¥KYèkèYGaê)ÛÒu#Ââšù›¯ğ:¥Pd¤ÓóGŠê¶¶Í7^W`†ez¦'âpøæ·wˆ@£#ÙÛè|ÕE‹)ÄUoº òŞÒÉÛ^€ôyHĞŒú8tròŸ&Gõ§äÅŞ{;›4şè`ãp´ÙŞ=:ØÙª‡K·"ï—÷oŒè!õòîÇ–¸Şğ%W¦Ù³Ä}U:‡µ¹yjÄ¯’'|P±´}çS(èhç¬
+Y	‚ê(E<ìÙ¾ºÉÈl‡
+,25ˆêÊ:şê–ÊÊl§G=š€ğ/ê>ûÔå_*¿í3°âİ#QºWá+'¯[ßBÄèöX)c_C¤•©Ëè’ìÄX‚&Záå3waåÎù‡óI”³Ó|ğ¥Â„u¬jğYÛ	F0›/ÒøÏÌñÄ&LsÀşm ŒhÑxä¾!Néİ™­ Ñ7^Ò½Cm ğàŸá=zûaôDk¥˜÷¢'º#ó%|\¿˜%1N¹÷§':æK.åX÷úî¼N,É™æ­·ˆ`ù3QG|xlÔCVzR2zBøDEùÅ¬É9OLS„¨W1O•S¢|W0“M¶Ì\âÂ![×‚áh®.¾Wßÿî%Ç5ÌŠîHÎ2ªÂi´´ºPc#¢Ì+°Qñ¹JLSyÒj)BVLó&–b(ÏËJZ°E¨i«Mô—„ç^€VÈ‚ÇÊà² +-¿Å}ï¤íº0ÆµãF¹û’F' 4ÀõÇF±ÇGÓŒ]3ôÑKñóïR¶-‚Kè˜f¤öÙØÈƒƒÜ“Ãím°ÃïoÄVÔŞ¬AZ}SœŠÄwPË;ÚÁ6ˆU`ü)kô8‹Ø8 IY§ñ³£Óøz¡NÓæÄ“·A§éŠ®NËNkİ'VP>lÙ…üªZ»1Âj3ÿ•.çğƒşñ ·Ğu«©/$ø®X_î´ß·«Síôó\='«İæ—Ş/ÒçÏ~/nÇü}y¬çú¼Ğ9¼WémH¯xåM·rö÷×¿àW	Àøº–ßîîlÏå,]şÛî0ÿ°H›»óÅ/‰°È–9].Ü<­Rv„]i®vÁÛv]PB‘ügLLDW„³ÌZ–ââ]ÕRÃ+ÛCSî±4®‚KİúÊñ¢~”lA7E5ê¸¥vs¶_2^ÔCs-zI‰ •¼© x8Grt·Ç»¨Ä•¬æÆ\‰g2`äB0OëU¥
+¡ŠƒŸ>%mğyÖ @à¿Ù<ÂÕæ"¢'˜NãbÚ~µ«Â‹qğóš—í„szÈ·ÁÇÃ+ ‡m~^d9|ûŞ`áå6åH9¨ÚÂ[öLå]ûäU^I"«ákì…ò›Jò[clå=åEµ\ë•K…11Œš€§Š®Òb%e~¡vİ*ú£Ã½İş,Ì‹¨›d£09,³<œD(B;e4­d§x%ll– ÕùàCe<.É(,G']§^m{
+j’gôBıyZœÄÇeWA%‘GE³¨Aóë\A©_tõvzš?âòô—\ÆªT‰¼‚"#®J!ê¤¨åâ”–ä¶¥¼XÊyºİÒ'1Ù¾•LrjÌ¹ëÆ¯ª°ŸƒvGAœıvYã‹SŠY©ÎdÒˆb“Í²Ş½4¢k-•ÉTìgt+…¹}Â³$ƒ¥Œ‹#°µ‹O˜r–iÀ )‘º¨s×‰%ry§U]É²¾Íma1ŠI@Ûc$Èò,*Wé<N4Üu¸‚¾"gXÉ
+Q]<qØ·3A¢Äpcğå­ÊoÆ³?QbÛøæÍÉ„Ùìç…qÕØıÀØñ$£—¢Ø‘Š©’²¦;.7e9lğLıùT½eOw?ÁõãG
+Jì…~1‘7—+R;0S7®ğ™@SÍ¶¥š:–Vfã‹úì­aJ”[•Ì-G·( ÇZãŸ·± ëgµû:†óbâ¦,‰‘îRtĞ´z‘‰”i3½P®Nó3>uÔ4j;5&¦eq§uQ…)ŸdÃwzúÔ©”µ´
+›Ÿ-Ø\hGİ''U`®Iæ`ôXgšì?…›Déï?³.£ü¨­Év”ùú“rŒ‰¼x!ÂÓ•‡+Úmüÿ‡ª€? áÅkâ‘P+ë»9	/ªƒé³¯˜)ÇëğW¾ŞîzfÕªt½<wjì¬e»Ìûrí±	dÜ2”@*oOBSÜÃ‰\íh—`ÔÆp|W¶)›•u+âWX˜WjV6ç:ƒªËáxõ°(¿ìƒEj¹aµPg¬Pér=¹J°“ßk”É°ëBpD?—ëÂ˜+ë<ZES•~˜rJµ…ÀŠÃê™ô õáÀ1Õ¯ŞTš\}u¶ïPÄ;{ÁìóàaPˆ˜¼Ï¢h¨(–¹B•KK ºı¤4qW6‘±µŸÌ±Ò”éËL<|ûtdŞ2c¶&3v¬ õåŸ+"ÃÚ«Øp™®(İøø¢4u)ïOYêÄ‚ğÙ]wñä¤\Y2œ—`¿“¦ÅxôñÓ™›)<¶¿îĞÎä<yê¯;½Ç%Dt3•^™‡¦ë¬2v•Œæy¦Ì,£¹î+ëß|ùw¿úãï?}²ÊĞY·»Ó1f¼ËšO¥My¾lSÑ#Gºéuä†ÂüÉUˆºtPz'-ÍMÄÄ‘Ó&GzWSR…é±ÿ7–*mçë³ƒ8úocFéã^½Æh•H9u'Oÿ	RNÙ}ßğßû[‡ä§dïù‹÷66wöv·¯–g:æc5™Wúôúëp’[u%˜ù½	’;=Ò²Z²jèJV…ù¨ğVTŒ#3¸+Ãï2Ñmd7VáÕœÕp±qw³2­õª¾tézuQü9BvxØ{„=«j'VW¸%ÆèŒ%-Ò½&ùsÈ‚i÷µ×&šI·9Ğj+™}ºl…b‡0[óGkûù‹–RYeÇ1ƒqÚ¼=UöìoÓ¦æqÇ.ñO•F;º¹~Ä
+ºÚ§ç\7 »ºÃd?JåÆ×@lgİLTp Ûœgeí’(4ÂbÎ¸®‹Û §p‚÷g·T3VŞG¢úô1RÉÊ; mÅ-:6Ãà¦œjÃ3£ùÌ?b»ˆi¶!:ÕÖàíØHYQÕ,p†Á9ˆÚ†×7v„K~„_Yw€U2d•ì“xìô–UŒøâßUŠ¯zd`UNœ ”òÎÓşªšl39ûW©%uCÍ§™«*ä^%Ó
+ .¼şvqŒ{‚Q•ŠTh™€ûêJÉí©b¬À òZÉ·Ú^¥>•‰—LJıX0ÙëUbkB(„8cŠˆQÑ«ÄÕ‚ Ä ¬9 €lö˜ˆ*5A\‰"V}àì<xüWkvÖ@}*…=!§•¡ycíNÑfi9à‘ÅFñˆKÇ.ãGY§ptÊ‘]²F\pİÌï(ÙÀê¦vÁö3ğÀ²›W×îZ¥|ùÀ©ƒ#æd8¥ä¥c§evÊD-ËitsH2òº¬ÆëÛ¯`Å}”ˆ_Ód­œÂÇflç©æ>Ùb3ÑñÕ"*.R´Mldãuı'tTFø²çsè–xıéMGh¨f¹*	ÖÏWÅ6ÔÛn¡ÌïÍ9—;¾ñª0Õ®oß2ï•6*t­ãÜT#¡mS†P{\œfB,Ô€â4·Py
+µ ¥…5³ÃiÛ„åM(m<°{1[ŸT'£>éBş†ùµ€gã¹(;ŞÓPhc×}Ší÷°“PÆèüŒ?	Eƒç?Å.æ>…ô!4ÑEïÂ~G“Ç;ºôÜÑYıÁ—w*ºÃ]Eæš=¡]nqğÉ?W—¯åÔÚyâ‹+VÂhÙU9ƒäMe.„LVÀãKr\`o“$êYµaø8–lÚÄ¬ÓAÆ7x6ë<]Mlu.ˆè¡8„v†\h«Ba‘b¶~QA¹Î5 3mR”.àT4u	ÒÈ_..Yì8ƒñêBÌ ÙuF˜1Òí	3Ó˜Ø™º-¤²z@·MØQ[
+  YúX †ï` ˜ÜÃ¬
+˜t>e¶Ê2g(p¾M§ôr\Ë™”Q´¹\¼Ôr³>P'‰6§¥0µá9"Å6hÊ×ØwDÊX;"EÕc¤+gEk;«ôbœ‚"^jÁcI•êÌúÅŠ¨ˆÁ´Ğv*u€$:7o,Q)œkU1×“¨£­¿B¬ş[¦„ì…E	à!·t=€g~h!i[QèßíZÚèº¢Õ($k*Skƒè¢Tœ¶L ¥š™¬Üa•Æí—öŒuÕ˜mw‘Ú,VëVÜ¶ `…éêœóÆmœö$èòqqØ13ˆµh:¼bXE(¥i›¢2Ÿ—Dê¡ÚåäKîUÄ9¶(âk¿‡Æ{R³óĞÜ™(FïÚ7!Úér~²şXJmÚzÊZYãW_OÃóîà±¦Z®JFu„LÓV]ÁwT&ÂåüÇa–j{>ş²rv¦˜+:°ôÔs0LJ‹`xNãÍ-l|ğng_ˆ¡İÈG'ñ)Û—¬m‚âSFœ ;£jÃ»ÏËgè^FÅ³¾i¬ßÂ÷–§jnÌÚNGBÖ<*HÖW<—n·<ÖÌ?‰½=ä;õ<¹î(,­í…T:(jL	-÷ò…šˆ§l07òŠ£ªÖ¨]±D!ê‰ß­*ŸàŠ‡¨‰?ÊhDóÆZÕÎà±ê&ûõíÙj¨7ûsÕ†4?úÿç}†¢ç«`j•I˜@±Z#KYJåÊW²œgqcâ”`èGMÒ¥™µ‘"j»D¦É!R¡ÔfÀAÁ)h?v‘å"ıe5PPÈh@¶9ãÅƒ™# F;\¿ĞªõwŠ$.fY÷((X­A²^‹“ãLº#¿¨&Z•Ì!?ïåñ$Ni‹úWf‚½¤S€ùe–½_°a±¿PüFü›3~+ãØPŒÂ·+_ÇiN>6jÊ¾¨õ,²F@U·U fØÀÔÍã¾–É <uNóbA…Lz+¢üc³8£÷Ñ•›Îi”Xšt©¶»NÊÀ“kA.4Hzíu2À­L]³ÅU½\ü€¬èï¼ŸGãînoM!¶@~|Uj±Ì0­Ğ™=©=ıùºÌá0eÙ«ô¦y½’Æì|o.Æ&ùáé Éˆ'?b’;-œ*âötİÙĞK¥	R¨Êª7púğC¿Oık÷sÆÉ6·®+ÒzÉÚ&|%Pê/3W,l#ò«ğ;&›­ù›!
+>ßzöïóíÈ,@bÍ;[lMİ[ÓCe¯x(÷Šóõw©^üğ›ö‰‡5ûÄyÏâãøTì¡eI€ÛDÙ>Tc£øÚ ÚÊüÎ`°ú` _Òä¸€ÉØñ\³»œ‘ZY­-H”ò;
+Şü6ì?YdÕ}w–êêbE¹Ü kjªxBŸªlœ^0âa½{l· bÄ
+8®;CUkª¸ÒDEY)Î]îâUFoÒ2®Ğ’#ç*naWh©[%9FQpÜ«®Òš@33kï/ÑÑ¡·&ƒ?-Ò¼4/NvÔç\È;©©s#÷QÓ_ö.júÚ{‚"™ãİ£°ˆÄJ•SºÑ•mªv£xrOß›:57Ó2¿fZkö×“Õ“{>À3.¸QÎÕzR>OS&ïÂTœâ(—;‰gnÚ¯zˆïW®(&!î²÷¿=`ü0Ö¯×8’®Î™{€ÛµØ>à±c0¶ŞäIŠ=Àµ¥µ-øë¿ÿTİÜ}=udY¼åæåP7w4/0àş÷
+TÚåî²¾«È¡fÀ«ùlş¹²bĞ…ƒË²) ìâR©­=B`ƒ‚0¥XŒµ'Ş¹}5ySwË_¥ÿÌ…ç¾NëŞ[Á#÷Éº#õL'‰¾°ùH9ëa!º´bK1[­ù¹HSdï‘:
+ÖLKëÂŒf¹	Ş•ÎªöYİûÃìWö¾~’ß¨u¦¹¿xK;csçI°b¬I¶6·Whz)¢@>±›y é-ıîMø¶BŠò"‰ §x\0rŠ~®¬×tç
+L3ƒéxi½¤Z%îÁn­cjfDÆ`Ó
+qìâbL€K­˜½8j8¡nÚ¬Âjf<Šƒi•Áy8PN|ÑFÌšJıñåšY	ØÂ^ŒÜ?9¹‡­c:®c84/iu•á	oHRº¤jLğ«á†O<#V¯tQîØúLoÚ¦Bİ”\´±@f@ì™M˜n»½l¬†)pyÓ¼ªX’ÀÊWñ³ıL¢Ğ²áX²W=–Œu£Å™dîãÛh:úÊ®Îoğ.øaèFÎ,7r‘Å÷Yß±ÃÿÜì‰LLn8•iÖîP¦:¸m,¼£\ø> åYë¶ÈÉ]®]·Éó/x·d¦œm—êWÕ'¡]†à¬ál¤ÆnP‹Ï7BÕù‚4c¡Zæ¹ET.J³æ¦ kÁİ»"Öt>ËÂËqË|óÃíûÛ‡ä½íİíƒÛxòÍÆ&;õ†lìïl]á–EI8ß€¹EÚCûËOÀÓiB·eş$Ë?¦¶i·3‹`NLõ¥1¾w3îÃGys]¢	´¾cP~‡qz³9FÎê[çÙ¬8‰g³88[ß‚ˆ …«”ày¼Áı,ß†¶ÆY·mÃXòÆul§÷Ğ‹fòñÏæ æ‡À¸9êÊî0ŸãvĞƒheé>š­İï?°V[‡Uš­ÕÓ7Ş³B HÄó¨­Ò’®~•.K¨üHuğ'„B}D†
+:ğñIÚğ´‰KïØ(©bGş<K®r®ØB‘£ş¹æ»ÎòHE¹ÂÔ{P+BYm3V»UÓyO2û\m‚Á](ââ¶×g3`á½rkfá,·ª›•F–ê-|cäõ¤ái<­§;Æ³aÍ>ëŸå`éâ&„Ñ/O¢´}Ô§½{G@Æs¦ Á|˜¬tî2UÌyj¯€12‹.ıd	‹x’"]Â0o8×¨ÂÃÔ4HD(Pô1‰—9­|Øk±­i¦™‚t¦òìU†b˜•ÊÃÙ†‰j’xş“ÀIKî³5Ş¹ÚéªE,â³Ãzj_Ëô²ı¯÷÷66wŞ|¾KŞ{±÷|ãÿöÿhûhüdgwkï'KÃ?jgg}SyÓ\.ıÕcW®Ä«âü…¯0Î7Za|¡.³É$A9Ïöóø4ñã®×zÅÊ¥Š o	4_hªkXï|mlÌÑ1!ú/|^Úxcêk“–:Œ
+vóó½­Ãù0Î7Ã¼Ì’PCOıàEÓ¨íùâk›FÏÅõ×OÍSĞø_evŒ‘«¶öÅ‹zUÓ~©WÒ/ö†
+ú½°qw;&têo|ıQ.®±_ú{QÕr¼u÷£ªb¼ñô¤*o¾Ò+xî›ËÖ—&R˜—Ÿ8Icj	”Ÿ©\‘•¨å]±¹ÑõÚ;d¢’ùÊ9X¢°úÓ=L¢¤öÛ‡½ÀiÈË·^ÜÕz®×Î>¨•ÌW>õdKı“U‚÷›¢.k15Ÿâ gLTÂ ¿×«*÷‡mè ‚²Ÿg•Ô0ˆ:*ça‚ÖJU‚šÆ–Ë3vğFs!he“ÿô@ZCUÕ‡I–ïFt?RÛ¢fMP[ƒò;Â ÇÿÑâğg Çs¦¶­:QÛ¯±Óíc(ıË‚NÌ’h¦i$ØBZDÎ¯`şå,.öyXÀHıŞ” ¶”øŞ jGœiï‚#?ê@T»ª©?McEGÙ˜mS?+¦9¿€xİ/0‰R¸±ïô€_Ë"9Úoà"hçæR÷„«æ)¼—$DËÇéä8—ÖQa†³$„˜µ9ÏéÙQÑ šÛ«upğ;g[y8ÙHÇ4ĞRKRS¾fE¸&ü*r×Áóì–ªÅ“éÔ'«Å(gåúw¿ódo¡'å4‡ÿ  ÿÿ 6.d
